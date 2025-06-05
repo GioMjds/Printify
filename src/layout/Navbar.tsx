@@ -1,33 +1,13 @@
 'use client';
 
+import { navbar } from '@/constants/navbar';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { navbar } from '@/constants/navbar';
+import { useState } from 'react';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const updateScrolled = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener('scroll', updateScrolled);
-        return () => window.removeEventListener('scroll', updateScrolled);
-    }, []);
-
-    const navVariants = {
-        hidden: { y: -100, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                duration: 0.6,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                staggerChildren: 0.1,
-            },
-        },
-    };
 
     const itemVariants = {
         hidden: { y: -20, opacity: 0 },
@@ -58,13 +38,7 @@ export default function Navbar() {
     };
 
     return (
-        <motion.nav
-            className={`fixed top-0 left-0 w-full z-50 transition-all bg-bg-secondary duration-300 ${isScrolled ? 'shadow-medium border-b border-soft' : ''
-                }`}
-            variants={navVariants}
-            initial="hidden"
-            animate="visible"
-        >
+        <nav className="fixed top-0 left-0 w-full z-50 transition-all bg-bg-secondary duration-300" >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16 lg:h-20">
                     {/* Logo */}
@@ -84,7 +58,7 @@ export default function Navbar() {
                                     priority
                                 />
                             </div>
-                            <span className="text-xl lg:text-2xl font-bold text-gradient">
+                            <span className="text-xl lg:text-2xl font-bold text-text-dark">
                                 Printify
                             </span>
                         </Link>
@@ -99,7 +73,7 @@ export default function Navbar() {
                             <motion.div
                                 key={item.name}
                                 variants={itemVariants}
-                                whileHover={{ y: -2 }}
+                                whileHover={{ y: -4 }}
                                 custom={index}
                             >
                                 <Link
@@ -122,7 +96,7 @@ export default function Navbar() {
                                 href="/login"
                                 className="text-base font-medium nav-link px-4 py-2"
                             >
-                                Sign In
+                                Login
                             </Link>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -130,7 +104,7 @@ export default function Navbar() {
                                 href="/register"
                                 className="btn-primary"
                             >
-                                Get Started
+                                Register
                             </Link>
                         </motion.div>
                     </motion.div>
@@ -194,7 +168,7 @@ export default function Navbar() {
                             >
                                 <Link
                                     href={item.href}
-                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link"
+                                    className="block px-3 py-2 rounded-md text-base font-medium bg-[var(--color-bg-highlight)] hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors duration-200"
                                     onClick={() => setIsOpen(false)}
                                 >
                                     {item.name}
@@ -213,20 +187,20 @@ export default function Navbar() {
                                     className="block px-3 py-2 rounded-md text-base font-medium nav-link"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    Sign In
+                                    Login
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="block btn-primary text-center mx-3"
+                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    Get Started
+                                    Register
                                 </Link>
                             </motion.div>
                         </div>
                     </div>
                 </motion.div>
             </div>
-        </motion.nav>
+        </nav>
     );
 }

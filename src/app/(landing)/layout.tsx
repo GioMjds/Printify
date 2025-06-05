@@ -1,10 +1,9 @@
+import Footer from "@/layout/Footer";
+import Navbar from "@/layout/Navbar";
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
-import "./globals.css";
-import Providers from "./providers";
-import Navbar from "@/layout/Navbar";
-import Footer from "@/layout/Footer";
-
+import "../../app/globals.css";
+import Providers from "../providers";
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -28,7 +27,9 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          {children}
+          <main className="flex-1 flex flex-col w-full">
+            {children}
+          </main>
           <Footer />
         </Providers>
       </body>
