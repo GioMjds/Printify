@@ -9,14 +9,26 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@gsap/react": "^2.1.2",
+    "@prisma/client": "^6.9.0",
     "@tanstack/react-query": "^5.80.5",
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.6.1",
+    "cookie": "^1.0.2",
     "framer-motion": "^12.16.0",
     "gsap": "^3.13.0",
+    "jose": "^6.0.11",
+    "lucide-react": "^0.513.0",
     "motion": "^12.16.0",
     "next": "15.3.3",
+    "nodemailer": "^7.0.3",
+    "prisma": "^6.9.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.57.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

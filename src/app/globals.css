@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Main Color Palette */
+  --color-primary: #ffdcdc;
+  --color-secondary: #fff2eb;
+  --color-accent: #ffe8cd;
+  --color-highlight: #ffd6ba;
+
+  /* Text Colors */
+  --color-text: #332f2e;
+  --color-text-light: #7c7c7c;
+  --color-text-dark: #1a1a1a;
+  --color-text-primary: #8b3a3a;
+
+  /* Background Colors */
+  --color-bg-primary: #ffdcdc;
+  --color-bg-secondary: #fff2eb;
+  --color-bg-accent: #ffe8cd;
+  --color-bg-highlight: #ffd6ba;
+  --color-bg-white: #ffffff;
+  --color-bg-soft: #faf9f8;
+
+  /* Border Colors */
+  --color-border-light: #f0e6e1;
+  --color-border: #e6d3cc;
+  --color-border-dark: #d4b8aa;
+
+  /* Shadow Colors */
+  --color-shadow-light: rgba(255, 220, 220, 0.3);
+  --color-shadow: rgba(255, 220, 220, 0.5);
+  --color-shadow-dark: rgba(255, 214, 186, 0.6);
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #ffdcdc 0%, #fff2eb 100%);
+  --gradient-secondary: linear-gradient(135deg, #ffe8cd 0%, #ffd6ba 100%);
+  --gradient-soft: linear-gradient(
+    135deg,
+    #fff2eb 0%,
+    #ffe8cd 50%,
+    #ffd6ba 100%
+  );
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Lexend", sans-serif;
+  box-sizing: border-box;
 }

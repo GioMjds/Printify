@@ -1,0 +1,49 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  role      UserRole  @default(CUSTOMER)
+  uploads   Upload[]  @relation("UserUploads")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Upload {
+  id          String   @id @default(uuid())
+  filename    String
+  url         String
+  status      UploadStatus  @default(PENDING)
+  customer    User     @relation("UserUploads", fields: [customerId], references: [id])
+  customerId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  notifications Notification[]
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  upload    Upload    @relation(fields: [uploadId], references: [id])
+  uploadId  String
+  sentAt    DateTime  @default(now())
+  message   String
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum UploadStatus {
+  PENDING
+  PRINTING
+  COMPLETED
+}
