@@ -1,10 +1,11 @@
+import LoginPage from "./login";
 
 export const metadata = {
-    title: "Login to Printify",
-}
+    title: "Log In to Printify",
+};
 
-export default function LoginPage() {
+export default function Login() {
     return (
-        <h1>Login Page</h1>
-    )
+        <LoginPage />
+    );
 }

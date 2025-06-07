@@ -1,208 +1,172 @@
 import { createSession, getSessionCookiesToDelete } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { otpStorage } from "@/utils/otpCache";
+import { sendOtpEmail } from "@/utils/send-email";
 import { compare, hash } from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import { sendOtpEmail } from "@/utils/send-email";
 
-// Cloudinary configuration
 cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
     api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
-        const body = await request.json();
+        const body = await req.json();
         const { action } = body;
 
         switch (action) {
             case "logout": {
-                const sessionId = request.cookies.get("access_token")?.value;
-                if (!sessionId)
-                    return NextResponse.json(
-                        {
-                            error: "No session found",
-                        },
-                        { status: 400 },
-                    );
+                const sessionId = req.cookies.get("access_token")?.value;
+                if (!sessionId) {
+                    return NextResponse.json({
+                        error: "No session found"
+                    }, { status: 401 });
+                }
 
-                const response = NextResponse.json(
-                    {
-                        message: "Logged out successfully",
-                    },
-                    { status: 200 },
-                );
+                const response = NextResponse.json({
+                    message: "Logged out successfully!"
+                }, { status: 200 });
 
                 const cookiesToDelete = await getSessionCookiesToDelete();
-                for (const cookieName of cookiesToDelete) {
-                    response.cookies.delete(cookieName);
+                for (const cookie of cookiesToDelete) {
+                    response.cookies.delete(cookie);
                 }
 
                 return response;
-            }
-            case "send_register_otp": {
-                const { email, password, confirmPassword } = body;
-
-                if (!email || !password || !confirmPassword) {
-                    return NextResponse.json(
-                        {
-                            error: "Email, password and confirm password are required",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                if (!confirmPassword) {
-                    return NextResponse.json(
-                        {
-                            error: "Confirm password is required",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                if (password !== confirmPassword) {
-                    return NextResponse.json(
-                        {
-                            error: "Passwords do not match",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                const existingUser = await prisma.user.findUnique({
-                    where: { email },
-                });
-
-                if (existingUser) {
-                    return NextResponse.json(
-                        {
-                            error: "User already exists",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                const otp = Math.floor(
-                    100000 + Math.random() * 900000,
-                ).toString();
-                const hashedPassword = await hash(password, 12);
-
-                otpStorage.set(email, otp, hashedPassword);
-
-                await sendOtpEmail(email, otp);
-                return NextResponse.json(
-                    {
-                        message: "OTP sent to email",
-                        email: email,
-                        otp: otp,
-                    },
-                    { status: 200 },
-                );
             }
             case "login": {
                 const { email, password } = body;
 
                 const user = await prisma.user.findUnique({
-                    where: { email },
+                    where: { email }
                 });
 
                 if (!email || !password) {
-                    return NextResponse.json(
-                        {
-                            error: "Email and password are required",
-                        },
-                        { status: 400 },
-                    );
+                    return NextResponse.json({
+                        error: "Email and password are required"
+                    }, { status: 400 });
                 }
 
                 if (!user) {
-                    return NextResponse.json(
-                        {
-                            error: "User does not exist",
-                        },
-                        { status: 404 },
-                    );
+                    return NextResponse.json({
+                        error: "User does not exist"
+                    }, { status: 404 });
                 }
 
                 const isPasswordValid = await compare(password, user.password!);
 
                 if (!isPasswordValid) {
-                    return NextResponse.json(
-                        {
-                            error: "Incorrect password",
-                        },
-                        { status: 401 },
-                    );
+                    return NextResponse.json({
+                        error: "Invalid password"
+                    }, { status: 401 });
                 }
 
                 await createSession(user.id, user.role!);
 
-                return NextResponse.json(
-                    {
-                        message: "Resident logged in successfully!",
-                        user: {
-                            id: user.id,
-                            email: user.email,
-                            role: user.role,
-                        },
-                    },
-                    { status: 200 },
-                );
+                return NextResponse.json({
+                    message: "Login successful",
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role
+                    }
+                }, { status: 200 });
             }
-            case "verify_register_otp": {
+            // For register/page.tsx -> register credential. If success,
+            // send OTP to email for verification.
+            case "send_register_otp": {
+                // This endpoint is for register/page.tsx
+                const { email, password, confirmPassword } = body;
+
+                if (!email || !password || !confirmPassword) {
+                    return NextResponse.json({
+                        error: "Email, password, and confirm password are required"
+                    }, { status: 400 });
+                }
+
+                if (!email) {
+                    return NextResponse.json({
+                        error: "Email is required"
+                    }, { status: 400 });
+                }
+
+                if (password !== confirmPassword) {
+                    return NextResponse.json({
+                        error: "Passwords do not match"
+                    }, { status: 400 });
+                }
+
+                const existingUser = await prisma.user.findUnique({
+                    where: { email }
+                });
+
+                if (existingUser) {
+                    return NextResponse.json({
+                        error: "User already exists"
+                    }, { status: 409 });
+                }
+
+                const otp = Math.floor(100000 + Math.random() * 999999).toString();
+                const hashedPassword = await hash(password, 12);
+
+                otpStorage.set(email, otp, hashedPassword);
+
+                await sendOtpEmail(email, otp);
+
+                return NextResponse.json({
+                    message: "OTP sent to your email",
+                    email: email,
+                    otp: otp // For testing purposes, remove in production
+                }, { status: 200 });
+            }
+            // For resend OTP in verify/page.tsx
+            case "resend_otp": {
+                const { email } = body;
+                if (!email) {
+                    return NextResponse.json({
+                        error: "Email is required"
+                    }, { status: 400 });
+                }
+
+                // Check if OTP exists for this email
+                const otpData = otpStorage.get(email);
+                if (!otpData) {
+                    return NextResponse.json({
+                        error: "No OTP request found for this email. Please register first."
+                    }, { status: 404 });
+                }
+
+                const newOtp = Math.floor(100000 + Math.random() * 999999).toString();
+
+                otpStorage.set(email, newOtp, otpData.hashedPassword);
+
+                await sendOtpEmail(email, newOtp);
+
+                return NextResponse.json({
+                    message: "OTP resent to your email",
+                    email: email,
+                    otp: newOtp // For testing purposes, remove in production
+                }, { status: 200 });
+            }
+            // verify/page.tsx -> verify OTP
+            case "verify_otp": {
                 const { email, otp } = body;
 
                 const validation = otpStorage.validate(email, otp);
                 if (!validation.valid) {
-                    return NextResponse.json(
-                        {
-                            error: validation.error,
-                        },
-                        { status: 400 },
-                    );
+                    return NextResponse.json({
+                        error: validation.error
+                    }, { status: 400 });
                 }
 
                 const hashedPassword = validation.data?.hashedPassword;
                 if (!hashedPassword) {
-                    return NextResponse.json(
-                        {
-                            error: "No hashed password found",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                let profileImageUrl;
-                try {
-                    const defaultImagePath = path.join(
-                        process.cwd(),
-                        "public",
-                        "Default_pfp.jpg",
-                    );
-                    const imageBuffer = fs.readFileSync(defaultImagePath);
-                    const base64Image = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
-
-                    const uploadResponse = await cloudinary.uploader.upload(
-                        base64Image,
-                        {
-                            folder: "wisewaste/profiles",
-                            public_id: `user-${email.replace(/[@.]/g, "-")}`,
-                            overwrite: true,
-                            resource_type: "image",
-                        },
-                    );
-
-                    profileImageUrl = uploadResponse.secure_url;
-                } catch (CloudinaryError) {
-                    console.error(
-                        `Error uploading image to Cloudinary: ${CloudinaryError}`,
-                    );
+                    return NextResponse.json({
+                        error: "No hashed password found for this email"
+                    }, { status: 400 });
                 }
 
                 const newUser = await prisma.user.create({
@@ -210,76 +174,30 @@ export async function POST(request: NextRequest) {
                         email: email,
                         password: hashedPassword,
                         role: "customer",
-                    },
+                    }
                 });
 
                 otpStorage.delete(email);
                 await createSession(newUser.id, newUser.role!);
 
-                return NextResponse.json(
-                    {
-                        message: "User registered successfully",
-                        user: {
-                            id: newUser.id,
-                            email: newUser.email,
-                            role: newUser.role,
-                        },
-                    },
-                    { status: 201 },
-                );
+                return NextResponse.json({
+                    message: "Registration successful",
+                    user: {
+                        id: newUser.id,
+                        email: newUser.email,
+                        role: newUser.role
+                    }
+                }, { status: 201 });
             }
-            case "resend_register_otp": {
-                const { email } = body;
-
-                if (!email) {
-                    return NextResponse.json(
-                        {
-                            error: "Email is required",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                const otpEntry = otpStorage.get(email);
-                if (!otpEntry) {
-                    return NextResponse.json(
-                        {
-                            error: "No OTP found for this email. Please register again.",
-                        },
-                        { status: 400 },
-                    );
-                }
-
-                const otp = Math.floor(
-                    100000 + Math.random() * 900000,
-                ).toString();
-                otpStorage.set(email, otp, otpEntry.hashedPassword);
-
-                await sendOtpEmail(email, otp);
-
-                return NextResponse.json(
-                    {
-                        message: "OTP resent to email",
-                        email: email,
-                        otp: otp,
-                    },
-                    { status: 200 },
-                );
+            default: {
+                return NextResponse.json({
+                    error: "Invalid action"
+                }, { status: 400 });
             }
-            default:
-                return NextResponse.json(
-                    {
-                        error: "Invalid action",
-                    },
-                    { status: 400 },
-                );
         }
     } catch (error) {
-        return NextResponse.json(
-            {
-                error: `Internal Server Error: ${error}`,
-            },
-            { status: 500 },
-        );
+        return NextResponse.json({
+            error: `API Error: ${error}`
+        }, { status: 500 });
     }
 }

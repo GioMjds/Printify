@@ -1,10 +1,11 @@
+import RegisterPage from "./register";
 
 export const metadata = {
-    title: "Sign in to Printify",
-}
+    title: "Sign up to Printify",
+};
 
-export default function RegisterPage() {
+export default function Register() {
     return (
-        <h1>Register Page</h1>
-    )
+        <RegisterPage />
+    );
 }
