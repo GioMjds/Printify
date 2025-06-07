@@ -1,6 +1,9 @@
 'use client';
 
+import { resendRegisterOtp, verifyRegisterOtp } from "@/services/Auth";
+import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function VerifyOTP({ email: propEmail = "" }: { email?: string }) {
@@ -13,6 +16,28 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
     const [cooldownTime, setCooldownTime] = useState(0);
     const [isCooldown, setIsCooldown] = useState(false);
     const [email, setEmail] = useState<string>(propEmail);
+
+    const router = useRouter();
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: async () => {
+            return await verifyRegisterOtp({
+                email: email,
+                otp: otp.join("")
+            })
+        },
+        onSuccess: (response) => {
+            if (response && response.success) {
+                setSuccess("OTP verified successfully!");
+            }
+            router.push("/");
+        },
+        onError: (error: any) => {
+            setError(error.response?.data?.error || "An error occurred while verifying OTP.");
+            setOtp(new Array(6).fill(""));
+            inputRefs.current[0]?.focus();
+        }
+    })
 
     useEffect(() => {
         if (!propEmail) {
@@ -82,27 +107,22 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
         setResendLoading(true);
         setResendMessage(null);
         setError(null);
-        setTimeout(() => {
-            setResendMessage("OTP resent successfully!");
-            setCooldownTime(120);
-            setIsCooldown(true);
+        try {
+            const response = await resendRegisterOtp(email);
+            if (response && response.message) {
+                setResendMessage("OTP resent successfully!");
+                setCooldownTime(60);
+                setIsCooldown(true);
+            }
+        } catch (error) {
+            console.error(`Error resending OTP: ${error}`);
+            setError("Failed to resend OTP. Please try again.");
+        } finally {
             setResendLoading(false);
-        }, 1000);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Simulate verification
-        if (otp.join("") === "123456") {
-            setSuccess("OTP verified! Redirecting...");
-            setError(null);
-        } else {
-            setError("Invalid OTP or server error.");
-            setSuccess(null);
-            setOtp(new Array(6).fill(""));
-            inputRefs.current[0]?.focus();
         }
     };
+
+    if (!email) return null;
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-bg-accent)]">
@@ -119,7 +139,13 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                 <p className="text-[var(--color-text-light)] mb-6 text-center text-base">
                     Enter the 6-digit code sent to your email to verify your account.
                 </p>
-                <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        mutate();
+                    }}
+                    className="w-full flex flex-col gap-4"
+                >
                     <div className="flex justify-center gap-2 mb-2">
                         {otp.map((value, i) => (
                             <input
@@ -134,7 +160,7 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                                 onChange={e => handleChange(i, e.target.value)}
                                 onKeyDown={e => handleKeyDown(i, e)}
                                 onPaste={handlePaste}
-                                disabled={success !== null}
+                                disabled={isPending}
                             />
                         ))}
                     </div>
@@ -161,13 +187,13 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                         whileHover={{ scale: 1.03 }}
                         type="submit"
                         className={`w-full py-2 rounded-lg bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-accent)] text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 ${otp.some(num => num === "") || success ? "opacity-50 cursor-not-allowed" : ""}`}
-                        disabled={otp.some(num => num === "") || success !== null}
+                        disabled={otp.some(num => num === "") || isPending}
                     >
                         Verify
                     </motion.button>
                 </form>
                 <div className="mt-6 text-sm text-[var(--color-text-light)]">
-                    Didn’t receive a code? {isCooldown ? (
+                    Didn&apos;t receive a code? {isCooldown ? (
                         <span className="text-gray-400">Resend available in {formatCooldownTime()}</span>
                     ) : (
                         <button

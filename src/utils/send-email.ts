@@ -105,6 +105,7 @@ export async function sendOtpEmail(email: string, otp: string) {
                 font-size: 2.2rem;
                 font-weight: 700;
                 color: #0E2148;
+                text-align: center;
                 letter-spacing: 12px;
                 font-family: 'Monaco', 'Consolas', monospace;
                 background: #fff;
@@ -150,9 +151,6 @@ export async function sendOtpEmail(email: string, otp: string) {
     <body>
         <div class="container">
             <div class="header">
-                <div class="logo">
-                    <img src="https://raw.githubusercontent.com/giomj/printify-assets/main/printify_logo.png" alt="Printify Logo" />
-                </div>
                 <div class="header-title">Printify</div>
                 <div class="header-desc">Your Print on Demand Partner</div>
             </div>

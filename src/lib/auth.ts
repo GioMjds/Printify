@@ -54,29 +54,7 @@ export async function createSession(userId: string, role: string) {
             .setExpirationTime("7d")
             .sign(encodedKey);
 
-        const cookieStore = await cookies();
-
-        cookieStore.set({
-            name: "access_token",
-            value: accessToken,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24,
-            path: "/",
-            sameSite: "strict",
-        });
-
-        cookieStore.set({
-            name: "refresh_token",
-            value: refreshToken,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 60 * 60 * 24 * 7,
-            path: "/",
-            sameSite: "strict",
-        });
-
-        return sessionData;
+        return { sessionData, accessToken, refreshToken };
     } catch (error) {
         console.error(`Error creating session: ${error}`);
         return null;

@@ -64,16 +64,44 @@ export async function POST(req: NextRequest) {
                     }, { status: 401 });
                 }
 
-                await createSession(user.id, user.role!);
+                const session = await createSession(user.id, user.role!);
 
-                return NextResponse.json({
-                    message: "Login successful",
+                if (!session) {
+                    return NextResponse.json({
+                        error: "Failed to create session"
+                    }, { status: 500 });
+                }
+
+                const response = NextResponse.json({
+                    message: "Customer login successful",
                     user: {
                         id: user.id,
                         email: user.email,
                         role: user.role
                     }
                 }, { status: 200 });
+
+                response.cookies.set({
+                    name: "access_token",
+                    value: session.accessToken,
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: 60 * 60 * 24, // 1 day
+                    path: "/",
+                    sameSite: "strict",
+                });
+
+                response.cookies.set({
+                    name: "refresh_token",
+                    value: session.refreshToken,
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: 60 * 60 * 24 * 7, // 7 days
+                    path: "/",
+                    sameSite: "strict",
+                });
+
+                return response;
             }
             // For register/page.tsx -> register credential. If success,
             // send OTP to email for verification.
@@ -106,10 +134,10 @@ export async function POST(req: NextRequest) {
                 if (existingUser) {
                     return NextResponse.json({
                         error: "User already exists"
-                    }, { status: 409 });
+                    }, { status: 400 });
                 }
 
-                const otp = Math.floor(100000 + Math.random() * 999999).toString();
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
                 const hashedPassword = await hash(password, 12);
 
                 otpStorage.set(email, otp, hashedPassword);
@@ -139,7 +167,7 @@ export async function POST(req: NextRequest) {
                     }, { status: 404 });
                 }
 
-                const newOtp = Math.floor(100000 + Math.random() * 999999).toString();
+                const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
                 otpStorage.set(email, newOtp, otpData.hashedPassword);
 
@@ -156,6 +184,7 @@ export async function POST(req: NextRequest) {
                 const { email, otp } = body;
 
                 const validation = otpStorage.validate(email, otp);
+                
                 if (!validation.valid) {
                     return NextResponse.json({
                         error: validation.error
@@ -171,6 +200,7 @@ export async function POST(req: NextRequest) {
 
                 const newUser = await prisma.user.create({
                     data: {
+                        id: crypto.randomUUID(),
                         email: email,
                         password: hashedPassword,
                         role: "customer",
@@ -178,16 +208,45 @@ export async function POST(req: NextRequest) {
                 });
 
                 otpStorage.delete(email);
-                await createSession(newUser.id, newUser.role!);
+                const session = await createSession(newUser.id, newUser.role!);
 
-                return NextResponse.json({
-                    message: "Registration successful",
+                if (!session) {
+                    return NextResponse.json({
+                        error: "Failed to create session"
+                    }, { status: 500 });
+                }
+
+                const response = NextResponse.json({
+                    message: "User registered successfully!",
                     user: {
                         id: newUser.id,
+                        name: "Guest",
                         email: newUser.email,
                         role: newUser.role
                     }
                 }, { status: 201 });
+
+                response.cookies.set({
+                    name: "access_token",
+                    value: session.accessToken,
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: 60 * 60 * 24, // 1 day
+                    path: "/",
+                    sameSite: "strict",
+                });
+
+                response.cookies.set({
+                    name: "refresh_token",
+                    value: session.refreshToken,
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge: 60 * 60 * 24 * 7, // 7 days
+                    path: "/",
+                    sameSite: "strict",
+                });
+
+                return response;
             }
             default: {
                 return NextResponse.json({
