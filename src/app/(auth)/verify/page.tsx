@@ -1,3 +1,4 @@
+import { RegisterPhaseRequired } from "@/components/ProtectedRoutes";
 import VerifyOTP from "./verify-otp";
 
 export const metadata = {
@@ -6,6 +7,8 @@ export const metadata = {
 
 export default function VerifyPage() {
     return (
-        <VerifyOTP />
+        <RegisterPhaseRequired>
+            <VerifyOTP />
+        </RegisterPhaseRequired>
     )
 }

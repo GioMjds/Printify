@@ -64,28 +64,6 @@ export default function Navbar() {
                     </Link>
                 </motion.div>
 
-                {/* Desktop Navigation */}
-                <motion.div
-                    className="hidden lg:flex items-center space-x-6"
-                    variants={itemVariants}
-                >
-                    {navbar.map((item, index) => (
-                        <motion.div
-                            key={item.name}
-                            variants={itemVariants}
-                            whileHover={{ y: -4 }}
-                            custom={index}
-                        >
-                            <Link
-                                href={item.href}
-                                className="text-base font-medium px-3 py-2 text-bg-white hover:text-highlight transition-colors duration-200"
-                            >
-                                {item.name}
-                            </Link>
-                        </motion.div>
-                    ))}
-                </motion.div>
-
                 {/* CTA Buttons */}
                 <motion.div
                     className="hidden lg:flex items-center space-x-4"
@@ -159,22 +137,6 @@ export default function Navbar() {
                 className="lg:hidden overflow-hidden bg-accent rounded-lg mt-2 shadow-soft"
             >
                 <div className="px-2 pt-2 pb-3 space-y-1">
-                    {navbar.map((item, index) => (
-                        <motion.div
-                            key={item.name}
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={isOpen ? { x: 0, opacity: 1 } : { x: -20, opacity: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                        >
-                            <Link
-                                href={item.href}
-                                className="block px-3 py-2 rounded-md text-base font-medium bg-accent text-bg-white hover:bg-highlight hover:text-primary transition-colors duration-200"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                {item.name}
-                            </Link>
-                        </motion.div>
-                    ))}
                     <div className="pt-4 pb-2 border-t border-highlight">
                         <motion.div
                             initial={{ x: -20, opacity: 0 }}

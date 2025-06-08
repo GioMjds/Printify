@@ -19,6 +19,10 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
 
     const router = useRouter();
 
+    useEffect(() => {
+        if (!email) router.replace("/login");
+    }, [email, router]);
+
     const { mutate, isPending } = useMutation({
         mutationFn: async () => {
             return await verifyRegisterOtp({

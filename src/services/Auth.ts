@@ -16,6 +16,10 @@ type VerifyOTP = {
     otp: string;
 }
 
+type ForgotOtp = { email: string };
+type ForgotVerify = { email: string; otp: string };
+type ForgotReset = { email: string; otp: string; newPassword: string };
+
 export const login = async ({ email, password }: Login) => {
     try {
         const response = await API.post("/auth/action/login", {
@@ -95,6 +99,57 @@ export const verifyRegisterOtp = async ({ email, otp }: VerifyOTP) => {
         return response.data;
     } catch (error) {
         console.error(`Verify register OTP failed: ${error}`);
+        throw error;
+    }
+};
+
+export const sendForgotOtp = async ({ email }: ForgotOtp) => {
+    try {
+        const response = await API.post("/auth/action/forgot_password_send_otp", {
+            action: "forgot_password_send_otp",
+            email: email
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Send forgot OTP failed: ${error}`);
+        throw error;
+    }
+};
+
+export const verifyForgotOtp = async ({ email, otp }: ForgotVerify) => {
+    try {
+        const response = await API.post("/auth/action/forgot_password", {
+            action: "forgot_password_verify_otp",
+            email: email,
+            otp: otp
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Verify forgot OTP failed: ${error}`);
+        throw error;
+    }
+};
+
+export const resetForgotPassword = async ({ email, otp, newPassword }: ForgotReset) => {
+    try {
+        const response = await API.post("/auth/action/forgot_password/", {
+            action: "forgot_password_reset_password",
+            email: email,
+            otp: otp,
+            newPassword: newPassword
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Reset forgot password failed: ${error}`);
         throw error;
     }
 };

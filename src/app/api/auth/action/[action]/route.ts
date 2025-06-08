@@ -1,7 +1,7 @@
 import { createSession, getSessionCookiesToDelete } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { otpStorage } from "@/utils/otpCache";
-import { sendOtpEmail } from "@/utils/send-email";
+import { sendOtpEmail, sendPassswordResetEmail } from "@/utils/send-email";
 import { compare, hash } from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
@@ -103,8 +103,6 @@ export async function POST(req: NextRequest) {
 
                 return response;
             }
-            // For register/page.tsx -> register credential. If success,
-            // send OTP to email for verification.
             case "send_register_otp": {
                 // This endpoint is for register/page.tsx
                 const { email, password, confirmPassword } = body;
@@ -150,7 +148,6 @@ export async function POST(req: NextRequest) {
                     otp: otp // For testing purposes, remove in production
                 }, { status: 200 });
             }
-            // For resend OTP in verify/page.tsx
             case "resend_otp": {
                 const { email } = body;
                 if (!email) {
@@ -179,7 +176,6 @@ export async function POST(req: NextRequest) {
                     otp: newOtp // For testing purposes, remove in production
                 }, { status: 200 });
             }
-            // verify/page.tsx -> verify OTP
             case "verify_otp": {
                 const { email, otp } = body;
 
@@ -248,6 +244,59 @@ export async function POST(req: NextRequest) {
                 });
 
                 return response;
+            }
+            // Forogt Password API actions
+            case "forgot_password_send_otp": {
+                const { email } = body;
+                if (!email) {
+                    return NextResponse.json({ error: "Email is required" }, { status: 400 });
+                }
+                const user = await prisma.user.findUnique({ where: { email } });
+                if (!user) {
+                    return NextResponse.json({ error: "User does not exist" }, { status: 404 });
+                }
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                otpStorage.set(email, otp, user.password!); // Store OTP with current password for verification
+                await sendPassswordResetEmail(email, otp);
+                return NextResponse.json({ message: "OTP sent to your email" }, { status: 200 });
+            }
+            case "forgot_password_verify_otp": {
+                const { email, otp } = body;
+                if (!email || !otp) {
+                    return NextResponse.json({ error: "Email and OTP are required" }, { status: 400 });
+                }
+                const validation = otpStorage.validate(email, otp);
+                if (!validation.valid) {
+                    return NextResponse.json({ error: validation.error }, { status: 400 });
+                }
+                return NextResponse.json({ message: "OTP verified" }, { status: 200 });
+            }
+            case "forgot_password_reset_password": {
+                const { email, otp, newPassword } = body;
+                if (!email || !otp || !newPassword) {
+                    return NextResponse.json({ 
+                        error: "Email, OTP, and new password are required"
+                    }, { status: 400 });
+                }
+
+                const validation = otpStorage.validate(email, otp);
+                if (!validation.valid) {
+                    return NextResponse.json({ 
+                        error: validation.error
+                    }, { status: 400 });
+                }
+
+                const hashedPassword = await hash(newPassword, 12);
+                await prisma.user.update({ 
+                    where: { email }, 
+                    data: { password: hashedPassword } 
+                });
+                
+                otpStorage.delete(email);
+
+                return NextResponse.json({ 
+                    message: "Password reset successful"
+                }, { status: 200 });
             }
             default: {
                 return NextResponse.json({

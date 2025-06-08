@@ -83,7 +83,7 @@ export default function LoginPage() {
                     <span className="text-2xl font-bold text-primary">Printify</span>
                 </div>
                 <h2 className="text-3xl font-bold text-center text-primary -mt-3">
-                    Welcome Back
+                    Welcome to Printify!
                 </h2>
                 <p className="text-center text-text-light -mt-4">
                     Log in to your Printify account
@@ -156,7 +156,7 @@ export default function LoginPage() {
                     </motion.button>
                 </form>
                 <div className="flex justify-between items-center">
-                    <Link href="/forgot-password" className="text-sm text-accent hover:underline">
+                    <Link href="/forgot" className="text-sm text-accent hover:underline">
                         Forgot password?
                     </Link>
                     <Link href="/register" className="text-sm text-accent hover:underline">
