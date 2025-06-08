@@ -18,7 +18,7 @@ type VerifyOTP = {
 
 export const login = async ({ email, password }: Login) => {
     try {
-        const response = await API.post("/auth/login", {
+        const response = await API.post("/auth/action/login", {
             action: "login",
             email: email,
             password: password
@@ -35,7 +35,7 @@ export const login = async ({ email, password }: Login) => {
 
 export const logout = async () => {
     try {
-        const response = await API.post("/auth/logout", {
+        const response = await API.post("/auth/action/logout", {
             action: "logout"
         }, {
             headers: { 'Content-Type': 'application/json' },
@@ -50,7 +50,7 @@ export const logout = async () => {
 
 export const sendRegisterOtp = async ({ email, password, confirmPassword }: SendRegisterOTP) => {
     try {
-        const response = await API.post("/auth/register", {
+        const response = await API.post("/auth/action/register", {
             action: "send_register_otp",
             email: email,
             password: password,
@@ -68,7 +68,7 @@ export const sendRegisterOtp = async ({ email, password, confirmPassword }: Send
 
 export const resendRegisterOtp = async (email: string) => {
     try {
-        const response = await API.post("/auth/resend_otp", {
+        const response = await API.post("/auth/action/resend_otp", {
             action: "resend_otp",
             email: email
         }, {
@@ -84,7 +84,7 @@ export const resendRegisterOtp = async (email: string) => {
 
 export const verifyRegisterOtp = async ({ email, otp }: VerifyOTP) => {
     try {
-        const response = await API.post("/auth/verify_otp", {
+        const response = await API.post("/auth/action/verify_otp", {
             action: "verify_otp",
             email: email,
             otp: otp

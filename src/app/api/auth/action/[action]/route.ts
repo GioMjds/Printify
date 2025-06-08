@@ -201,6 +201,7 @@ export async function POST(req: NextRequest) {
                 const newUser = await prisma.user.create({
                     data: {
                         id: crypto.randomUUID(),
+                        name: "Guest", // Default name for now since no survey needed
                         email: email,
                         password: hashedPassword,
                         role: "customer",

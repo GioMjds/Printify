@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "../../app/globals.css";
 import Providers from "../providers";
+import { AuthRedirect } from "@/components/ProtectedRoutes";
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -26,11 +27,13 @@ export default function RootLayout({
         className={`${lexend.variable} antialiased`}
       >
         <Providers>
-          <Navbar />
-          <main className="flex-1 flex flex-col w-full">
-            {children}
-          </main>
-          <Footer />
+          <AuthRedirect>
+            <Navbar />
+            <main className="flex-1 flex flex-col w-full">
+              {children}
+            </main>
+            <Footer />
+          </AuthRedirect>
         </Providers>
       </body>
     </html>

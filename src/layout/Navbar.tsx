@@ -53,6 +53,7 @@ export default function Navbar() {
                                 src="/printify_logo.png"
                                 alt="Printify Logo"
                                 fill
+                                sizes='auto'
                                 className="object-contain"
                                 priority
                             />

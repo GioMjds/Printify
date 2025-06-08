@@ -61,6 +61,10 @@ export async function createSession(userId: string, role: string) {
     }
 }
 
+export async function verifyToken(token: string) {
+    return jwtVerify(token, encodedKey);
+}
+
 export async function getSessionCookiesToDelete() {
     return ["access_token", "refresh_token"];
 }
