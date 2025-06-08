@@ -1,4 +1,5 @@
-# 🖨️ Printify
+# Printify
+# ![Printify Logo](public/printify_logo.png) 
 
 > **Seamless document-to-print platform**
 >
