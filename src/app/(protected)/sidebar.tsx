@@ -5,6 +5,7 @@ import { customerSidebar } from "@/constants/customer-sidebar";
 import { logout } from "@/services/Auth";
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -55,9 +56,10 @@ export default function Sidebar({ role }: { role: string }) {
             <div className="px-6 pb-8">
                 <button
                     onClick={handleLogout}
-                    className="w-full cursor-pointer py-2 rounded-lg bg-accent text-white font-semibold hover:bg-highlight hover:text-primary transition-colors shadow-md"
+                    className="w-full flex items-center justify-center cursor-pointer gap-2 py-2 rounded-lg bg-accent text-white font-semibold hover:bg-highlight hover:text-primary transition-colors shadow-md"
                 >
-                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" /> Log Out
+                    <LogOut className="w-5 h-5" />
+                    <span>Log Out</span>
                 </button>
             </div>
         </aside>

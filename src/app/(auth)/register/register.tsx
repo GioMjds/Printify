@@ -39,7 +39,6 @@ export default function RegisterPage() {
         },
         onSuccess: (response) => {
             if (response && response.email) {
-                // Store email in localStorage for verify page
                 if (typeof window !== "undefined") {
                     localStorage.setItem("register_email", response.email);
                 }
@@ -198,7 +197,7 @@ export default function RegisterPage() {
                     <motion.button
                         type="submit"
                         disabled={isPending}
-                        className={`mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all flex items-center justify-center`}
+                        className={`mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all flex items-center justify-center ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >

@@ -148,11 +148,11 @@ export default function LoginPage() {
                     <motion.button
                         type="submit"
                         disabled={isPending}
-                        className="mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all"
+                        className={`mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >
-                        Login
+                        {isPending ? "Logging in..." : "Log In"}
                     </motion.button>
                 </form>
                 <div className="flex justify-between items-center">

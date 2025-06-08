@@ -186,10 +186,10 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                         whileTap={{ scale: 0.97 }}
                         whileHover={{ scale: 1.03 }}
                         type="submit"
-                        className={`w-full py-2 rounded-lg bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-accent)] text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 ${otp.some(num => num === "") || success ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`w-full py-2 rounded-lg bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-accent)] text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 ${isPending ? "opacity-50 cursor-not-allowed" : " cursor-pointer"}`}
                         disabled={otp.some(num => num === "") || isPending}
                     >
-                        Verify
+                        {isPending ? "Verifying..." : "Verify OTP"}
                     </motion.button>
                 </form>
                 <div className="mt-6 text-sm text-[var(--color-text-light)]">
