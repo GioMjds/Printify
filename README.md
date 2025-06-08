@@ -115,19 +115,111 @@ Printify is a professional web portal that transforms your PDF and DOCX document
 
 ## 📁 Repository Structure
 
-```folder
+```plaintext
 /printify
-├── app               # Next.js App Router pages & layouts
-│   ├── api           # API routes (uploads, orders, notifications)
-│   └── globals.css   # Global Tailwind CSS styles
-├── prisma            # Prisma schema & migrations
-│   └── schema.prisma
-├── lib
-│   └── prisma.ts     # Prisma client singleton
-├── public            # Static assets
-├── components        # Reusable React components
-├── .env.local        # Environment variables (not committed)
-└── README.md         # Project overview & setup
+├── components/
+│   ├── ProtectedRoutes.tsx
+│   ├── constants/
+│   │   ├── admin-sidebar.ts
+│   │   ├── customer-sidebar.ts
+│   │   ├── hero.ts
+│   │   └── navbar.ts
+│   ├── hooks/
+│   │   └── useWebSockets.tsx
+│   ├── layout/
+│   │   ├── Footer.tsx
+│   │   └── Navbar.tsx
+├── lib/
+│   ├── auth.ts
+│   └── prisma.ts
+├── public/
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── printify_logo.png
+│   ├── vercel.svg
+│   └── window.svg
+├── prisma/
+│   ├── schema.prisma
+│   └── migrations/
+│       ├── migration_lock.toml
+│       ├── 20250605034628_init/
+│       │   └── migration.sql
+│       ├── 20250605100725_init/
+│       │   └── migration.sql
+│       ├── 20250605101251_init/
+│       │   └── migration.sql
+│       └── 20250607093243_init/
+│           └── migration.sql
+├── src/
+│   ├── middleware.ts
+│   ├── app/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── providers.tsx
+│   │   ├── (auth)/
+│   │   │   ├── layout.tsx
+│   │   │   ├── login/
+│   │   │   │   ├── login.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── register/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── register.tsx
+│   │   │   └── verify/
+│   │   │       ├── page.tsx
+│   │   │       └── verify-otp.tsx
+│   │   ├── (landing)/
+│   │   │   ├── landing-page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── (protected)/
+│   │   │   ├── layout.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   ├── admin/
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── analytics/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── orders/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── settings/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── users/
+│   │   │   │       └── page.tsx
+│   │   │   └── customer/
+│   │   │       ├── page.tsx
+│   │   │       ├── new/
+│   │   │       │   └── page.tsx
+│   │   │       ├── orders/
+│   │   │       │   └── page.tsx
+│   │   │       └── profile/
+│   │   │           └── page.tsx
+│   │   └── api/
+│   │       ├── auth/
+│   │       │   ├── [...nextauth]/
+│   │       │   │   └── route.ts
+│   │       │   └── action/
+│   │       │       └── [action]/
+│   │       │           └── route.ts
+├── services/
+│   ├── _axios.ts
+│   └── Auth.ts
+├── skeletons/
+├── types/
+│   └── useWebSocketsTypes.ts
+├── utils/
+│   ├── otpCache.ts
+│   └── send-email.ts
+├── .env.local
+├── README.md
+├── eslint.config.mjs
+├── next-auth.d.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── tsconfig.json
 ```
 
 ---

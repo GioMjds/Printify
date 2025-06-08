@@ -22,22 +22,20 @@ export async function middleware(req: NextRequest) {
 
     if (PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
         if (!accessToken) {
-            // Not authenticated, redirect to login
             return NextResponse.redirect(new URL("/login", req.url));
         }
         try {
             const { payload } = await jwtVerify(accessToken, encodedKey, { algorithms: ["HS256"] });
             const role = payload.role;
-            // Admin pages
+
             if (pathname.startsWith("/admin") && role !== "admin") {
                 return NextResponse.redirect(new URL("/customer", req.url));
             }
-            // Customer pages
+
             if (pathname.startsWith("/customer") && role !== "customer") {
                 return NextResponse.redirect(new URL("/admin", req.url));
             }
         } catch {
-            // Invalid token, redirect to login
             return NextResponse.redirect(new URL("/login", req.url));
         }
     }
