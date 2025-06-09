@@ -34,9 +34,4 @@ export const adminSidebar: AdminSidebar[] = [
         icon: BarChart2,
         href: "/admin/analytics",
     },
-    {
-        name: "Administrator Permissions",
-        icon: Shield,
-        href: "/admin/settings",
-    },
 ];

@@ -31,7 +31,7 @@ interface PasswordFormData {
 export default function ForgotPasswordPage() {
     const [step, setStep] = useState<Step>(Step.email);
     const [email, setEmail] = useState<string>("");
-    const [otp, setOtp] = useState<string>(""); // Store OTP after verification
+    const [otp, setOtp] = useState<string>("");
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();

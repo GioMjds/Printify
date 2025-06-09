@@ -1,10 +1,10 @@
+import "@/app/globals.css";
 import { RoleRequired } from "@/components/ProtectedRoutes";
 import { getSession } from "@/lib/auth";
 import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
-import "../globals.css";
-import Providers from "../providers";
-import Sidebar from "./sidebar";
+import Providers from "../../providers";
+import Sidebar from "../sidebar";
 
 const lexend = Lexend({
     variable: "--font-lexend",
