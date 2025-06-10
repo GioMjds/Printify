@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id 
-  email     String    @unique
-  password  String
-  name      String?
-  role      UserRole  @default(customer)
-  uploads   Upload[]  @relation("UserUploads")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String    @id 
+  email         String    @unique
+  password      String
+  profile_image String?
+  name          String?
+  role          UserRole  @default(customer)
+  uploads       Upload[]  @relation("UserUploads")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Upload {

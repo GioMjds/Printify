@@ -16,7 +16,8 @@ export async function AuthRequired({ children }: { children: ReactNode }) {
  */
 export async function AuthRedirect({ children }: { children: ReactNode }) {
     const session = await getSession();
-    if (session) redirect(session.role === "admin" ? "/admin" : "/customer");
+    if (session && session.role === 'admin') redirect('/admin');
+    if (session && session.role === 'customer') redirect('/');
     return <>{children}</>;
 }
 
@@ -28,7 +29,7 @@ export async function RoleRequired({ allowedRoles, children }: { allowedRoles: s
     if (!session) redirect("/login");
     if (!allowedRoles.includes(session.role)) {
         if (session.role === "admin") redirect("/admin");
-        if (session.role === "customer") redirect("/customer");
+        if (session.role === "customer") redirect("/");
         redirect("/login");
     }
     return <>{children}</>;

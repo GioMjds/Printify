@@ -4,7 +4,9 @@ import { otpStorage } from "@/utils/otpCache";
 import { sendOtpEmail, sendPassswordResetEmail } from "@/utils/send-email";
 import { compare, hash } from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
+import path from "path";
 
 cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -104,7 +106,6 @@ export async function POST(req: NextRequest) {
                 return response;
             }
             case "send_register_otp": {
-                // This endpoint is for register/page.tsx
                 const { email, password, confirmPassword } = body;
 
                 if (!email || !password || !confirmPassword) {
@@ -194,12 +195,39 @@ export async function POST(req: NextRequest) {
                     }, { status: 400 });
                 }
 
+                let profileImageUrl;
+
+                try {
+                    const defaultImagePath = path.join(
+                        process.cwd(),
+                        "public",
+                        "Default_pfp.jpg",
+                    );
+                    const imageBuffer = fs.readFileSync(defaultImagePath);
+                    const base64Items = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
+
+                    const uploadResponse = await cloudinary.uploader.upload(
+                        base64Items,
+                        {
+                            folder: "wisewaste/profiles",
+                            public_id: `user-${email.replace(/[@.]/g, "-")}`,
+                            overwrite: true,
+                            resource_type: "image",
+                        },
+                    )
+
+                    profileImageUrl = uploadResponse.secure_url;
+                } catch (CloudinaryError) {
+                    console.error(`Error uploading profile image: ${CloudinaryError}`);
+                }
+
                 const newUser = await prisma.user.create({
                     data: {
                         id: crypto.randomUUID(),
-                        name: "Guest", // Default name for now since no survey needed
+                        name: "Guest",
                         email: email,
                         password: hashedPassword,
+                        profile_image: profileImageUrl,
                         role: "customer",
                     }
                 });
@@ -217,7 +245,7 @@ export async function POST(req: NextRequest) {
                     message: "User registered successfully!",
                     user: {
                         id: newUser.id,
-                        name: "Guest",
+                        name: newUser.name,
                         email: newUser.email,
                         role: newUser.role
                     }
@@ -245,7 +273,6 @@ export async function POST(req: NextRequest) {
 
                 return response;
             }
-            // Forogt Password API actions
             case "forgot_password_send_otp": {
                 const { email } = body;
                 if (!email) {

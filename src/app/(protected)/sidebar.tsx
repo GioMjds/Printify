@@ -2,7 +2,6 @@
 
 import Modal from "@/components/Modal";
 import { adminSidebar } from "@/constants/admin-sidebar";
-import { customerSidebar } from "@/constants/customer-sidebar";
 import { logout } from "@/services/Auth";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
@@ -10,11 +9,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Sidebar({ role }: { role: string }) {
+export default function Sidebar() {
     const router = useRouter();
     const pathname = usePathname();
-    const menuItems = role === 'admin' ? adminSidebar : customerSidebar;
-
+    
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
@@ -39,7 +37,7 @@ export default function Sidebar({ role }: { role: string }) {
                         <span className="text-2xl font-bold tracking-wide">Printify</span>
                     </div>
                     <ul className="space-y-2">
-                        {menuItems.map((item) => {
+                        {adminSidebar.map((item) => {
                             const isActive = pathname === item.href;
                             return (
                                 <li key={item.name}>

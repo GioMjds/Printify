@@ -2,6 +2,7 @@
 
 import { navbar } from '@/constants/navbar';
 import { motion } from 'framer-motion';
+import { getSession } from '@/lib/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';

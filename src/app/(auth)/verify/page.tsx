@@ -1,4 +1,4 @@
-import { RegisterPhaseRequired } from "@/components/ProtectedRoutes";
+import { RegisterPhaseRequired } from "@/components/RegisterPhaseRequired";
 import VerifyOTP from "./verify-otp";
 
 export const metadata = {

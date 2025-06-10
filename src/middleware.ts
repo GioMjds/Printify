@@ -10,10 +10,6 @@ const PROTECTED_PATHS = [
     "/admin/orders",
     "/admin/settings",
     "/admin/users",
-    "/customer",
-    "/customer/orders",
-    "/customer/profile",
-    "/customer/new"
 ];
 
 export async function middleware(req: NextRequest) {
@@ -29,11 +25,7 @@ export async function middleware(req: NextRequest) {
             const role = payload.role;
 
             if (pathname.startsWith("/admin") && role !== "admin") {
-                return NextResponse.redirect(new URL("/customer", req.url));
-            }
-
-            if (pathname.startsWith("/customer") && role !== "customer") {
-                return NextResponse.redirect(new URL("/admin", req.url));
+                return NextResponse.redirect(new URL("/", req.url));
             }
         } catch {
             return NextResponse.redirect(new URL("/login", req.url));

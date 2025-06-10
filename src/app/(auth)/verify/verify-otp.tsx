@@ -20,8 +20,10 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
     const router = useRouter();
 
     useEffect(() => {
-        if (!email) router.replace("/login");
-    }, [email, router]);
+        const storedEmail = localStorage.getItem("register_email");
+        if (storedEmail) setEmail(storedEmail);
+        else router.push("/login");
+    }, []);
 
     const { mutate, isPending } = useMutation({
         mutationFn: async () => {
@@ -35,6 +37,7 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                 setSuccess("OTP verified successfully!");
             }
             router.push("/");
+            localStorage.removeItem("register_email");
         },
         onError: (error: any) => {
             setError(error.response?.data?.error || "An error occurred while verifying OTP.");

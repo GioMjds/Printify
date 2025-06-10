@@ -34,7 +34,6 @@ export default function LoginPage() {
                 if (response.user.role === 'admin') router.push("/admin");
                 else router.push("/");
             }
-            console.log(`Login successful! ${response.user.role}`);
         },
         onError: (error: any) => {
             console.error(`Login failed: ${error}`);

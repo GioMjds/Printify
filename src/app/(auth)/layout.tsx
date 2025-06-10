@@ -28,9 +28,7 @@ export default function RootLayout({
                 className={`${lexend.variable} antialiased`}
             >
                 <Providers>
-                    <AuthRedirect>
-                        {children}
-                    </AuthRedirect>
+                    {children}
                 </Providers>
             </body>
         </html>
