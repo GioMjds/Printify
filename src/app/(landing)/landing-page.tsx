@@ -2,13 +2,32 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useRef } from 'react';
 import { processSteps } from '@/constants/hero';
+import { getSession } from '@/services/Auth';
 
 export default function LandingPage() {
     const heroRef = useRef<HTMLDivElement>(null);
     const processRef = useRef<HTMLDivElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
+
+    const router = useRouter();
+    const [checkingSession, setCheckingSession] = useState<boolean>(false);
+
+    const handleGetStarted = async () => {
+        setCheckingSession(true);
+        try {
+            const session = await getSession();
+            if (session) router.push('/upload');
+            else router.push('/login');
+        } catch (error) {
+            console.error(`Error checking session: ${error}`);
+            router.push('/login');
+        } finally {
+            setCheckingSession(false);
+        }
+    }
 
     return (
         <div className="overflow-x-hidden">
@@ -53,12 +72,14 @@ export default function LandingPage() {
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }}
                     >
-                        <Link
-                            href="/login"
+                        <button
+                            type="button"
+                            onClick={handleGetStarted}
                             className="bg-primary hover:bg-text-dark text-highlight font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
+                            disabled={checkingSession}
                         >
                             Get Started
-                        </Link>
+                        </button>
                     </motion.div>
                 </div>
 

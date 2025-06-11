@@ -98,6 +98,7 @@ export async function getCurrentUser() {
                 email: true,
                 role: true,
                 name: true,
+                profile_image: true,
             },
         });
 

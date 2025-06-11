@@ -153,3 +153,17 @@ export const resetForgotPassword = async ({ email, otp, newPassword }: ForgotRes
         throw error;
     }
 };
+
+// Session helper function
+export const getSession = async () => {
+    try {
+        const response = await API.get('/session', {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+        });
+        return response.data.session;
+    } catch (error) {
+        console.error(`Get session failed: ${error}`);
+        throw error;
+    }
+};
