@@ -4,3 +4,4 @@ ignoredBuiltDependencies:
   - prisma
 onlyBuiltDependencies:
   - bcrypt
+  - canvas
