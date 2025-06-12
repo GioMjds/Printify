@@ -1,8 +1,8 @@
 'use client';
 
+import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
 import ProfileIcon from '@/components/ProfileIcon';
-import Dropdown from '@/components/Dropdown';
 import { navbar } from '@/constants/navbar';
 import { logout } from '@/services/Auth';
 import { motion } from 'framer-motion';
@@ -18,8 +18,10 @@ interface NavbarProps {
         name?: string;
         email?: string;
         role?: string;
+        id?: string;
     } | null;
 }
+
 
 export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -126,7 +128,9 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 options={[
                                     {
                                         label: 'Profile',
-                                        onClick: () => router.push('/profile'),
+                                        onClick: () => {
+                                            router.push(`/profile/${userDetails.id}`)
+                                        },
                                     },
                                     {
                                         label: 'My Orders',

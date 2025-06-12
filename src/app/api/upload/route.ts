@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
         await prisma.upload.create({
             data: {
-                filename: result.original_filename,
+                filename: file.name,
                 fileData: result.secure_url,
                 status: 'pending',
                 customerId: customerId,
@@ -83,10 +83,12 @@ export async function POST(req: NextRequest) {
             message: "File uploaded successfully",
             uploadId: result.public_id,
             fileData: result.secure_url,
-            filename: result.original_filename,
+            filename: file.name,
             status: "pending"
         }, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Failed to upload file"
+        }, { status: 500 });
     }
 }

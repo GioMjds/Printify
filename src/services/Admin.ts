@@ -1,5 +1,9 @@
 import { API } from "./_axios";
 
+type AdminAccountAction = {
+    uploadId: string;
+}
+
 export const fetchAllPrintOrders = async () => {
     try {
         const response = await API.get('/admin/fetch_print_orders', {
@@ -10,6 +14,17 @@ export const fetchAllPrintOrders = async () => {
         return response.data;
     } catch (error) {
         console.error(`Failed to fetch print orders: ${error}`);
+        throw error;
+    }
+};
+
+// Admin actions can be extended here
+export const adminAccount = async ({ uploadId }: AdminAccountAction) => {
+    try {
+        const response = await API.get(`/admin/upload/${uploadId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to perform admin action: ${error}`);
         throw error;
     }
 };

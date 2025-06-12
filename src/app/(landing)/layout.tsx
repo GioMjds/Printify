@@ -30,8 +30,10 @@ export default async function RootLayout({
       name: user?.name ?? undefined,
       email: user?.email ?? undefined,
       role: user?.role?.toString() ?? undefined,
+      id: user?.id ?? undefined,
     }
   }
+  
   return (
     <html lang="en">
       <body

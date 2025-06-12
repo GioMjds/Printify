@@ -2,7 +2,6 @@
 
 import { fetchAllPrintOrders } from "@/services/Admin";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 
 export default function Orders() {
     const { data } = useQuery<any>({
@@ -34,14 +33,7 @@ export default function Orders() {
                             <tr key={order.id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">{order.customer?.name || order.customer?.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
-                                    <Link
-                                        href={order.fileData}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary underline"
-                                    >
-                                        View File
-                                    </Link>
+                                    <span>{order.filename}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap uppercase text-sm text-primary">{order.status}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
