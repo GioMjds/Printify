@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useRef } from 'react';
 import { processSteps } from '@/constants/hero';
@@ -55,7 +54,7 @@ export default function LandingPage() {
                     </motion.h1>
 
                     <motion.p
-                        className="text-xl md:text-2xl mb-10 text-bg-soft max-w-2xl mx-auto"
+                        className="text-xl md:text-2xl mb-10 text-bg-soft max-w-3xl mx-auto"
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
