@@ -1,63 +1,92 @@
-import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { randomUUID } from "crypto";
+import { v2 as cloudinary } from 'cloudinary';
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import fs from 'fs/promises';
-import path from 'path';
 
-// Allowed file extensions
 const allowedExtensions = ['.doc', '.docx', '.pdf'];
 
+cloudinary.config({
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
+    secure: true,
+});
+
+export const config = {
+    api: {
+        bodyParser: false,
+    }
+}
+
 export async function POST(req: NextRequest) {
-    try {
-        const session = await getSession();
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-        
-        const formData = await req.formData();
-        const file = formData.get("file");
-        
-        if (!file || typeof file === "string") {
-            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-        }
-
-        // Validate file type
-        const filename = file.name;
-        const ext = path.extname(filename).toLowerCase();
-        if (!allowedExtensions.includes(ext)) {
-            return NextResponse.json(
-                { error: "Invalid file type. Only .doc, .docx, .pdf are accepted" },
-                { status: 400 }
-            );
-        }
-
-        const uploadId = randomUUID();
-        const safeFilename = `${uploadId}${ext}`;
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-        
-        await fs.mkdir(uploadDir, { recursive: true });
-        
-        const buffer = await file.arrayBuffer();
-        await fs.writeFile(
-            path.join(uploadDir, safeFilename),
-            Buffer.from(buffer)
+    const contentType = req.headers.get("Content-Type") || "";
+    if (
+        !contentType.startsWith("multipart/form-data") &&
+        !contentType.startsWith("application/x-www-form-urlencoded")
+    ) {
+        return NextResponse.json(
+            { error: 'Content-Type must be "multipart/form-data" or "application/x-www-form-urlencoded".' },
+            { status: 415 }
         );
+    }
 
-        const url = `/uploads/${safeFilename}`;
-        const upload = await prisma.upload.create({
-            data: {
-                id: uploadId,
-                filename,
-                url,
-                customerId: session.userId,
-            },
+    const formData = await req.formData();
+    const file = formData.get('file') as File | null;
+    const customerId = formData.get('customerId') as string | null;
+
+    if (!file || !customerId) {
+        return NextResponse.json({ 
+            error: "File and customer ID are required"
+        }, { status: 400 });
+    }
+
+    const fileName = file.name;
+    const fileExtension = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        return NextResponse.json({
+            error: "Invalid file type. Only .doc, .docx, and .pdf files are allowed."
+        }, { status: 400 });
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    try {
+        const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: 'raw',
+                    public_id: fileName.split(".")[0],
+                    folder: 'printify_uploads',
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            );
+            stream.end(buffer);
         });
 
-        return NextResponse.json({ uploadId: upload.id });
+        const result = uploadResult as any;
+
+        await prisma.upload.create({
+            data: {
+                filename: result.original_filename,
+                fileData: result.secure_url,
+                status: 'pending',
+                customerId: customerId,
+            }
+        });
+
+        return NextResponse.json({
+            message: "File uploaded successfully",
+            uploadId: result.public_id,
+            fileData: result.secure_url,
+            filename: result.original_filename,
+            status: "pending"
+        }, { status: 201 });
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
     }
 }

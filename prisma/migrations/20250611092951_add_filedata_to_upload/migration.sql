@@ -1,15 +1,17 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('CUSTOMER', 'ADMIN');
+CREATE TYPE "UserRole" AS ENUM ('customer', 'admin');
 
 -- CreateEnum
-CREATE TYPE "UploadStatus" AS ENUM ('PENDING', 'PRINTING', 'COMPLETED');
+CREATE TYPE "UploadStatus" AS ENUM ('pending', 'printing', 'completed');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "profile_image" TEXT,
     "name" TEXT,
-    "role" "UserRole" NOT NULL DEFAULT 'CUSTOMER',
+    "role" "UserRole" NOT NULL DEFAULT 'customer',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -20,8 +22,8 @@ CREATE TABLE "User" (
 CREATE TABLE "Upload" (
     "id" TEXT NOT NULL,
     "filename" TEXT NOT NULL,
-    "url" TEXT NOT NULL,
-    "status" "UploadStatus" NOT NULL DEFAULT 'PENDING',
+    "fileData" BYTEA NOT NULL,
+    "status" "UploadStatus" NOT NULL DEFAULT 'pending',
     "customerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

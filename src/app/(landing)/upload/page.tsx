@@ -11,6 +11,6 @@ export default async function Upload() {
     if (!session) redirect('/login');
 
     return (
-        <UploadFilePage />
+        <UploadFilePage customerId={session.userId} />
     )
 }

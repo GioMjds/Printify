@@ -27,16 +27,16 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${lexend.variable} antialiased`}>
                 <Providers>
-                    <div className="flex min-h-screen">
-                        <div className="sticky top-0 h-screen flex-shrink-0 z-30">
-                            <Sidebar />
-                        </div>
-                        <main className="flex-1 flex flex-col overflow-y-auto min-h-screen p-4">
-                            <RoleRequired allowedRoles={['admin', 'customer']}>
+                    <RoleRequired allowedRoles={['admin', 'customer']}>
+                        <div className="flex min-h-screen">
+                            <div className="sticky top-0 h-screen flex-shrink-0 z-30">
+                                <Sidebar />
+                            </div>
+                            <main className="flex-1 flex flex-col overflow-y-auto min-h-screen p-4">
                                 {children}
-                            </RoleRequired>
-                        </main>
-                    </div>
+                            </main>
+                        </div>
+                    </RoleRequired>
                 </Providers>
             </body>
         </html>

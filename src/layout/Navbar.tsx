@@ -6,7 +6,7 @@ import Dropdown from '@/components/Dropdown';
 import { navbar } from '@/constants/navbar';
 import { logout } from '@/services/Auth';
 import { motion } from 'framer-motion';
-import { LogOut } from 'lucide-react';
+import { LogIn, LogOut, UserRoundPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -103,6 +103,24 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         className="hidden lg:flex items-center space-x-4"
                         variants={itemVariants}
                     >
+                        <Link
+                            href="/upload"
+                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
+                        >
+                            Upload
+                        </Link>
+                        <Link
+                            href="/about"
+                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
+                        >
+                            About
+                        </Link>
+                        <Link
+                            href="/contact"
+                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
+                        >
+                            Contact Us
+                        </Link>
                         {userDetails ? (
                             <Dropdown
                                 options={[
@@ -129,16 +147,18 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                     <Link
                                         href="/login"
-                                        className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
+                                        className="flex items-center gap-2 text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
                                     >
+                                        <LogIn size={24} />
                                         Login
                                     </Link>
                                 </motion.div>
                                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                     <Link
                                         href="/register"
-                                        className="btn-primary bg-highlight text-primary hover:bg-accent hover:text-bg-white rounded-full px-6 py-2 font-bold shadow-md transition-colors duration-200"
+                                        className="flex items-center gap-2 text-primary font-medium bg-highlight nav-link px-4 py-2 hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
                                     >
+                                        <UserRoundPlus size={24} />
                                         Register
                                     </Link>
                                 </motion.div>
@@ -203,6 +223,27 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 transition={{ delay: navbar.length * 0.1 }}
                                 className="space-y-2"
                             >
+                                <Link
+                                    href="/upload"
+                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Upload
+                                </Link>
+                                <Link
+                                    href="/about"
+                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    About
+                                </Link>
+                                <Link
+                                    href="/contact"
+                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Contact Us
+                                </Link>
                                 {userDetails ? (
                                     <ProfileIcon profileImage={userDetails.profileImage} />
                                 ) : (

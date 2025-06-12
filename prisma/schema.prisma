@@ -20,14 +20,14 @@ model User {
 }
 
 model Upload {
-  id          String   @id @default(uuid())
-  filename    String
-  url         String
-  status      UploadStatus  @default(pending)
-  customer    User     @relation("UserUploads", fields: [customerId], references: [id])
-  customerId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String        @id @default(uuid())
+  filename      String
+  fileData      String
+  status        UploadStatus  @default(pending)
+  customer      User          @relation("UserUploads", fields: [customerId], references: [id])
+  customerId    String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   notifications Notification[]
 }
 

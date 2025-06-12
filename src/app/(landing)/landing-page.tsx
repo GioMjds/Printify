@@ -44,14 +44,14 @@ export default function LandingPage() {
 
                 <div className="relative z-10 text-center max-w-4xl">
                     <motion.h1
-                        className="text-6xl md:text-8xl font-bold mb-6 text-white"
+                        className="text-5xl md:text-7xl font-bold mb-6 text-white"
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 1, ease: 'easeOut' }}
                     >
-                        Bring Your{' '}
-                        <span className="text-highlight">Designs</span> to Life
+                        Welcome to{' '}
+                        <span className="text-highlight">Printify</span>
                     </motion.h1>
 
                     <motion.p
@@ -61,8 +61,8 @@ export default function LandingPage() {
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
                     >
-                        Premium printing services for your business, events, and personal
-                        projects
+                        Send your document files for printing and we will
+                        handle the rest.
                     </motion.p>
 
                     <motion.div
@@ -72,14 +72,16 @@ export default function LandingPage() {
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.4, ease: 'easeOut' }}
                     >
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             type="button"
                             onClick={handleGetStarted}
-                            className="bg-primary hover:bg-text-dark text-highlight font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
+                            className="bg-primary cursor-pointer hover:bg-text-dark text-highlight font-bold py-3 px-8 rounded-full text-lg transition-all duration-300"
                             disabled={checkingSession}
                         >
                             Get Started
-                        </button>
+                        </motion.button>
                     </motion.div>
                 </div>
 

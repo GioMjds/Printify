@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Upload" ALTER COLUMN "fileData" SET DATA TYPE TEXT;

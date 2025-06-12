@@ -1,7 +1,6 @@
 'use client';
 
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { FC } from "react";
 
 interface ProvidersProps {
     children: React.ReactNode;
