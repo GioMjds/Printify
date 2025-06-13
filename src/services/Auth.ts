@@ -6,6 +6,8 @@ type Login = {
 }
 
 type SendRegisterOTP = {
+    firstName?: string;
+    lastName?: string;
     email: string;
     password: string;
     confirmPassword: string;
@@ -52,10 +54,12 @@ export const logout = async () => {
     }
 };
 
-export const sendRegisterOtp = async ({ email, password, confirmPassword }: SendRegisterOTP) => {
+export const sendRegisterOtp = async ({ firstName, lastName, email, password, confirmPassword }: SendRegisterOTP) => {
     try {
         const response = await API.post("/auth/action/register", {
             action: "send_register_otp",
+            firstName: firstName,
+            lastName: lastName,
             email: email,
             password: password,
             confirmPassword: confirmPassword

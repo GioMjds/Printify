@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Modal from "@/components/Modal";
@@ -14,6 +15,7 @@ export default function UploadPage({ customerId }: { customerId?: string }) {
     const [previewType, setPreviewType] = useState<"pdf" | "docx" | 'doc' | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [success, setSuccess] = useState(false);
+    
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,13 +101,13 @@ export default function UploadPage({ customerId }: { customerId?: string }) {
                         {/* Upload Form */}
                         <motion.form
                             onSubmit={handleSubmit}
-                            className="bg-white/90 rounded-3xl shadow-2xl p-10 flex flex-col items-center max-w-xl w-full md:w-2/3 lg:w-1/2"
+                            className="glass-card p-10 flex flex-col items-center max-w-xl w-full md:w-2/3 lg:w-1/2"
                             initial={{ y: 40, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.7, ease: 'easeOut' }}
                         >
                             <motion.h1
-                                className="text-4xl md:text-5xl font-bold mb-4 text-primary"
+                                className="text-4xl md:text-5xl font-bold mb-4 text-accent"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2, duration: 0.6 }}
@@ -113,7 +115,7 @@ export default function UploadPage({ customerId }: { customerId?: string }) {
                                 Upload Your File
                             </motion.h1>
                             <motion.p
-                                className="text-md text-text-light mb-8 text-center"
+                                className="text-md text-gray-800 mb-8 text-center"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3, duration: 0.6 }}
@@ -123,11 +125,11 @@ export default function UploadPage({ customerId }: { customerId?: string }) {
                             <motion.label
                                 htmlFor="file-upload"
                                 className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-accent rounded-xl cursor-pointer bg-bg-soft hover:bg-bg-highlight transition-colors duration-200 group mb-6"
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4, duration: 0.6 }}
+                                transition={{ ease: 'linear' }}
                             >
                                 <svg className="w-12 h-12 text-accent mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" />

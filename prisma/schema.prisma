@@ -14,6 +14,7 @@ model User {
   profile_image String?
   name          String?
   role          UserRole  @default(customer)
+  isVerified    Boolean?  @default(false)
   uploads       Upload[]  @relation("UserUploads")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Image from "next/image";
@@ -75,8 +76,8 @@ export default function LoginPage() {
                     <Image
                         src={logo}
                         alt="Printify Logo"
-                        width={72}
-                        height={72}
+                        width={28}
+                        height={28}
                         priority
                     />
                     <span className="text-2xl font-bold text-primary">Printify</span>
@@ -89,9 +90,9 @@ export default function LoginPage() {
                 </p>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
                     <div>
+                        <label htmlFor="email" className="text-sm text-gray-600 font-semibold tracking-tighter">Email</label>
                         <input
                             type="email"
-                            placeholder="Email"
                             {...register("email", {
                                 required: "Email is required",
                                 pattern: {
@@ -112,9 +113,9 @@ export default function LoginPage() {
                         )}
                     </div>
                     <div className="relative">
+                        <label htmlFor="password" className="text-sm text-gray-600 font-semibold tracking-tighter">Password</label>
                         <input
                             type={passwordVisible ? "text" : "password"}
-                            placeholder="Password"
                             {...register("password", {
                                 required: "Password is required",
                                 minLength: {
@@ -128,7 +129,7 @@ export default function LoginPage() {
                             type="button"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-primary transition"
+                            className="absolute cursor-pointer right-3 top-2/3 -translate-y-1/2 text-text-light hover:text-primary transition"
                             onClick={() => setPasswordVisible(!passwordVisible)}
                             aria-label="Toggle password visibility"
                         >

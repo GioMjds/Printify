@@ -3,7 +3,6 @@ import {
     ClipboardList,
     Gauge,
     LucideIcon,
-    Shield,
     Users,
 } from "lucide-react";
 

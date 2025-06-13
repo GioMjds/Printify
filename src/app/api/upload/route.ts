@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/prisma";
 import { v2 as cloudinary } from 'cloudinary';
 import type { NextRequest } from "next/server";
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
         }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ 
-            error: "Failed to upload file"
+            error: `File upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
         }, { status: 500 });
     }
 }

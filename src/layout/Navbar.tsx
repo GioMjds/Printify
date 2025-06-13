@@ -2,15 +2,18 @@
 
 import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
-import ProfileIcon from '@/components/ProfileIcon';
 import { navbar } from '@/constants/navbar';
 import { logout } from '@/services/Auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import { LogIn, LogOut, UserRoundPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Suspense, lazy, useState } from 'react';
+import ProfileSpinner from '@/skeletons/ProfileSpinner';
+
+const ProfileIcon = lazy(() => import('@/components/ProfileIcon'));
 
 interface NavbarProps {
     userDetails?: {
@@ -29,6 +32,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
     const router = useRouter();
+    const pathname = usePathname();
 
     const itemVariants = {
         hidden: { y: -20, opacity: 0 },
@@ -105,24 +109,30 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         className="hidden lg:flex items-center space-x-4"
                         variants={itemVariants}
                     >
-                        <Link
-                            href="/upload"
-                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
-                        >
-                            Upload
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
-                        >
-                            About
-                        </Link>
-                        <Link
-                            href="/contact"
-                            className="text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
-                        >
-                            Contact Us
-                        </Link>
+                        {userDetails &&
+                            navbar.map((item: { href: string; icon?: any; name: string }) => {
+                                const isActive = pathname === item.href;
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={`relative group text-base font-medium nav-link px-4 py-3 rounded-full transition-colors duration-200 
+                                        ${isActive ? 'bg-accent text-bg-white shadow-md'
+                                                : 'text-highlight hover:text-bg-white hover:bg-accent'}
+                                    `}
+                                    >
+                                        {item.icon && (
+                                            <>
+                                                <FontAwesomeIcon icon={item.icon} size='lg' />
+                                                <span className="absolute left-1/2 -translate-x-1/2 top-[105%] mb-2 w-max px-2 py-1 rounded bg-gray-900 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
+                                                    {item.name}
+                                                </span>
+                                            </>
+                                        )}
+                                    </Link>
+                                );
+                            })
+                        }
                         {userDetails ? (
                             <Dropdown
                                 options={[
@@ -133,10 +143,6 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                         },
                                     },
                                     {
-                                        label: 'My Orders',
-                                        onClick: () => router.push('/orders'),
-                                    },
-                                    {
                                         label: 'Log Out',
                                         onClick: () => setShowLogoutModal(true),
                                         icon: <LogOut size={16} className='w-4 h-4' />,
@@ -144,7 +150,9 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 ]}
                                 position="bottom"
                             >
-                                <ProfileIcon profileImage={userDetails.profileImage} />
+                                <Suspense fallback={<ProfileSpinner />}>
+                                    <ProfileIcon profileImage={userDetails.profileImage} />
+                                </Suspense>
                             </Dropdown>
                         ) : (
                             <>

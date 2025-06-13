@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
@@ -15,7 +16,6 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: any }) {
-      // On initial sign in, persist the role into the JWT
       if (user) {
         token.role = user.role;
         token.id = user.id;

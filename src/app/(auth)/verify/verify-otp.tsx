@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { resendRegisterOtp, verifyRegisterOtp } from "@/services/Auth";
@@ -23,7 +24,7 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
         const storedEmail = localStorage.getItem("register_email");
         if (storedEmail) setEmail(storedEmail);
         else router.push("/login");
-    }, []);
+    }, [router]);
 
     const { mutate, isPending } = useMutation({
         mutationFn: async () => {
@@ -36,8 +37,8 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
             if (response && response.success) {
                 setSuccess("OTP verified successfully!");
             }
-            router.push("/");
             localStorage.removeItem("register_email");
+            router.push("/");
         },
         onError: (error: any) => {
             setError(error.response?.data?.error || "An error occurred while verifying OTP.");

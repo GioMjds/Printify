@@ -10,7 +10,7 @@ export function RegisterPhaseRequired({ children }: { children: ReactNode }) {
         if (!localStorage.getItem("register_email")) {
             router.replace("/login");
         }
-    }, []);
+    }, [router]);
 
     if (typeof window !== "undefined" && localStorage.getItem("register_email")) {
         return <>{children}</>;

@@ -2,8 +2,11 @@ import prisma from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { userId: string }}) {
-    const { userId } = await params;
+export async function GET(
+    req: NextRequest, 
+    context: { params: Promise<{ userId: string }> }
+) {
+    const { userId } = await context.params;
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -15,7 +18,9 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
         });
 
         if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+            return NextResponse.json({ 
+                error: "User not found" 
+            }, { status: 404 });
         }
 
         return NextResponse.json({
@@ -29,7 +34,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
         }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ 
-            error: "Failed to fetch profile" 
+            error: `profile/[userId] GET error: ${error}` 
         }, { status: 500 });
     }
 }

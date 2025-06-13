@@ -106,7 +106,13 @@ export async function POST(req: NextRequest) {
                 return response;
             }
             case "send_register_otp": {
-                const { email, password, confirmPassword } = body;
+                const { firstName, lastName, email, password, confirmPassword } = body;
+
+                if (!firstName || !lastName) {
+                    return NextResponse.json({
+                        error: "First name and last name are required"
+                    }, { status: 400 });
+                }
 
                 if (!email || !password || !confirmPassword) {
                     return NextResponse.json({
@@ -139,18 +145,20 @@ export async function POST(req: NextRequest) {
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
                 const hashedPassword = await hash(password, 12);
 
-                otpStorage.set(email, otp, hashedPassword);
+                otpStorage.set(firstName, lastName, email, otp, hashedPassword);
 
                 await sendOtpEmail(email, otp);
 
                 return NextResponse.json({
                     message: "OTP sent to your email",
+                    firstName: firstName,
+                    lastName: lastName,
                     email: email,
-                    otp: otp // For testing purposes, remove in production
+                    otp: otp
                 }, { status: 200 });
             }
             case "resend_otp": {
-                const { email } = body;
+                const { firstName, lastName, email } = body;
                 if (!email) {
                     return NextResponse.json({
                         error: "Email is required"
@@ -167,14 +175,13 @@ export async function POST(req: NextRequest) {
 
                 const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
-                otpStorage.set(email, newOtp, otpData.hashedPassword);
+                otpStorage.set(firstName, lastName, email, newOtp, otpData.hashedPassword);
 
                 await sendOtpEmail(email, newOtp);
 
                 return NextResponse.json({
                     message: "OTP resent to your email",
                     email: email,
-                    otp: newOtp // For testing purposes, remove in production
                 }, { status: 200 });
             }
             case "verify_otp": {
@@ -189,6 +196,9 @@ export async function POST(req: NextRequest) {
                 }
 
                 const hashedPassword = validation.data?.hashedPassword;
+                const firstName = validation.data?.firstName;
+                const lastName = validation.data?.lastName;
+                
                 if (!hashedPassword) {
                     return NextResponse.json({
                         error: "No hashed password found for this email"
@@ -209,7 +219,7 @@ export async function POST(req: NextRequest) {
                     const uploadResponse = await cloudinary.uploader.upload(
                         base64Items,
                         {
-                            folder: "wisewaste/profiles",
+                            folder: "printify/profiles",
                             public_id: `user-${email.replace(/[@.]/g, "-")}`,
                             overwrite: true,
                             resource_type: "image",
@@ -224,7 +234,7 @@ export async function POST(req: NextRequest) {
                 const newUser = await prisma.user.create({
                     data: {
                         id: crypto.randomUUID(),
-                        name: "Guest",
+                        name: `${firstName} ${lastName}`,
                         email: email,
                         password: hashedPassword,
                         profile_image: profileImageUrl,
@@ -283,7 +293,7 @@ export async function POST(req: NextRequest) {
                     return NextResponse.json({ error: "User does not exist" }, { status: 404 });
                 }
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
-                otpStorage.set(email, otp, user.password!); // Store OTP with current password for verification
+                otpStorage.set("", "", email, otp, user.password!); // Store OTP with current password for verification
                 await sendPassswordResetEmail(email, otp);
                 return NextResponse.json({ message: "OTP sent to your email" }, { status: 200 });
             }

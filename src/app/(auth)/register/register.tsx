@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import logo from "@/../public/printify_logo.png";
@@ -13,6 +14,8 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface RegisterForm {
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
     confirmPassword: string;
@@ -23,7 +26,13 @@ export default function RegisterPage() {
     const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState<boolean>(false);
 
-    const { register, handleSubmit, formState: { errors }, setError, watch } = useForm<RegisterForm>({
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setError,
+        watch
+    } = useForm<RegisterForm>({
         mode: "onBlur",
     });
 
@@ -32,12 +41,15 @@ export default function RegisterPage() {
     const { mutate, isPending } = useMutation({
         mutationFn: async (data: RegisterForm) => {
             return await sendRegisterOtp({
+                firstName: data.firstName,
+                lastName: data.lastName,
                 email: data.email,
                 password: data.password,
                 confirmPassword: data.confirmPassword
             });
         },
         onSuccess: (response) => {
+            console.table(`User Details: ${response}`)
             if (response && response.email) {
                 if (typeof window !== "undefined") {
                     localStorage.setItem("register_email", response.email);
@@ -85,7 +97,7 @@ export default function RegisterPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-bg-primary">
             <motion.div
-                className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-6"
+                className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-3"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: "easeInOut" }}
@@ -94,8 +106,8 @@ export default function RegisterPage() {
                     <Image
                         src={logo}
                         alt="Printify Logo"
-                        width={72}
-                        height={72}
+                        width={28}
+                        height={28}
                         priority
                     />
                     <span className="text-2xl font-bold text-primary">Printify</span>
@@ -103,11 +115,35 @@ export default function RegisterPage() {
                 <h2 className="text-3xl font-bold text-center text-primary -mt-3">
                     Create Account
                 </h2>
-                <p className="text-center text-text-light -mt-4">
-                    Join Printify and start your journey
-                </p>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="flex gap-2">
+                        <div className="w-1/2">
+                            <label htmlFor="firstName" className="text-sm text-gray-600 font-semibold tracking-tighter">First Name</label>
+                            <input
+                                type="text"
+                                placeholder="First Name"
+                                {...register("firstName", { required: "First name is required" })}
+                                className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            />
+                            {errors.firstName && (
+                                <span className="text-xs text-red-500">{errors.firstName.message}</span>
+                            )}
+                        </div>
+                        <div className="w-1/2">
+                            <label htmlFor="lastName" className="text-sm text-gray-600 font-semibold tracking-tighter">Last Name</label>
+                            <input
+                                type="text"
+                                placeholder="Last Name"
+                                {...register("lastName", { required: "Last name is required" })}
+                                className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            />
+                            {errors.lastName && (
+                                <span className="text-xs text-red-500">{errors.lastName.message}</span>
+                            )}
+                        </div>
+                    </div>
                     <div>
+                        <label htmlFor="email" className="text-sm text-gray-600 font-semibold tracking-tighter">Email</label>
                         <input
                             type="email"
                             placeholder="Enter your email address"
@@ -131,9 +167,9 @@ export default function RegisterPage() {
                         )}
                     </div>
                     <div className="relative">
+                        <label htmlFor="password" className="text-sm text-gray-600 font-semibold tracking-tighter">Password</label>
                         <input
                             type={passwordVisible ? "text" : "password"}
-                            placeholder="Password"
                             {...register("password", {
                                 required: "Password is required",
                                 minLength: {
@@ -147,7 +183,7 @@ export default function RegisterPage() {
                             type="button"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-primary"
+                            className="absolute cursor-pointer right-3 top-2/3 -translate-y-1/2 text-text-light hover:text-primary"
                             onClick={() => setPasswordVisible(!passwordVisible)}
                             aria-label="Toggle password visibility"
                         >
@@ -164,9 +200,9 @@ export default function RegisterPage() {
                         </motion.span>
                     )}
                     <div className="relative">
+                        <label htmlFor="confirmPassword" className="text-sm text-gray-600 font-semibold tracking-tighter">Confirm Password</label>
                         <input
                             type={confirmPasswordVisible ? "text" : "password"}
-                            placeholder="Confirm Password"
                             {...register("confirmPassword", {
                                 required: "Please confirm your password",
                                 validate: (value) =>
@@ -178,7 +214,7 @@ export default function RegisterPage() {
                             type="button"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-primary transition"
+                            className="absolute cursor-pointer right-3 top-2/3 -translate-y-1/2 text-text-light hover:text-primary transition"
                             onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
                             aria-label="Toggle confirm password visibility"
                         >
