@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import logo from "@/../public/printify_logo.png";
+import { login } from "@/services/Auth";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/../public/printify_logo.png";
-import { motion } from "framer-motion";
-import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { login } from "@/services/Auth";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface LoginForm {
     email: string;
@@ -65,7 +65,14 @@ export default function LoginPage() {
     const onSubmit: SubmitHandler<LoginForm> = (data) => mutate(data)
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <div className="min-h-screen flex items-center justify-center bg-bg-primary relative">
+            {/* Full-page loading overlay */}
+            {isPending && (
+                <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
+                    <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                    <span className="ml-4 text-white font-semibold text-2xl">Logging in....</span>
+                </div>
+            )}
             <motion.div
                 className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-6"
                 initial={{ opacity: 0, y: 40 }}
@@ -101,6 +108,7 @@ export default function LoginPage() {
                                 }
                             })}
                             className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            disabled={isPending}
                         />
                         {errors.email && (
                             <motion.span
@@ -124,6 +132,7 @@ export default function LoginPage() {
                                 }
                             })}
                             className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            disabled={isPending}
                         />
                         <motion.button
                             type="button"
@@ -132,6 +141,7 @@ export default function LoginPage() {
                             className="absolute cursor-pointer right-3 top-2/3 -translate-y-1/2 text-text-light hover:text-primary transition"
                             onClick={() => setPasswordVisible(!passwordVisible)}
                             aria-label="Toggle password visibility"
+                            disabled={isPending}
                         >
                             <FontAwesomeIcon icon={passwordVisible ? faEye : faEyeSlash} size="xl" />
                         </motion.button>

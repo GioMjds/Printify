@@ -17,22 +17,23 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     });
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-start bg-bg-soft py-0 px-0">
-            <div className="w-full max-w-5xl mt-0 p-0 bg-white rounded-none shadow-none">
+        <div className="min-h-screen w-full flex flex-col items-center justify-start">
+            <div className="w-full max-w-6xl mt-0 p-0 bg-white rounded-none shadow-none">
                 <div className="flex flex-col md:flex-row items-center gap-6 mb-8 pt-16 px-6">
                     <div className="flex-shrink-0">
                         <Image
-                            src={data.profile_image || "/Default_pfp.jpg"}
+                            src={data.profile_image}
                             alt="Profile"
                             width={140}
                             height={140}
+                            loading="lazy"
                             className="rounded-full border-4 border-accent object-cover"
                         />
                     </div>
                     <div className="flex-1 text-center md:text-left">
                         <h2 className="text-4xl font-bold text-primary mb-1">{data.name || "No Name"}</h2>
                         <p className="text-text-light text-lg mb-2">{data.email}</p>
-                        <span className="inline-block bg-accent text-white px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+                        <span className="inline-block bg-accent text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
                             {data.role}
                         </span>
                     </div>

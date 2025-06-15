@@ -11,8 +11,8 @@ export const metadata = {
     title: "My Profile",
 }
 
-export default async function Profile({ params }: { params: { userId: string } }) {
-    const { userId } = await params;
+export default async function Profile(context: { params: Promise<{ userId: string }> }) {
+    const { userId } = await context.params;
     const session = await getSession();
     const queryClient = new QueryClient();
 

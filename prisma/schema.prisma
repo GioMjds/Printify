@@ -46,7 +46,9 @@ enum UserRole {
 }
 
 enum UploadStatus {
-  pending
-  printing
-  completed
-}
+  pending // Default status for new document uploads (customer-side)
+  printing // Set by admin when the document is being printed
+  cancelled // Customer can cancel the upload at any time
+  ready_to_pickup // Admin can set this when the document is ready for pickup
+  completed // Final status when the document has been picked up by the customer
+} 
