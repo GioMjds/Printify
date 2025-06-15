@@ -1,6 +1,6 @@
 import { API } from "./_axios";
 
-export const fetchCustomerProfile = async (userId: string) => {
+export const fetchCustomerProfile = async ({ userId }: { userId: string }) => {
     try {
         const response = await API.get(`/profile/${userId}`, {
             withCredentials: true,

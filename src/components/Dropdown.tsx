@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { FC, ReactNode, memo, useCallback, useEffect, useRef, useState } from "react";
 
 interface DropdownItem {
@@ -10,12 +11,17 @@ interface DropdownItem {
 }
 
 interface CustomDropdownProps {
+    userDetails?: {
+        name: string;
+        email: string;
+        profileImage?: string | null;
+    }
     options: DropdownItem[];
     position?: "top" | "right" | "bottom" | "left";
     children: ReactNode;
 }
 
-const Dropdown: FC<CustomDropdownProps> = ({ options, position = "bottom", children }) => {
+const Dropdown: FC<CustomDropdownProps> = ({ options, position = "bottom", children, userDetails }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -71,8 +77,26 @@ const Dropdown: FC<CustomDropdownProps> = ({ options, position = "bottom", child
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 15 }}
                         transition={{ duration: 0.3 }}
-                        className={`${dropdownPositionClasses} bg-white text-gray-800 rounded-md shadow-lg z-50 overflow-hidden w-44`}
+                        className={`${dropdownPositionClasses} bg-white text-gray-800 rounded-md shadow-lg z-50 overflow-hidden w-56`}
                     >
+                        {/* Profile section above options */}
+                        {userDetails && (
+                            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50">
+                                <div className="w-10 h-10 relative rounded-full overflow-hidden border border-accent">
+                                    <Image
+                                        src={userDetails.profileImage as string}
+                                        alt={userDetails.name}
+                                        priority
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-primary text-base">{userDetails.name || 'No Name'}</span>
+                                    <span className="text-xs text-gray-500">{userDetails.email}</span>
+                                </div>
+                            </div>
+                        )}
                         <ul className="py-2">
                             {options.map((option, index) => (
                                 <li key={`${option.label}-${index}`}>

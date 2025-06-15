@@ -135,6 +135,11 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         }
                         {userDetails ? (
                             <Dropdown
+                                userDetails={{
+                                    name: userDetails.name ?? '',
+                                    email: userDetails.email ?? "",
+                                    profileImage: userDetails.profileImage ?? null,
+                                }}
                                 options={[
                                     {
                                         label: 'Profile',

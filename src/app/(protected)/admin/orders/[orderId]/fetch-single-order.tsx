@@ -1,27 +1,14 @@
 'use client';
 
 import { fetchPrintOrder } from "@/services/Admin";
-import type { Upload } from "@/types/prismaTypes";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 
 export default function FetchSingleOrder({ orderId }: { orderId: string }) {
-    const { data, isError } = useQuery<Upload>({
+    const { data } = useQuery({
         queryKey: ['printOrder', orderId],
         queryFn: () => fetchPrintOrder({ uploadId: orderId }),
     });
-
-    if (isError || !data) {
-        return (
-            <motion.div
-                className="text-center text-red-600 mt-10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-            >
-                Failed to load order details.
-            </motion.div>
-        );
-    }
 
     return (
         <motion.div

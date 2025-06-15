@@ -18,7 +18,7 @@ export default async function Profile(context: { params: Promise<{ userId: strin
 
     await queryClient.prefetchQuery({
         queryKey: ['profile', userId],
-        queryFn: () => fetchCustomerProfile(session?.userId as string)
+        queryFn: () => fetchCustomerProfile({ userId: session?.userId as string })
     });
 
     return (
