@@ -35,6 +35,14 @@ export const fetchPrintOrder = async ({ uploadId }: UploadID ) => {
     }
 };
 
+/**
+ * Triggers a file download for the given uploadId by navigating to the download_file endpoint.
+ */
+export const downloadFile = (uploadId: string) => {
+    if (!uploadId) return;
+    window.open(`/api/admin/download_file?action=download_file&uploadId=${uploadId}`, '_blank');
+}
+
 // Admin actions can be extended here
 export const adminAccount = async ({ uploadId }: AdminAccountAction) => {
     try {

@@ -3,9 +3,9 @@
 import { fetchCustomerProfile } from "@/services/Customer";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Calendar, Eye, FileText, User, Mail, Shield } from "lucide-react";
+import { Mail, Shield, CheckCheckIcon, CheckIcon, CheckCircle2Icon } from "lucide-react";
+import { User } from "@/types/prismaTypes";
 
 interface ProfilePageProps {
     userId: string;
@@ -46,16 +46,8 @@ const cardVariants = {
     }
 };
 
-const statusColors = {
-    pending: "bg-gradient-to-r from-yellow-400 to-orange-500",
-    printing: "bg-gradient-to-r from-blue-400 to-purple-500",
-    ready_to_pickup: "bg-gradient-to-r from-green-400 to-teal-500",
-    completed: "bg-gradient-to-r from-green-400 to-emerald-500",
-    cancelled: "bg-gradient-to-r from-red-400 to-pink-500",
-};
-
 export default function ProfilePage({ userId }: ProfilePageProps) {
-    const { data } = useQuery({
+    const { data } = useQuery<User>({
         queryKey: ["profile", userId],
         queryFn: () => fetchCustomerProfile({ userId: userId }),
         enabled: !!userId,
@@ -108,7 +100,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                         <div className="relative group">
                             <div className="relative bg-white p-2 rounded-full">
                                 <Image
-                                    src={data.profile_image}
+                                    src={data.profile_image as string}
                                     alt="Profile"
                                     width={160}
                                     height={160}
@@ -116,19 +108,13 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                                     className="rounded-full object-cover ring-4 ring-white/50 shadow-2xl"
                                 />
                             </div>
-                            <motion.div
-                                className="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full p-2 shadow-lg"
-                                animate={{ scale: [1, 1.1, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            >
-                                <User className="w-5 h-5 text-white" />
-                            </motion.div>
                         </div>
 
                         <div className="flex-1 text-center lg:text-left space-y-4">
                             <motion.div variants={itemVariants}>
-                                <h1 className="text-5xl font-bold text-accent mb-2">
+                                <h1 className="text-5xl font-bold text-accent mb-2 flex items-center gap-2">
                                     {data.name}
+                                    {data.isVerified && ( <CheckCircle2Icon className="text-green-500 w-10 h-10" />)}
                                 </h1>
                                 <div className="flex items-center justify-center lg:justify-start gap-2 text-text-light text-xl mb-4">
                                     <Mail className="w-5 h-5" />

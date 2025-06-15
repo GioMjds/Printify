@@ -27,6 +27,7 @@ model Upload {
   status        UploadStatus  @default(pending)
   customer      User          @relation("UserUploads", fields: [customerId], references: [id])
   customerId    String
+  format        String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   notifications Notification[]

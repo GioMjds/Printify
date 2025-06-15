@@ -31,6 +31,7 @@ export async function GET(
             role: user.role,
             uploads: user.uploads,
             createdAt: user.createdAt,
+            isVerified: user.isVerified
         }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ 

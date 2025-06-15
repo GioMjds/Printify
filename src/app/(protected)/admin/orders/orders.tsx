@@ -1,8 +1,8 @@
 'use client';
 
-import { fetchAllPrintOrders } from "@/services/Admin";
+import { fetchAllPrintOrders, downloadFile } from "@/services/Admin";
 import { useQuery } from "@tanstack/react-query";
-import { Eye } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import Link from "next/link";
 
 function getPrintOrderStatus(status: string) {
@@ -61,12 +61,20 @@ export default function Orders() {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                     <Link
                                         href={`/admin/orders/${order.id}`}
-                                        className="flex items-center justify-center text-accent hover:text-accent-dark transition"
+                                        className="flex items-center justify-center text-accent hover:text-accent-dark transition mr-2"
                                         title="View Order Details"
                                         aria-label={`View details for order ${order.id}`}
                                     >
                                         <Eye size={24} />
                                     </Link>
+                                    <button
+                                        onClick={() => downloadFile(order.id)}
+                                        className="flex items-center justify-center text-primary hover:text-accent transition"
+                                        title="Download File"
+                                        aria-label={`Download file for order ${order.id}`}
+                                    >
+                                        <Download size={22} />
+                                    </button>
                                 </td>
                             </tr>
                         ))}
