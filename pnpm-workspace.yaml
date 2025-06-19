@@ -5,3 +5,4 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - bcrypt
   - canvas
+  - msgpackr-extract

@@ -1,9 +1,11 @@
 'use client';
 
-import { fetchAllPrintOrders, downloadFile } from "@/services/Admin";
+import { downloadFile, fetchAllPrintOrders } from "@/services/Admin";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Eye } from "lucide-react";
+import { FileText, Info } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import Modal from "@/components/Modal";
 
 function getPrintOrderStatus(status: string) {
     switch (status) {
@@ -29,6 +31,7 @@ export default function Orders() {
     });
 
     const orders = data?.printOrders || [];
+    const [openModalId, setOpenModalId] = useState<string | null>(null);
 
     return (
         <div className="min-h-screen bg-white p-8">
@@ -48,39 +51,63 @@ export default function Orders() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-border-light">
-                        {orders.map((order: any) => (
-                            <tr key={order.id}>
-                                <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-primary">{order.customer?.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
-                                    <span>{order.filename}</span>
-                                </td>
-                                <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{order.status}</td>
-                                <td className="px-6 py-4 text-md text-center text-primary">
-                                    {new Date(order.createdAt).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <Link
-                                        href={`/admin/orders/${order.id}`}
-                                        className="flex items-center justify-center text-accent hover:text-accent-dark transition mr-2"
-                                        title="View Order Details"
-                                        aria-label={`View details for order ${order.id}`}
-                                    >
-                                        <Eye size={24} />
-                                    </Link>
-                                    <button
-                                        onClick={() => downloadFile(order.id)}
-                                        className="flex items-center justify-center text-primary hover:text-accent transition"
-                                        title="Download File"
-                                        aria-label={`Download file for order ${order.id}`}
-                                    >
-                                        <Download size={22} />
-                                    </button>
+                        {orders.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} className="py-12 text-center text-lg text-gray-500">
+                                    No print orders yet.
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            orders.map((order: any) => (
+                                <tr key={order.id}>
+                                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-primary">{order.customer?.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
+                                        <span>{order.filename}</span>
+                                    </td>
+                                    <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{order.status}</td>
+                                    <td className="px-6 py-4 text-md text-center text-primary">
+                                        {new Date(order.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm flex gap-2 items-center justify-center">
+                                        {/* View File Icon Button */}
+                                        <button
+                                            onClick={() => downloadFile(order.id)}
+                                            className="flex items-center justify-center text-secondary hover:text-accent transition border border-border-light rounded p-2"
+                                            title="View Uploaded File"
+                                            aria-label={`View uploaded file for order ${order.id}`}
+                                        >
+                                            <FileText size={20} />
+                                        </button>
+                                        {/* Open Modal Icon Button */}
+                                        <button
+                                            onClick={() => setOpenModalId(order.id)}
+                                            className="flex items-center justify-center text-accent hover:text-primary transition border border-border-light rounded p-2"
+                                            title="Open Modal"
+                                            aria-label={`Open modal for order ${order.id}`}
+                                        >
+                                            <Info size={20} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
+            {/* Empty Modal (no functionality yet) */}
+            {openModalId && (
+                <Modal
+                    isOpen={!!openModalId}
+                    onCancel={() => setOpenModalId(null)}
+                    onConfirm={() => setOpenModalId(null)}
+                    title="Order Modal"
+                    description=""
+                    confirmText="Close"
+                    cancelText="Cancel"
+                >
+                    {/* Modal content will go here */}
+                </Modal>
+            )}
         </div>
     );
 }
