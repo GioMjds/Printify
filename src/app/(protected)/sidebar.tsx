@@ -12,7 +12,7 @@ import { useState } from "react";
 export default function Sidebar() {
     const router = useRouter();
     const pathname = usePathname();
-    
+
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 

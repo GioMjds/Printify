@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
             case 'fetch_print_orders': {
                 const printOrders = await prisma.upload.findMany({
                     orderBy: {
-                        createdAt: 'desc',
+                        createdAt: 'asc',
                     },
                     include: {
                         customer: true,

@@ -1,9 +1,8 @@
 import {
-    BarChart2,
     ClipboardList,
     Gauge,
     LucideIcon,
-    Users,
+    Users
 } from "lucide-react";
 
 interface AdminSidebar {
@@ -27,10 +26,5 @@ export const adminSidebar: AdminSidebar[] = [
         name: "Users",
         icon: Users,
         href: "/admin/users",
-    },
-    {
-        name: "Analytics",
-        icon: BarChart2,
-        href: "/admin/analytics",
     },
 ];

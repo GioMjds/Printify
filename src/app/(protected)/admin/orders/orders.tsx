@@ -1,10 +1,9 @@
 'use client';
 
-import { downloadFile, fetchAllPrintOrders } from "@/services/Admin";
-import { useQuery } from "@tanstack/react-query";
-import { FileText, Info } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { downloadFile, fetchAllPrintOrders } from "@/services/Admin";
+import { FileText, Info } from "lucide-react";
 import Modal from "@/components/Modal";
 
 function getPrintOrderStatus(status: string) {
@@ -25,13 +24,14 @@ function getPrintOrderStatus(status: string) {
 }
 
 export default function Orders() {
+    const [openModalId, setOpenModalId] = useState<string | null>(null);
+    
     const { data } = useQuery({
         queryKey: ['printOrders'],
         queryFn: () => fetchAllPrintOrders(),
     });
 
     const orders = data?.printOrders || [];
-    const [openModalId, setOpenModalId] = useState<string | null>(null);
 
     return (
         <div className="min-h-screen bg-white p-8">

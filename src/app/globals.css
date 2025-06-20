@@ -59,7 +59,7 @@ body {
   background: rgba(255, 255, 255, 0.18);
   border-radius: 2rem;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   border: 1.5px solid rgba(255, 255, 255, 0.28);
 }

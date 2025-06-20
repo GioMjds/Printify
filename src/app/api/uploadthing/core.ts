@@ -33,14 +33,13 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      // Store upload info in the database
       await prisma.upload.create({
         data: {
           filename: file.name,
           fileData: file.ufsUrl,
           status: "pending",
           customerId: metadata.userId,
-          format: file.name.split(".").pop() || "", // Ensure string type
+          format: file.name.split(".").pop() || "",
         },
       });
       return {

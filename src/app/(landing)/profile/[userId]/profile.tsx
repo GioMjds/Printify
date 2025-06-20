@@ -57,7 +57,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
     return (
         <motion.div
-            className="min-h-screen w-full bg-gradient-to-br from-bg-soft via-white to-bg-highlight relative overflow-hidden p-4 mt-12"
+            className="min-h-screen w-full bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden p-4 mt-12"
             initial="hidden"
             animate="visible"
             variants={containerVariants}
@@ -112,11 +112,11 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
                         <div className="flex-1 text-center lg:text-left space-y-4">
                             <motion.div variants={itemVariants}>
-                                <h1 className="text-5xl font-bold text-accent mb-2 flex items-center gap-2">
+                                <h1 className="text-5xl font-bold text-highlight mb-2 flex items-center gap-2">
                                     {data.name}
                                     {data.isVerified && ( <CheckCircle2Icon className="text-green-500 w-10 h-10" />)}
                                 </h1>
-                                <div className="flex items-center justify-center lg:justify-start gap-2 text-text-light text-xl mb-4">
+                                <div className="flex items-center justify-center lg:justify-start gap-2 text-highlight text-xl mb-4">
                                     <Mail className="w-5 h-5" />
                                     <span>{data.email}</span>
                                 </div>
@@ -135,8 +135,8 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                         >
                             <div className="grid grid-cols-1 gap-4 text-center">
                                 <div className="glass-card p-4 rounded-xl">
-                                    <div className="text-5xl font-bold text-primary">{data.uploads?.length}</div>
-                                    <div className="text-text-light text-sm">Total Orders</div>
+                                    <div className="text-5xl font-bold text-text-primary">{data.uploads?.length}</div>
+                                    <div className="text-highlight text-sm">Total Orders</div>
                                 </div>
                             </div>
                         </motion.div>
