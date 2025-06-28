@@ -53,3 +53,17 @@ export const adminAccount = async ({ uploadId }: AdminAccountAction) => {
         throw error;
     }
 };
+
+export const fetchUsers = async () => {
+    try {
+        const response = await API.get('/admin/fetch_users', {
+            params: { action: 'fetch_users' },
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to fetch users: ${error}`);
+        throw error;
+    }
+};

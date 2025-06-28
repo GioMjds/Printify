@@ -43,6 +43,27 @@ export async function GET(req: NextRequest) {
                     }
                 });
             }
+            case 'fetch_users': {
+                const users = await prisma.user.findMany({
+                    where: {
+                        role: {
+                            not: 'admin',
+                        },
+                    },
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                        isVerified: true,
+                    },
+                });
+
+                return NextResponse.json({ users }, { status: 200 });
+            }
             default: {
                 return NextResponse.json({
                     error: "Invalid admin action"

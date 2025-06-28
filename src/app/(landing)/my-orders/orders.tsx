@@ -4,6 +4,7 @@ import { fetchCustomerPrintUploads } from "@/services/Customer";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
 const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -109,22 +110,19 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                                     </span>
                                 </div>
                                 <div className="flex-1 flex flex-col gap-2">
-                                    <h2
-                                        className="text-lg font-semibold text-[var(--color-text-primary)] truncate"
-                                        title={upload.filename}
-                                    >
+                                    <h2 className="text-lg font-semibold text-[var(--color-text-primary)] truncate">
                                         {upload.filename}
                                     </h2>
                                 </div>
                                 <div className="mt-4 flex items-center gap-2">
-                                    <a
+                                    <Link
                                         href={upload.fileData}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-[var(--color-secondary)] hover:underline text-sm font-medium"
                                     >
                                         View File
-                                    </a>
+                                    </Link>
                                 </div>
                             </motion.div>
                         ))}

@@ -4,7 +4,7 @@ import { fetchCustomerProfile } from "@/services/Customer";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mail, Shield, CheckCheckIcon, CheckIcon, CheckCircle2Icon } from "lucide-react";
+import { Mail, Shield, CheckCircle2Icon } from "lucide-react";
 import { User } from "@/types/prismaTypes";
 
 interface ProfilePageProps {
