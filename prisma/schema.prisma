@@ -8,37 +8,39 @@ datasource db {
 }
 
 model User {
-  id            String    @id 
-  email         String    @unique
-  password      String
-  profile_image String?
-  name          String?
-  role          UserRole  @default(customer)
-  isVerified    Boolean?  @default(false)
-  uploads       Upload[]  @relation("UserUploads")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                String        @id 
+  email             String        @unique
+  password          String
+  profile_image     String?
+  name              String?
+  role              UserRole      @default(customer)
+  isVerified        Boolean?      @default(false)
+  uploads           Upload[]      @relation("UserUploads")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 model Upload {
-  id            String        @id @default(uuid())
-  filename      String
-  fileData      String
-  status        UploadStatus  @default(pending)
-  customer      User          @relation("UserUploads", fields: [customerId], references: [id])
-  customerId    String
-  format        String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  notifications Notification[]
+  id                String        @id @default(uuid())
+  filename          String
+  fileData          String
+  status            UploadStatus  @default(pending)
+  rejection_reason  String?
+  needed_amount     Int?
+  customer          User          @relation("UserUploads", fields: [customerId], references: [id])
+  customerId        String
+  format            String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  notifications     Notification[]
 }
 
 model Notification {
-  id        String    @id @default(uuid())
-  upload    Upload    @relation(fields: [uploadId], references: [id])
-  uploadId  String
-  sentAt    DateTime  @default(now())
-  message   String
+  id                String        @id @default(uuid())
+  upload            Upload        @relation(fields: [uploadId], references: [id])
+  uploadId          String
+  sentAt            DateTime      @default(now())
+  message           String
 }
 
 enum UserRole {
@@ -48,8 +50,8 @@ enum UserRole {
 
 enum UploadStatus {
   pending // Default status for new document uploads (customer-side)
-  printing // Set by admin when the document is being printed
   cancelled // Customer can cancel the upload at any time
+  rejected // Admin can reject the upload if it doesn't meet requirements w/ specific reason
   ready_to_pickup // Admin can set this when the document is ready for pickup
   completed // Final status when the document has been picked up by the customer
 } 

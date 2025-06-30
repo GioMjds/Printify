@@ -10,6 +10,8 @@ const PROTECTED_PATHS = [
     "/admin/orders",
     "/admin/settings",
     "/admin/users",
+    '/upload',
+    '/my-orders',
 ];
 
 export async function middleware(req: NextRequest) {

@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { getSession } from "@/lib/auth";
 import { fetchCustomerPrintUploads } from "@/services/Customer";
+import { AuthRequired } from "@/components/ProtectedRoutes";
 
 export const metadata = {
     title: "My Orders",
@@ -20,10 +21,12 @@ export default async function MyOrders(context: { params: Promise<{ userId: stri
         queryKey: ['myOrders', userId],
         queryFn: () => fetchCustomerPrintUploads({ userId: session?.userId as string }), // Replace with actual userId if needed
     });
-    
+
     return (
-        <HydrationBoundary state={dehydrate(queryClient)}>
-            <MyOrdersPage userId={userId} />
-        </HydrationBoundary>
+        <AuthRequired>
+            <HydrationBoundary state={dehydrate(queryClient)}>
+                <MyOrdersPage userId={userId} />
+            </HydrationBoundary>
+        </AuthRequired>
     )
 }

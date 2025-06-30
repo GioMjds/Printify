@@ -1,41 +1,54 @@
 'use client';
 
-import { useState } from "react";
+import PrintOrderModal from "@/components/PrintOrderModal";
+import { fetchAllPrintOrders } from "@/services/Admin";
 import { useQuery } from "@tanstack/react-query";
-import { downloadFile, fetchAllPrintOrders } from "@/services/Admin";
 import { FileText, Info } from "lucide-react";
-import Modal from "@/components/Modal";
+import Link from "next/link";
+import { useState } from "react";
 
 function getPrintOrderStatus(status: string) {
     switch (status) {
         case "pending":
-            return "bg-yellow-100 text-yellow-800 rounded-full px-3 py-1";
+            return "text-yellow-500";
         case "printing":
-            return "bg-blue-100 text-blue-800 rounded-full px-3 py-1";
+            return "text-blue-500";
         case "ready_to_pickup":
-            return "bg-green-100 text-green-800 rounded-full px-3 py-1";
+            return "text-green-500";
         case "completed":
-            return "bg-gray-200 text-gray-700 rounded-full px-3 py-1";
+            return "text-gray-500";
         case "cancelled":
-            return "bg-red-100 text-red-800 rounded-full px-3 py-1";
+            return "text-red-500";
         default:
-            return "bg-gray-100 text-gray-700 rounded-full px-3 py-1";
+            return "text-gray-500";
     }
 }
 
 export default function Orders() {
-    const [openModalId, setOpenModalId] = useState<string | null>(null);
-    
+    const [openModalId, setOpenModalId] = useState<boolean>(false);
+
     const { data } = useQuery({
         queryKey: ['printOrders'],
         queryFn: () => fetchAllPrintOrders(),
     });
 
     const orders = data?.printOrders || [];
+    const selectedOrder = orders.find((order: any) => order.id === openModalId);
+
+    const handleCloseModal = () => setOpenModalId(false);
+    
+    const handleReject = (orderId: string, reason: string) => {
+        // TODO: Implement reject logic (API call)
+        setOpenModalId(false);
+    };
+    const handleReadyToPickup = (orderId: string, amount: number) => {
+        // TODO: Implement ready to pickup logic (API call)
+        setOpenModalId(false);
+    };
 
     return (
-        <div className="min-h-screen bg-white p-8">
-            <div className="mb-8">
+        <div className="min-h-screen bg-white p-4">
+            <div className="mb-2">
                 <h1 className="text-3xl font-bold text-primary mb-2">Customer Orders</h1>
                 <p className="text-text-light">Manage and review all print orders submitted by customers.</p>
             </div>
@@ -69,24 +82,30 @@ export default function Orders() {
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm flex gap-2 items-center justify-center">
-                                        {/* View File Icon Button */}
-                                        <button
-                                            onClick={() => downloadFile(order.id)}
-                                            className="flex items-center justify-center text-secondary hover:text-accent transition border border-border-light rounded p-2"
-                                            title="View Uploaded File"
-                                            aria-label={`View uploaded file for order ${order.id}`}
-                                        >
-                                            <FileText size={20} />
-                                        </button>
-                                        {/* Open Modal Icon Button */}
-                                        <button
-                                            onClick={() => setOpenModalId(order.id)}
-                                            className="flex items-center justify-center text-accent hover:text-primary transition border border-border-light rounded p-2"
-                                            title="Open Modal"
-                                            aria-label={`Open modal for order ${order.id}`}
-                                        >
-                                            <Info size={20} />
-                                        </button>
+                                        {/* Redirect to Order Details Button with Tooltip */}
+                                        <div className="relative group">
+                                            <Link
+                                                href={`/admin/orders/${order.id}`}
+                                                className="flex items-center justify-center cursor-pointer text-accent border border-border-light rounded p-2"
+                                            >
+                                                <FileText size={20} />
+                                            </Link>
+                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 whitespace-nowrap">
+                                                View Details
+                                            </span>
+                                        </div>
+                                        {/* Open Modal Icon Button with Tooltip */}
+                                        <div className="relative group">
+                                            <button
+                                                onClick={() => setOpenModalId(order.id)}
+                                                className="flex items-center justify-center cursor-pointer text-accent border border-border-light rounded p-2"
+                                            >
+                                                <Info size={20} />
+                                            </button>
+                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 whitespace-nowrap">
+                                                More Info
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -94,19 +113,14 @@ export default function Orders() {
                     </tbody>
                 </table>
             </div>
-            {/* Empty Modal (no functionality yet) */}
-            {openModalId && (
-                <Modal
-                    isOpen={!!openModalId}
-                    onCancel={() => setOpenModalId(null)}
-                    onConfirm={() => setOpenModalId(null)}
-                    title="Order Modal"
-                    description=""
-                    confirmText="Close"
-                    cancelText="Cancel"
-                >
-                    {/* Modal content will go here */}
-                </Modal>
+            {/* Modal for specific print order */}
+            {openModalId && selectedOrder && (
+                <PrintOrderModal
+                    order={selectedOrder}
+                    onClose={handleCloseModal}
+                    onReject={handleReject}
+                    onReadyToPickup={handleReadyToPickup}
+                />
             )}
         </div>
     );

@@ -28,7 +28,7 @@ const Modal: FC<ModalProps> = ({
     className,
     isOpen,
     loading = false,
-    loadingText = "Processing..."
+    loadingText = "Processing...",
 }) => {
     const handleCancel = useCallback(() => {
         onCancel();
@@ -59,6 +59,7 @@ const Modal: FC<ModalProps> = ({
         };
     }, [isOpen]);
 
+    if (!isOpen) return null;
     return (
         <AnimatePresence mode="wait">
             {isOpen && (

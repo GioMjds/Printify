@@ -77,6 +77,28 @@ export async function GET(req: NextRequest) {
     }
 }
 
+export async function PUT(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { adminAction } = body;
+
+        switch (adminAction) {
+            case "update_upload_status": {
+
+            }
+            default: {
+                return NextResponse.json({
+                    error: "Invalid admin action"
+                }, { status: 400 });
+            }
+        }
+    } catch (error) {
+        return NextResponse.json({
+            error: `An error occurred: ${error}`
+        }, { status: 500 });
+    }
+}
+
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();

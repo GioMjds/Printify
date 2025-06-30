@@ -10,6 +10,11 @@ export async function GET(
     try {
         const printUpload = await prisma.upload.findUnique({
             where: { id: uploadId },
+            include: {
+                customer: {
+                    select: { name: true }
+                }
+            }
         });
 
         if (!printUpload) {
@@ -23,7 +28,7 @@ export async function GET(
             filename: printUpload.filename,
             fileData: printUpload.fileData,
             status: printUpload.status,
-            customer: printUpload.customerId,
+            customer: printUpload.customer.name,
             createdAt: printUpload.createdAt,
             updatedAt: printUpload.updatedAt,
         }, { status: 200 });
