@@ -3,8 +3,10 @@ import {
     HydrationBoundary,
     QueryClient
 } from "@tanstack/react-query";
-import AdminUsers from "./users";
+import dynamic from "next/dynamic";
 import { fetchUsers } from "@/services/Admin";
+
+const AdminUsers = dynamic(() => import("./users"));
 
 export const metadata = {
     title: "Users",

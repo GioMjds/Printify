@@ -18,11 +18,11 @@ export default function LandingPage() {
         setCheckingSession(true);
         try {
             const session = await getSession();
-            if (session) router.push('/upload');
-            else router.push('/login');
+            if (session) router.prefetch('/upload');
+            else router.prefetch('/login');
         } catch (error) {
             console.error(`Error checking session: ${error}`);
-            router.push('/login');
+            router.prefetch('/login');
         } finally {
             setCheckingSession(false);
         }

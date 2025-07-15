@@ -4,8 +4,10 @@ import {
     HydrationBoundary,
     QueryClient
 } from "@tanstack/react-query";
-import ProfilePage from "./profile";
+import dynamic from "next/dynamic";
 import { getSession } from "@/lib/auth";
+
+const ProfilePage = dynamic(() => import("./profile"))
 
 export const metadata = {
     title: "My Profile",

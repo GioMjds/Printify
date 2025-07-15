@@ -3,8 +3,10 @@ import {
     HydrationBoundary,
     QueryClient,
 } from "@tanstack/react-query"
-import Orders from "./orders";
+import dynamic from "next/dynamic";
 import { fetchAllPrintOrders } from "@/services/Admin";
+
+const Orders = dynamic(() => import("./orders"))
 
 export const metadata = {
     title: "Orders",

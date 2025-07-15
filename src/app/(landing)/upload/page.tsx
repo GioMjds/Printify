@@ -1,6 +1,8 @@
 import { getSession } from '@/lib/auth';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
-import UploadFilePage from "./upload-file";
+
+const UploadFilePage = dynamic(() => import("./upload-file"));
 
 export const metadata = {
     title: "Upload Your Files",

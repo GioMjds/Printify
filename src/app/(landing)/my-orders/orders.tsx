@@ -6,6 +6,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
+interface UploadMap {
+    id: string;
+    status: string;
+    createdAt: string;
+    filename: string;
+    fileData: string;
+}
+
 const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
     printing: "bg-blue-100 text-blue-800 border-blue-300",
@@ -33,17 +41,17 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-bg-primary to-bg-accent">
                 <span className="loader mb-4" />
-                <p className="text-lg text-primary">Loading your orders...</p>
+                <p className="text-lg text-bg-soft">Loading your orders...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <p className="text-lg text-red-600">Failed to load orders.</p>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-bg-primary to-bg-accent">
+                <p className="text-lg text-red-400">Failed to load orders.</p>
             </div>
         );
     }
@@ -51,9 +59,13 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
     const uploads = data?.uploads || [];
 
     return (
-        <section className="w-full min-h-screen py-10 mt-20 px-4 md:px-12 bg-gradient-to-br from-[var(--color-bg-soft)] to-[var(--color-bg-white)]">
-            <div className="max-w-5xl mx-auto">
-                <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center tracking-tight">
+        <section className="w-full min-h-screen py-10 mt-20 px-4 md:px-12 bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden">
+            {/* Decorative Blobs */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-bg-accent opacity-20 rounded-full blur-3xl z-0" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-bg-highlight opacity-15 rounded-full blur-3xl z-0" />
+
+            <div className="max-w-5xl mx-auto relative z-10">
+                <h1 className="text-3xl md:text-4xl font-bold text-bg-soft mb-8 text-center tracking-tight">
                     My Print Orders
                 </h1>
                 {uploads.length < 0 ? (
@@ -65,7 +77,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                             height={80}
                             className="mb-4 opacity-70"
                         />
-                        <p className="text-xl text-[var(--color-text-light)]">
+                        <p className="text-xl text-bg-soft">
                             No print orders found.
                         </p>
                     </div>
@@ -83,7 +95,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                             },
                         }}
                     >
-                        {uploads.map((upload: any, idx: number) => (
+                        {uploads.map((upload: UploadMap, idx: number) => (
                             <motion.div
                                 key={upload.id}
                                 className="glass-card p-6 flex flex-col gap-4 border border-[var(--color-border-light)] shadow-lg hover:shadow-xl transition-shadow duration-200 relative"
@@ -103,14 +115,14 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                                     >
                                         {upload.status
                                             .replace(/_/g, " ")
-                                            .replace(/\b\w/g, (c: any) => c.toUpperCase())}
+                                            .replace(/\b\w/g, (c: string) => c.toUpperCase())}
                                     </span>
-                                    <span className="ml-auto text-xs text-gray-500">
+                                    <span className="ml-auto text-xs text-bg-soft/70">
                                         {formatDate(upload.createdAt)}
                                     </span>
                                 </div>
                                 <div className="flex-1 flex flex-col gap-2">
-                                    <h2 className="text-lg font-semibold text-[var(--color-text-primary)] truncate">
+                                    <h2 className="text-lg font-semibold text-bg-primary truncate">
                                         {upload.filename}
                                     </h2>
                                 </div>
@@ -119,7 +131,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                                         href={upload.fileData}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-[var(--color-secondary)] hover:underline text-sm font-medium"
+                                        className="text-bg-soft hover:text-bg-highlight hover:underline text-sm font-medium transition-colors duration-200"
                                     >
                                         View File
                                     </Link>

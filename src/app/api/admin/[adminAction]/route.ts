@@ -86,6 +86,9 @@ export async function PUT(req: NextRequest) {
             case "update_upload_status": {
 
             }
+            case "reject_print_order": {
+                
+            }
             default: {
                 return NextResponse.json({
                     error: "Invalid admin action"

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { v2 as cloudinary } from 'cloudinary';
+import type { UploadApiResponse } from 'cloudinary';
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -55,17 +56,17 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     try {
-        const uploadResult = await new Promise<any>((resolve, reject) => {
+        const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({
-                resource_type: 'raw',
-                public_id: fileName.replace(/\.[^/.]+$/, ""),
-                folder: 'printify_uploads',
-                use_filename: true,
-                unique_filename: false,
-                context: `extension=${fileExtension}|customerId=${customerId}`,
+            resource_type: 'raw',
+            public_id: fileName.replace(/\.[^/.]+$/, ""),
+            folder: 'printify_uploads',
+            use_filename: true,
+            unique_filename: false,
+            context: `extension=${fileExtension}|customerId=${customerId}`,
             }, (error, result) => {
                 if (error) return reject(error);
-                resolve(result);
+                resolve(result as UploadApiResponse);
             });
             stream.end(buffer);
         });
@@ -89,9 +90,9 @@ export async function POST(req: NextRequest) {
             format: fileExtension.replace('.', ''),
             status: "pending"
         }, { status: 201 });
-    } catch (error: any) {
+    } catch (error) {
         return NextResponse.json({
-            error: `File upload failed: ${error.message ?? 'Unknown error'}`
+            error: `File upload failed: ${error}`
         }, { status: 500 })
     }
 }

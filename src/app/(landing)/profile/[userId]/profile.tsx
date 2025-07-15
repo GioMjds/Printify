@@ -11,17 +11,6 @@ interface ProfilePageProps {
     userId: string;
 }
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-            duration: 0.6
-        }
-    }
-};
-
 const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -56,40 +45,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     if (!data) return null;
 
     return (
-        <motion.div
-            className="min-h-screen w-full bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden p-4 mt-12"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-        >
-            {/* Animated background elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <motion.div
-                    className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-full blur-3xl"
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 180, 360],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                />
-                <motion.div
-                    className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-full blur-3xl"
-                    animate={{
-                        scale: [1.2, 1, 1.2],
-                        rotate: [360, 180, 0],
-                    }}
-                    transition={{
-                        duration: 25,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                />
-            </div>
-
+        <div className="min-h-screen w-full bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden p-4 mt-12">
             <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-8">
                 {/* Profile Header */}
                 <motion.div
@@ -114,7 +70,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                             <motion.div variants={itemVariants}>
                                 <h1 className="text-5xl font-bold text-highlight mb-2 flex items-center gap-2">
                                     {data.name}
-                                    {data.isVerified && ( <CheckCircle2Icon className="text-green-500 w-10 h-10" />)}
+                                    {data.isVerified && (<CheckCircle2Icon className="text-green-500 w-10 h-10" />)}
                                 </h1>
                                 <div className="flex items-center justify-center lg:justify-start gap-2 text-highlight text-xl mb-4">
                                     <Mail className="w-5 h-5" />
@@ -143,6 +99,6 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                     </div>
                 </motion.div>
             </div>
-        </motion.div>
+        </div>
     );
 }

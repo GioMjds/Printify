@@ -25,7 +25,6 @@ interface NavbarProps {
     } | null;
 }
 
-
 export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -67,7 +66,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
             setLoading(true);
             await logout();
             setShowLogoutModal(false);
-            router.push('/');
+            router.prefetch('/');
             router.refresh();
         } catch (error) {
             console.error(`Logout failed: ${error}`);
@@ -87,7 +86,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Link href="/" className="flex items-center space-x-2">
+                        <Link prefetch={false} href="/" className="flex items-center space-x-2">
                             <div className="relative w-10 h-10 lg:w-12 lg:h-12">
                                 <Image
                                     src="/printify_logo.png"
@@ -110,7 +109,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         variants={itemVariants}
                     >
                         {userDetails &&
-                            navbar.map((item: { href: string; icon?: any; name: string }) => {
+                            navbar.map((item) => {
                                 const isActive = pathname === item.href;
                                 return (
                                     <Link

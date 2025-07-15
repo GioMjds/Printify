@@ -7,6 +7,21 @@ import { FileText, Info } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+type PrintOrder = {
+    id: string;
+    filename: string;
+    fileData: string;
+    status: string;
+    needed_amount?: number;
+    customer?: {
+        name?: string;
+        id?: string;
+    };
+    createdAt: string;
+    updatedAt: string;
+    format: string;
+};
+
 function getPrintOrderStatus(status: string) {
     switch (status) {
         case "pending":
@@ -25,23 +40,23 @@ function getPrintOrderStatus(status: string) {
 }
 
 export default function Orders() {
-    const [openModalId, setOpenModalId] = useState<boolean>(false);
+    const [openModalId, setOpenModalId] = useState<string | number | false>(false);
 
     const { data } = useQuery({
         queryKey: ['printOrders'],
         queryFn: () => fetchAllPrintOrders(),
     });
 
-    const orders = data?.printOrders || [];
-    const selectedOrder = orders.find((order: any) => order.id === openModalId);
+    const orders: PrintOrder[] = data?.printOrders || [];
+    const selectedOrder = orders.find((order) => order.id === openModalId);
 
     const handleCloseModal = () => setOpenModalId(false);
     
-    const handleReject = (orderId: string, reason: string) => {
+    const handleReject = () => {
         // TODO: Implement reject logic (API call)
         setOpenModalId(false);
     };
-    const handleReadyToPickup = (orderId: string, amount: number) => {
+    const handleReadyToPickup = () => {
         // TODO: Implement ready to pickup logic (API call)
         setOpenModalId(false);
     };
@@ -71,7 +86,7 @@ export default function Orders() {
                                 </td>
                             </tr>
                         ) : (
-                            orders.map((order: any) => (
+                            orders.map((order) => (
                                 <tr key={order.id}>
                                     <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-primary">{order.customer?.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
