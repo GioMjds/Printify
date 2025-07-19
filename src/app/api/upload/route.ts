@@ -23,8 +23,9 @@ export const config = {
 }
 
 export async function POST(req: NextRequest) {
-    const contentType = req.headers.get("Content-Type") || "";
-    if (!contentType.startsWith("multipart/form-data")) {
+    const contentType: string | null = req.headers.get("Content-Type");
+
+    if (!contentType || !contentType.startsWith("multipart/form-data")) {
         return NextResponse.json({ 
             error: 'Content-Type must be "multipart/form-data".' 
         }, { status: 415 });
@@ -42,12 +43,9 @@ export async function POST(req: NextRequest) {
 
     const fileName = file.name;
     const fileExtension = fileName.slice(fileName.lastIndexOf('.')).toLowerCase();
+    const isValidFileExtension = !allowedExtensions.includes(fileExtension) || !allowedMimeTypes.includes(file.type)
 
-    // extension + MIME check
-    if (
-        !allowedExtensions.includes(fileExtension) ||
-        !allowedMimeTypes.includes(file.type)
-    ) {
+    if (isValidFileExtension) {
         return NextResponse.json({
             error: "Invalid file type. Only PDF and Word documents are allowed."
         }, { status: 400 });

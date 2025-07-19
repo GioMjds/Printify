@@ -1,3 +1,8 @@
+import { 
+    dehydrate, 
+    HydrationBoundary, 
+    QueryClient 
+} from '@tanstack/react-query';
 import { getSession } from '@/lib/auth';
 import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
@@ -10,9 +15,13 @@ export const metadata = {
 
 export default async function Upload() {
     const session = await getSession();
+    const queryClient = new QueryClient();
+
     if (!session) redirect('/login');
 
     return (
-        <UploadFilePage />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <UploadFilePage />
+        </HydrationBoundary>
     )
 }

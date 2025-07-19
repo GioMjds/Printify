@@ -21,9 +21,9 @@ interface PrintOrderModalProps {
 }
 
 export default function PrintOrderModal({ order, onClose, onReject, onReadyToPickup }: PrintOrderModalProps) {
-    const [amount, setAmount] = useState(order.needed_amount || 0);
-    const [rejectReason, setRejectReason] = useState("");
-    const [showRejectInput, setShowRejectInput] = useState(false);
+    const [amount, setAmount] = useState<number>(order.needed_amount || 0);
+    const [rejectReason, setRejectReason] = useState<string>("");
+    const [showRejectInput, setShowRejectInput] = useState<boolean>(false);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -116,15 +116,15 @@ export default function PrintOrderModal({ order, onClose, onReject, onReadyToPic
                                 className="border border-border-light rounded px-2 py-1 w-24 text-primary"
                             />
                         </div>
-                        <div className="flex gap-3 mt-2">
+                        <div className="flex gap-3 mt-2 justify-between">
                             <button
-                                className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
+                                className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
                                 onClick={() => setShowRejectInput(true)}
                             >
                                 Reject Print Order
                             </button>
                             <button
-                                className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded"
+                                className="bg-green-500 cursor-pointer hover:bg-green-600 text-white font-semibold px-4 py-2 rounded"
                                 onClick={() => onReadyToPickup(order.id, amount)}
                             >
                                 Ready To Pickup

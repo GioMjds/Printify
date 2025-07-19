@@ -128,9 +128,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                                 </div>
                                 <div className="mt-4 flex items-center gap-2">
                                     <Link
-                                        href={upload.fileData}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                        href={`/my-orders/${upload.id}`}
                                         className="text-bg-soft hover:text-bg-highlight hover:underline text-sm font-medium transition-colors duration-200"
                                     >
                                         View File

@@ -5,7 +5,7 @@ import { useState } from "react";
 import SuccessFallback from "./success-fallback";
 
 export default function UploadPage() {
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     return (
@@ -28,7 +28,7 @@ export default function UploadPage() {
                                 onClientUploadComplete={() => setSuccess(true)}
                                 onUploadError={err => setError(err.message)}
                                 appearance={{
-                                    button: "bg-accent text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-highlight transition-colors duration-200",
+                                    button: "bg-accent cursor-pointer text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-highlight transition-colors duration-200",
                                     label: {
                                         color: "#E3D095",
                                     },
