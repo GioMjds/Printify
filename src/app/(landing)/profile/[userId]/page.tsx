@@ -6,22 +6,46 @@ import {
 } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { getSession } from "@/lib/auth";
+import { notFound } from "next/navigation";
 
 const ProfilePage = dynamic(() => import("./profile"))
 
-export const metadata = {
-    title: "My Profile",
+export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }) {
+    try {
+        const { userId } = await params;
+        const data = await fetchCustomerProfile({ userId: userId });
+
+        if (!data || data.error) {
+            return {
+                title: "Profile Not Found"
+            };
+        }
+
+        return {
+            title: data.name ? `${data.name} | Profile` : "User Profile",
+            description: `Profile details for ${data.name || "the user"}`,
+        }
+    } catch {
+        return {
+            title: "Profile Not Found"
+        }
+    }
 }
 
 export default async function Profile(context: { params: Promise<{ userId: string }> }) {
     const { userId } = await context.params;
-    const session = await getSession();
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery({
-        queryKey: ['profile', userId],
-        queryFn: () => fetchCustomerProfile({ userId: session?.userId as string })
-    });
+    try {
+        const data = await queryClient.fetchQuery({
+            queryKey: ['profile', userId],
+            queryFn: () => fetchCustomerProfile({ userId })
+        });
+        if (!data || data.error) notFound();
+    } catch (error) {
+        notFound();
+    }
+
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>

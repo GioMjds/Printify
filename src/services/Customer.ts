@@ -4,14 +4,14 @@ type PrintUploads = {
     userId: string;
 }
 
-export const fetchCustomerProfile = async ({ userId }: { userId: string }) => {
+export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
     try {
         const response = await API.get(`/profile/${userId}`, {
             withCredentials: true,
         });
         return response.data;
     } catch (error) {
-        console.error("Failed to fetch customer profile:", error);
+        console.error(`Failed to fetch customer profile: ${error}`);
         throw error;
     }
 };

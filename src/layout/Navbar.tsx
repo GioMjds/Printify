@@ -4,32 +4,29 @@ import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
 import { navbar } from '@/constants/navbar';
 import { logout } from '@/services/Auth';
+import ProfileSpinner from '@/skeletons/ProfileSpinner';
+import { NavbarProps, Notification } from '@/types/Navbar';
+import { formatNotificationTime } from '@/utils/notificationHelpers';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
-import { LogIn, LogOut, UserRoundPlus } from 'lucide-react';
+import { Bell, BellDot, LogIn, LogOut, UserRoundPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Suspense, lazy, useState } from 'react';
-import ProfileSpinner from '@/skeletons/ProfileSpinner';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 const ProfileIcon = lazy(() => import('@/components/ProfileIcon'));
 
-interface NavbarProps {
-    userDetails?: {
-        profileImage?: string;
-        name?: string;
-        email?: string;
-        role?: string;
-        id?: string;
-    } | null;
-}
-
-export default function Navbar({ userDetails }: NavbarProps) {
+export default function Navbar({ userDetails, notifications: initialNotifications = [] }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+    const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const notificationRef = useRef<HTMLDivElement>(null);
 
+    const hasUnread = notifications.some(n => !n.read);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -74,6 +71,35 @@ export default function Navbar({ userDetails }: NavbarProps) {
             setLoading(false);
         }
     }
+
+    const markNotificationAsRead = (notificationId: string) => {
+        setNotifications(prev =>
+            prev.map(notification =>
+                notification.id === notificationId
+                    ? { ...notification, read: true }
+                    : notification
+            )
+        );
+    };
+
+    const markAllAsRead = () => {
+        setNotifications(prev =>
+            prev.map(notification => ({ ...notification, read: true }))
+        );
+    };
+
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+                setShowNotifications(false);
+            }
+        };
+
+        if (showNotifications) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showNotifications]);
 
     return (
         <>
@@ -132,6 +158,91 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 );
                             })
                         }
+                        {userDetails && (
+                            <div className="relative" ref={notificationRef}>
+                                <motion.button
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                    className="relative group cursor-pointer p-3 text-highlight rounded-full transition-colors duration-200"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    {hasUnread ? (
+                                        <>
+                                            <FontAwesomeIcon icon={faBell} size='xl' />
+                                            <span>
+                                                {unreadCount > 0 ? `${unreadCount} new` : 'No new'}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <FontAwesomeIcon icon={faBell} size='xl' />
+                                    )}
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-5">
+                                            {unreadCount > 99 ? '99+' : unreadCount}
+                                        </span>
+                                    )}
+                                </motion.button>
+
+                                {/* Notification Dropdown */}
+                                {showNotifications && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                        className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-border-light z-50 max-h-96 overflow-hidden"
+                                    >
+                                        <div className="p-4 border-b border-border-light">
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="text-lg font-semibold text-primary">Notifications</h3>
+                                                {unreadCount > 0 && (
+                                                    <button
+                                                        onClick={markAllAsRead}
+                                                        className="text-sm text-accent hover:text-primary transition-colors"
+                                                    >
+                                                        Mark all as read
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="max-h-64 overflow-y-auto">
+                                            {notifications.length === 0 ? (
+                                                <div className="p-4 text-center text-gray-500">
+                                                    No notifications yet
+                                                </div>
+                                            ) : (
+                                                notifications.map((notification) => (
+                                                    <div
+                                                        key={notification.id}
+                                                        className={`p-4 border-b border-gray-100 last:border-b-0 cursor-pointer hover:bg-bg-soft transition-colors ${!notification.read ? 'bg-blue-50 border-l-4 border-l-accent' : ''
+                                                            }`}
+                                                        onClick={() => {
+                                                            markNotificationAsRead(notification.id);
+                                                            if (notification.orderId) {
+                                                                router.prefetch(`/my-orders/${notification.orderId}`);
+                                                                setShowNotifications(false);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <div className="flex justify-between items-start">
+                                                            <p className={`text-sm ${!notification.read ? 'font-semibold text-primary' : 'text-gray-700'}`}>
+                                                                {notification.message}
+                                                            </p>
+                                                            {!notification.read && (
+                                                                <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 ml-2 mt-1"></div>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-gray-500 mt-1">
+                                                            {formatNotificationTime(notification.createdAt)}
+                                                        </p>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </div>
+                        )}
                         {userDetails ? (
                             <Dropdown
                                 userDetails={{
@@ -261,7 +372,53 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                     Contact Us
                                 </Link>
                                 {userDetails ? (
-                                    <ProfileIcon profileImage={userDetails.profileImage} />
+                                    <>
+                                        {/* Mobile Notifications */}
+                                        <div className="px-3 py-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-base font-medium text-highlight">Notifications</span>
+                                                <div className="flex items-center space-x-2">
+                                                    {unreadCount > 0 && (
+                                                        <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-5">
+                                                            {unreadCount > 99 ? '99+' : unreadCount}
+                                                        </span>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setShowNotifications(!showNotifications)}
+                                                        className="text-highlight hover:text-bg-white"
+                                                    >
+                                                        {hasUnread ? <BellDot size={20} /> : <Bell size={20} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {showNotifications && (
+                                                <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                                                    {notifications.length === 0 ? (
+                                                        <p className="text-sm text-gray-400">No notifications yet</p>
+                                                    ) : (
+                                                        notifications.map((notification) => (
+                                                            <div
+                                                                key={notification.id}
+                                                                className={`p-2 rounded text-sm ${!notification.read ? 'bg-blue-50 border-l-2 border-l-accent text-primary' : 'text-gray-600'
+                                                                    }`}
+                                                                onClick={() => {
+                                                                    markNotificationAsRead(notification.id);
+                                                                    if (notification.orderId) {
+                                                                        router.push(`/my-orders/${notification.orderId}`);
+                                                                        setIsOpen(false);
+                                                                        setShowNotifications(false);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {notification.message}
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <ProfileIcon profileImage={userDetails.profileImage} />
+                                    </>
                                 ) : (
                                     <>
                                         <Link

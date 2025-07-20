@@ -1,3 +1,8 @@
+/**
+ * @param status - The status string for which to retrieve the color classes.
+ * @returns A string containing Tailwind CSS classes for background, text, and border colors
+ *          that visually represent the provided status.
+ */
 export const getStatusColor = (status: string) => {
   switch (status) {
     case "pending":
@@ -14,3 +19,18 @@ export const getStatusColor = (status: string) => {
       return "bg-blue-100 text-blue-800 border-blue-300";
   }
 };
+
+/**
+ * Formats a date string into a more readable format.
+ * @param dateStr - The date string to format.
+ * @returns A formatted date string.
+ */
+export function formatDate(dateStr: string) {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}

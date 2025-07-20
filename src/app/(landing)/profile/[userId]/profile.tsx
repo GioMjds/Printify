@@ -45,7 +45,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
     if (!data) return null;
 
     return (
-        <div className="min-h-screen w-full bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden p-4 mt-12">
+        <div className="min-h-screen w-full bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden p-4 mt-12">
             <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-8">
                 {/* Profile Header */}
                 <motion.div

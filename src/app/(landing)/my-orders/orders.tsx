@@ -1,65 +1,24 @@
 "use client";
 
 import { fetchCustomerPrintUploads } from "@/services/Customer";
+import { formatDate, getStatusColor } from "@/utils/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { Upload, UploadResponse } from "@/types/MyOrders";
 import Image from "next/image";
 import Link from "next/link";
 
-interface UploadMap {
-    id: string;
-    status: string;
-    createdAt: string;
-    filename: string;
-    fileData: string;
-}
-
-const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
-    printing: "bg-blue-100 text-blue-800 border-blue-300",
-    cancelled: "bg-red-100 text-red-800 border-red-300",
-    ready_to_pickup: "bg-purple-100 text-purple-800 border-purple-300",
-    completed: "bg-green-100 text-green-800 border-green-300",
-};
-
-function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-}
-
 export default function MyOrdersPage({ userId }: { userId: string }) {
-    const { data, isLoading, error } = useQuery({
+    const { data } = useQuery<UploadResponse>({
         queryKey: ["myOrders", userId],
         queryFn: () => fetchCustomerPrintUploads({ userId }),
         enabled: !!userId,
-    });
-
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-bg-primary to-bg-accent">
-                <span className="loader mb-4" />
-                <p className="text-lg text-bg-soft">Loading your orders...</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-bg-primary to-bg-accent">
-                <p className="text-lg text-red-400">Failed to load orders.</p>
-            </div>
-        );
-    }
+    }); 
 
     const uploads = data?.uploads || [];
 
     return (
-        <section className="w-full min-h-screen py-10 mt-20 px-4 md:px-12 bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden">
+        <section className="w-full min-h-screen py-10 mt-20 px-4 md:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
             {/* Decorative Blobs */}
             <div className="absolute top-0 left-0 w-72 h-72 bg-bg-accent opacity-20 rounded-full blur-3xl z-0" />
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-bg-highlight opacity-15 rounded-full blur-3xl z-0" />
@@ -68,7 +27,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                 <h1 className="text-3xl md:text-4xl font-bold text-bg-soft mb-8 text-center tracking-tight">
                     My Print Orders
                 </h1>
-                {uploads.length < 0 ? (
+                {uploads.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <Image
                             src="/file.svg"
@@ -95,7 +54,7 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                             },
                         }}
                     >
-                        {uploads.map((upload: UploadMap, idx: number) => (
+                        {uploads.map((upload: Upload, idx: number) => (
                             <motion.div
                                 key={upload.id}
                                 className="glass-card p-6 flex flex-col gap-4 border border-[var(--color-border-light)] shadow-lg hover:shadow-xl transition-shadow duration-200 relative"
@@ -109,13 +68,11 @@ export default function MyOrdersPage({ userId }: { userId: string }) {
                             >
                                 <div className="flex items-center gap-3 mb-2">
                                     <span
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[upload.status] ||
+                                        className={`px-3 py-1 uppercase rounded-full text-xs font-semibold border ${getStatusColor(upload.status) ||
                                             "bg-gray-100 text-gray-700 border-gray-300"
                                             }`}
                                     >
-                                        {upload.status
-                                            .replace(/_/g, " ")
-                                            .replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                                        {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
                                     </span>
                                     <span className="ml-auto text-xs text-bg-soft/70">
                                         {formatDate(upload.createdAt)}

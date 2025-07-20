@@ -12,10 +12,11 @@ export const metadata = {
     title: "My Orders",
 }
 
-export default async function MyOrders(context: { params: Promise<{ userId: string }> }) {
-    const { userId } = await context.params;
+export default async function MyOrders() {
     const session = await getSession();
     const queryClient = new QueryClient();
+
+    const userId = session?.userId as string;
 
     await queryClient.prefetchQuery({
         queryKey: ['myOrders', userId],

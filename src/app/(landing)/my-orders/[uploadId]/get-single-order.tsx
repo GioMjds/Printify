@@ -7,11 +7,7 @@ import { getStatusColor } from "@/utils/formatters";
 import Image from "next/image";
 import Link from "next/link";
 
-interface GetSingleOrderPageProps {
-    uploadId: string;
-}
-
-export default function GetSingleOrderPage({ uploadId }: GetSingleOrderPageProps) {
+export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
     const { data } = useQuery({
         queryKey: ['singleOrder', uploadId],
         queryFn: () => fetchSinglePrintUpload({ uploadId }),

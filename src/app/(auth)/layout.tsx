@@ -3,6 +3,7 @@ import { Lexend } from "next/font/google";
 import "../globals.css";
 import Providers from "../providers";
 import { AuthRedirect } from "@/components/ProtectedRoutes";
+import { WebSocketProvider } from "@/contexts/WebSocketContext";
 
 const lexend = Lexend({
     variable: "--font-lexend",
@@ -24,14 +25,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body
-                className={`${lexend.variable} antialiased`}
-            >
-                <Providers>
-                    <AuthRedirect>
-                        {children}
-                    </AuthRedirect>
-                </Providers>
+            <body className={`${lexend.variable} antialiased`}>
+                <WebSocketProvider>
+                    <Providers>
+                        <AuthRedirect>
+                            {children}
+                        </AuthRedirect>
+                    </Providers>
+                </WebSocketProvider>
             </body>
         </html>
     );
