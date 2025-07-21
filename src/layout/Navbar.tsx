@@ -3,10 +3,11 @@
 import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
 import { navbar } from '@/constants/navbar';
+import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { logout } from '@/services/Auth';
 import ProfileSpinner from '@/skeletons/ProfileSpinner';
-import { NavbarProps, Notification } from '@/types/Navbar';
-import { formatNotificationTime } from '@/utils/notificationHelpers';
+import { NavbarProps } from '@/types/Navbar';
+import { formatNotificationTime } from '@/utils/notifications';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
@@ -18,15 +19,25 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 
 const ProfileIcon = lazy(() => import('@/components/ProfileIcon'));
 
-export default function Navbar({ userDetails, notifications: initialNotifications = [] }: NavbarProps) {
+export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
-    const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
     const notificationRef = useRef<HTMLDivElement>(null);
 
-    const hasUnread = notifications.some(n => !n.read);
+    // Use the new notifications hook
+    const { 
+        notifications, 
+        unreadCount, 
+        hasUnread, 
+        isLoading: notificationsLoading,
+        isConnected,
+        markAsRead,
+        markAllAsRead,
+        refreshNotifications
+    } = useNavbarNotifications();
+
     const router = useRouter();
     const pathname = usePathname();
 
@@ -73,22 +84,12 @@ export default function Navbar({ userDetails, notifications: initialNotification
     }
 
     const markNotificationAsRead = (notificationId: string) => {
-        setNotifications(prev =>
-            prev.map(notification =>
-                notification.id === notificationId
-                    ? { ...notification, read: true }
-                    : notification
-            )
-        );
+        markAsRead(notificationId);
     };
 
-    const markAllAsRead = () => {
-        setNotifications(prev =>
-            prev.map(notification => ({ ...notification, read: true }))
-        );
+    const handleMarkAllAsRead = () => {
+        markAllAsRead();
     };
-
-    const unreadCount = notifications.filter(n => !n.read).length;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -143,7 +144,7 @@ export default function Navbar({ userDetails, notifications: initialNotification
                                         href={item.href}
                                         className={`relative group text-base font-medium nav-link px-4 py-3 rounded-full transition-colors duration-200 
                                         ${isActive ? 'bg-accent text-bg-white shadow-md'
-                                                : 'text-highlight hover:text-bg-white hover:bg-accent'}
+                                                : 'text-highlight hover:text-bg-accent'}
                                     `}
                                     >
                                         {item.icon && (
@@ -169,9 +170,6 @@ export default function Navbar({ userDetails, notifications: initialNotification
                                     {hasUnread ? (
                                         <>
                                             <FontAwesomeIcon icon={faBell} size='xl' />
-                                            <span>
-                                                {unreadCount > 0 ? `${unreadCount} new` : 'No new'}
-                                            </span>
                                         </>
                                     ) : (
                                         <FontAwesomeIcon icon={faBell} size='xl' />
@@ -193,22 +191,39 @@ export default function Navbar({ userDetails, notifications: initialNotification
                                     >
                                         <div className="p-4 border-b border-border-light">
                                             <div className="flex items-center justify-between">
-                                                <h3 className="text-lg font-semibold text-primary">Notifications</h3>
-                                                {unreadCount > 0 && (
-                                                    <button
-                                                        onClick={markAllAsRead}
-                                                        className="text-sm text-accent hover:text-primary transition-colors"
-                                                    >
-                                                        Mark all as read
-                                                    </button>
-                                                )}
+                                                <h3 className="text-lg font-semibold text-primary">
+                                                    Notifications
+                                                    {notificationsLoading && (
+                                                        <span className="ml-2 text-xs text-gray-500">(Loading...)</span>
+                                                    )}
+                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    {/* Connection status */}
+                                                    <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} 
+                                                          title={isConnected ? 'Connected' : 'Disconnected'} />
+                                                    {unreadCount > 0 && (
+                                                        <button
+                                                            onClick={handleMarkAllAsRead}
+                                                            className="text-sm text-accent hover:text-primary transition-colors"
+                                                        >
+                                                            Mark all as read
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
                                         <div className="max-h-64 overflow-y-auto">
-                                            {notifications.length === 0 ? (
+                                            {notificationsLoading ? (
                                                 <div className="p-4 text-center text-gray-500">
-                                                    No notifications yet
+                                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent mx-auto"></div>
+                                                    <p className="mt-2 text-sm">Loading notifications...</p>
+                                                </div>
+                                            ) : notifications.length === 0 ? (
+                                                <div className="p-4 text-center text-gray-500">
+                                                    <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                    <p>No notifications yet</p>
+                                                    <p className="text-xs mt-1">You'll see updates about your orders here</p>
                                                 </div>
                                             ) : (
                                                 notifications.map((notification) => (
@@ -219,7 +234,7 @@ export default function Navbar({ userDetails, notifications: initialNotification
                                                         onClick={() => {
                                                             markNotificationAsRead(notification.id);
                                                             if (notification.orderId) {
-                                                                router.prefetch(`/my-orders/${notification.orderId}`);
+                                                                router.push(`/my-orders/${notification.orderId}`);
                                                                 setShowNotifications(false);
                                                             }
                                                         }}
@@ -343,6 +358,7 @@ export default function Navbar({ userDetails, notifications: initialNotification
                     className="lg:hidden overflow-hidden bg-accent rounded-lg mt-2 shadow-soft"
                 >
                     <div className="px-2 pt-2 pb-3 space-y-1">
+                        {/* Mobile navigation items */}
                         <div className="pt-4 pb-2 border-t border-highlight">
                             <motion.div
                                 initial={{ x: -20, opacity: 0 }}

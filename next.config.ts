@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     '*',
   ],
+  serverExternalPackages: ['ws'],
 };
 
 export default nextConfig;

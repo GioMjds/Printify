@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { JWTPayload, SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import prisma from "./prisma";
+import { NextResponse } from "next/server";
 
 const secretKey = process.env.JWT_SECRET_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -12,7 +12,7 @@ interface SessionData extends JWTPayload {
     email: string;
 }
 
-export async function encrypt(payload: any) {
+export async function encrypt(payload: Record<string, unknown>): Promise<string> {
     return new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
@@ -106,5 +106,50 @@ export async function getCurrentUser() {
     } catch (error) {
         console.error(`Error getting current user: ${error}`);
         return null;
+    }
+}
+
+// Server-side authentication validation for API endpoints
+export async function validateAdminSession(): Promise<NextResponse | null> {
+    try {
+        const session = await getSession();
+
+        if (!session?.userId) {
+            return NextResponse.json({
+                error: "Unauthorized - Admin Access needed"
+            }, { status: 401 });
+        }
+
+        if (session.role !== 'admin') {
+            return NextResponse.json({
+                error: "Forbidden - Admin access required"
+            }, { status: 403 });
+        }
+
+        return null;
+    } catch (error) {
+        return NextResponse.json({
+            error: `Internal Server Error - ${error}`
+        }, { status: 500 });
+    }
+}
+
+// Server-side general session validation for any protected route
+export async function validateSession(): Promise<NextResponse | null> {
+    try {
+        const session = await getSession();
+
+        if (!session?.userId) {
+            return NextResponse.json({
+                error: "Unauthorized - No session found",
+            }, { status: 401 });
+        }
+
+        return null;
+    } catch (error) {
+        console.error(`Error validating session: ${error}`);
+        return NextResponse.json({
+            error: "Internal server error during authentication",
+        }, { status: 500 });
     }
 }

@@ -14,11 +14,14 @@ export const metadata = {
 
 export default async function AdminOrders() {
     const queryClient = new QueryClient();
-
-    await queryClient.prefetchQuery({
-        queryKey: ['printOrders'],
-        queryFn: () => fetchAllPrintOrders()
-    })
+    try {
+        await queryClient.prefetchQuery({
+            queryKey: ['printOrders'],
+            queryFn: () => fetchAllPrintOrders()
+        });
+    } catch (error) {
+        console.error(`Failed to prefetch orders: ${error}`);
+    }
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>

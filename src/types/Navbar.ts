@@ -14,5 +14,4 @@ export interface NavbarProps {
         role?: string;
         id?: string;
     } | null;
-    notifications?: Notification[];
 }

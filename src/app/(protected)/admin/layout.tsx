@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import Sidebar from "../sidebar";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const lexend = Lexend({
     variable: "--font-lexend",
@@ -29,7 +31,7 @@ export default function RootLayout({
             <body className={`${lexend.variable} antialiased`}>
                 <WebSocketProvider>
                     <Providers>
-                        <RoleRequired allowedRoles={['admin', 'customer']}>
+                        <RoleRequired allowedRoles={['admin']}>
                             <div className="flex min-h-screen">
                                 <div className="sticky top-0 h-screen flex-shrink-0 z-30">
                                     <Sidebar />
@@ -38,6 +40,16 @@ export default function RootLayout({
                                     {children}
                                 </main>
                             </div>
+                            <ToastContainer
+                                position="top-right"
+                                autoClose={5000}
+                                hideProgressBar={false}
+                                newestOnTop={false}
+                                closeOnClick
+                                rtl={false}
+                                theme="light"
+                                toastClassName="font-lexend"
+                            />
                         </RoleRequired>
                     </Providers>
                 </WebSocketProvider>

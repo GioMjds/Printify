@@ -34,3 +34,46 @@ export function formatDate(dateStr: string) {
         minute: "2-digit",
     });
 }
+
+/**
+ * Get the text color class for a print order status (admin-side).
+ * @param status - The status of the print order.
+ * @returns A string containing the Tailwind CSS text color class.
+ */
+export function getPrintOrderStatus(status: string) {
+    switch (status) {
+        case "pending":
+            return "text-yellow-500";
+        case "printing":
+            return "text-blue-500";
+        case "ready_to_pickup":
+            return "text-green-500";
+        case "completed":
+            return "text-gray-500";
+        case "cancelled":
+            return "text-red-500";
+        case "rejected":
+            return "text-red-500";
+        default:
+            return "text-gray-500";
+    }
+}
+
+export function getStatus(status: string) {
+    switch (status) {
+        case "pending":
+            return "Pending";
+        case "printing":
+            return "Printing";
+        case "ready_to_pickup":
+            return "Ready To Pickup";
+        case "completed":
+            return "Completed";
+        case "cancelled":
+            return "Cancelled";
+        case "rejected":
+            return "Rejected";
+        default:
+            return "Unknown Status";
+    }
+}

@@ -1,6 +1,9 @@
-import prisma from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { generateNotificationMessage } from "@/utils/notifications";
+import prisma from "@/lib/prisma";
+import axios from "axios";
+import path from "path";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,6 +14,11 @@ export async function GET(req: NextRequest) {
     switch (adminAction) {
       case "fetch_print_orders": {
         const printOrders = await prisma.upload.findMany({
+          where: {
+            status: {
+              notIn: ["cancelled", "rejected", "completed"],
+            },
+          },
           orderBy: {
             createdAt: "asc",
           },
@@ -19,31 +27,36 @@ export async function GET(req: NextRequest) {
           },
         });
 
-        return NextResponse.json({ printOrders }, { status: 200 });
+        return NextResponse.json({ 
+          "printOrders": printOrders
+        }, { status: 200 });
       }
       case "download_file": {
         if (!uploadId) {
-          return NextResponse.json(
-            { error: "Missing uploadId" },
-            { status: 400 }
-          );
+          return NextResponse.json({ 
+            error: "Missing uploadId" 
+          }, { status: 400 });
         }
+
         const upload = await prisma.upload.findUnique({
           where: { id: uploadId },
         });
+
         if (!upload) {
-          return NextResponse.json(
-            { error: "File not found" },
-            { status: 404 }
-          );
+          return NextResponse.json({ 
+            error: "File not found" 
+          }, { status: 404 });
         }
+
         const fileUrl = upload.fileData;
         let filename = upload.filename;
         const format = upload.format;
-        // Ensure filename ends with the correct extension
-        if (!filename.toLowerCase().endsWith(`.${format}`)) {
-          filename = filename.replace(/\.[^/.]+$/, "") + `.${format}`;
+
+        const ext = `.${format}`;
+        if (path.extname(filename).toLowerCase() !== ext.toLowerCase()) {
+          filename = path.basename(filename, path.extname(filename)) + ext;
         }
+
         return new NextResponse(null, {
           status: 302,
           headers: {
@@ -74,24 +87,20 @@ export async function GET(req: NextRequest) {
           },
         });
 
-        return NextResponse.json({ users }, { status: 200 });
+        return NextResponse.json({ 
+          "users": users 
+        }, { status: 200 });
       }
       default: {
-        return NextResponse.json(
-          {
-            error: "Invalid admin action",
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          error: "Invalid admin action",
+        }, { status: 400 });
       }
     }
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: `An error occurred: ${error}`,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+        error: `/api/admin/[adminAction] GET error: ${error}`,
+    }, { status: 500 });
   }
 }
 
@@ -105,15 +114,11 @@ export async function PUT(req: NextRequest) {
         const { uploadId, newStatus, rejectionReason } = body;
 
         if (!uploadId || !newStatus) {
-          return NextResponse.json(
-            {
-              error: "Missing required fields: uploadId and newStatus",
-            },
-            { status: 400 }
-          );
+          return NextResponse.json({
+            error: "Missing required fields: uploadId and newStatus",
+          }, { status: 400 });
         }
 
-        // Validate status
         const validStatuses = [
           "pending",
           "printing",
@@ -122,31 +127,25 @@ export async function PUT(req: NextRequest) {
           "cancelled",
           "rejected",
         ];
+
         if (!validStatuses.includes(newStatus)) {
-          return NextResponse.json(
-            {
-              error: "Invalid status",
-            },
-            { status: 400 }
-          );
+          return NextResponse.json({
+            error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+          }, { status: 400 });
         }
 
-        // Update the upload
-        const updateData: any = {
-          status: newStatus,
-          updatedAt: new Date(),
-        };
-
-        if (newStatus === "rejected" && rejectionReason) {
-          updateData.rejection_reason = rejectionReason;
+        if (newStatus === "rejected" && !rejectionReason) {
+          return NextResponse.json({
+            error: "Rejection reason is required when status is 'rejected'",
+          }, { status: 400 });
         }
 
-        const updatedUpload = await prisma.upload.update({
+        const existingUpload = await prisma.upload.findUnique({
           where: { id: uploadId },
-          data: updateData,
           include: {
             customer: {
               select: {
+                id: true,
                 name: true,
                 email: true,
               },
@@ -154,79 +153,39 @@ export async function PUT(req: NextRequest) {
           },
         });
 
-        // Create notification message based on status
-        let notificationMessage = "";
-        switch (newStatus) {
-          case "printing":
-            notificationMessage = `Your print order for "${updatedUpload.filename}" is now being printed.`;
-            break;
-          case "ready_to_pickup":
-            notificationMessage = `Your print order for "${updatedUpload.filename}" is ready for pickup!`;
-            break;
-          case "completed":
-            notificationMessage = `Your print order for "${updatedUpload.filename}" has been completed.`;
-            break;
-          case "rejected":
-            notificationMessage = `Your print order for "${
-              updatedUpload.filename
-            }" has been rejected. ${
-              rejectionReason ? `Reason: ${rejectionReason}` : ""
-            }`;
-            break;
-          case "cancelled":
-            notificationMessage = `Your print order for "${updatedUpload.filename}" has been cancelled.`;
-            break;
-          default:
-            notificationMessage = `Your print order for "${updatedUpload.filename}" status has been updated to ${newStatus}.`;
-        }
-
-        // Create notification
-        await prisma.notification.create({
-          data: {
-            uploadId: uploadId,
-            message: notificationMessage,
-            sentAt: new Date(),
-          },
-        });
-
-        return NextResponse.json(
-          {
-            message: "Upload status updated successfully",
-            upload: updatedUpload,
-          },
-          { status: 200 }
-        );
-      }
-
-      case "reject_print_order": {
-        const { uploadId, rejectionReason } = body;
-
-        if (!uploadId) {
-          return NextResponse.json(
-            {
-              error: "Missing required field: uploadId",
-            },
-            { status: 400 }
-          );
+        if (!existingUpload) {
+          return NextResponse.json({ 
+            error: "Upload not found" 
+          }, { status: 404 });
         }
 
         const updatedUpload = await prisma.upload.update({
           where: { id: uploadId },
           data: {
-            status: "rejected",
-            rejection_reason: rejectionReason || "No reason provided",
+            status: newStatus,
+            rejection_reason: newStatus === "rejected" 
+              ? (rejectionReason || "No reason provided")
+              : null,
             updatedAt: new Date(),
+          },
+          include: {
+            customer: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
           },
         });
 
-        // Create rejection notification
-        const notificationMessage = `Your print order for "${
-          updatedUpload.filename
-        }" has been rejected. ${
-          rejectionReason ? `Reason: ${rejectionReason}` : ""
-        }`;
+        const notificationMessage = generateNotificationMessage(
+          existingUpload.filename,
+          newStatus,
+          rejectionReason
+        );
 
-        await prisma.notification.create({
+        const notification = await prisma.notification.create({
           data: {
             uploadId: uploadId,
             message: notificationMessage,
@@ -234,55 +193,49 @@ export async function PUT(req: NextRequest) {
           },
         });
 
-        return NextResponse.json(
-          {
-            message: "Print order rejected successfully",
+        try {
+          const notificationData = {
+            id: notification.id,
+            message: notificationMessage,
+            orderId: uploadId,
+            orderFilename: existingUpload.filename,
+            status: newStatus,
+            ...(newStatus === "rejected" && { rejectionReason: rejectionReason }),
+            createdAt: notification.sentAt.toISOString(),
+            read: false,
+          };
+
+          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/send`, {
+            userId: existingUpload.customerId,
+            notification: notificationData,
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        } catch (wsError) {
+          console.warn(`⚠️ Failed to send real-time notification: ${wsError}`);
+        }
+
+        return NextResponse.json({
+            message: `Print upload status updated to ${newStatus} successfully`,
             upload: updatedUpload,
-          },
-          { status: 200 }
-        );
+            notification: {
+              id: notification.id,
+              message: notificationMessage,
+              sentAt: notification.sentAt,
+            },
+        }, { status: 200 });
       }
-
       default: {
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             error: "Invalid admin action",
-          },
-          { status: 400 }
-        );
+        }, { status: 400 });
       }
     }
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: `An error occurred: ${error}`,
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const { adminAction } = body;
-
-    switch (adminAction) {
-      default: {
-        return NextResponse.json(
-          {
-            error: "Invalid admin action",
-          },
-          { status: 400 }
-        );
-      }
-    }
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: `An error occurred: ${error}`,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+        error: `/api/admin/[adminAction] PUT error: ${error}`,
+    }, { status: 500 });
   }
 }

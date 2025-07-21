@@ -8,37 +8,6 @@ export interface Notification {
   orderId?: string;
 }
 
-// Generate sample notifications for testing
-export const generateSampleNotifications = (): Notification[] => [
-  {
-    id: "1",
-    message: "Your print order #PO001 is ready for pickup!",
-    read: false,
-    createdAt: new Date().toISOString(),
-    orderId: "PO001",
-  },
-  {
-    id: "2",
-    message: "Your print order #PO002 is currently being processed.",
-    read: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-    orderId: "PO002",
-  },
-  {
-    id: "3",
-    message: "Welcome to Printify! Your account has been verified.",
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-  },
-  {
-    id: "4",
-    message: "Your print order #PO003 has been completed and picked up.",
-    read: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-    orderId: "PO003",
-  },
-];
-
 // Helper to create a new notification
 export const createNotification = (
   message: string,
@@ -78,3 +47,21 @@ export const formatNotificationTime = (createdAt: string): string => {
         : undefined,
   });
 };
+
+export const generateNotificationMessage = (filename: string, status: string, rejectionReason?: string): string => {
+  switch (status) {
+    case "printing":
+      return `Your print order "${filename}" is now being printed.`;
+    case "ready_to_pickup":
+      return `Your print order "${filename}" is ready for pickup!`;
+    case "completed":
+      return `Your print order "${filename}" has been completed.`;
+    case "cancelled":
+      return `Your print order "${filename}" has been cancelled.`;
+    case "rejected":
+      const reason = rejectionReason ? ` Reason: ${rejectionReason}` : "";
+      return `Your print order "${filename}" has been rejected.${reason}`;
+    default:
+      return `Your print order "${filename}" status has been updated to ${status}.`;
+  }
+}

@@ -3,7 +3,7 @@
 import { fetchSinglePrintUpload } from "@/services/Customer";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { getStatusColor } from "@/utils/formatters";
+import { getStatus, getStatusColor } from "@/utils/formatters";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -112,7 +112,7 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
                                         label="Status"
                                         value={
                                             <span className={`px-3 py-1 rounded-full uppercase text-sm font-medium border ${getStatusColor(data?.status || 'pending')}`}>
-                                                {data?.status?.replace('_', ' ')}
+                                                {getStatus(data.status)}
                                             </span>
                                         }
                                     />

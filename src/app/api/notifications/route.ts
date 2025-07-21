@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// GET - Fetch notifications for the authenticated user
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
@@ -16,7 +15,6 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(searchParams.get("offset") || "0");
     const unreadOnly = searchParams.get("unreadOnly") === "true";
 
-    // First, get all uploads for this user to find related notifications
     const userUploads = await prisma.upload.findMany({
       where: {
         customerId: session.userId,
@@ -28,14 +26,12 @@ export async function GET(req: NextRequest) {
 
     const uploadIds = userUploads.map((upload) => upload.id);
 
-    // Build the where clause for notifications
     const whereClause: any = {
       uploadId: {
         in: uploadIds,
       },
     };
 
-    // Add unread filter if requested
     if (unreadOnly) {
       // For unread notifications, we need to check if they haven't been marked as read
       // Since we don't have a direct read status in the Notification model,
@@ -61,11 +57,10 @@ export async function GET(req: NextRequest) {
       skip: offset,
     });
 
-    // Transform notifications to match the frontend interface
     const transformedNotifications = notifications.map((notification) => ({
       id: notification.id,
       message: notification.message,
-      read: false, // We'll need to implement read tracking separately
+      read: false,
       createdAt: notification.sentAt.toISOString(),
       orderId: notification.uploadId,
     }));
@@ -79,10 +74,9 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error fetching notifications:", error);
     return NextResponse.json(
       {
-        error: "Failed to fetch notifications",
+        error: `Failed to fetch notifications: ${error}`,
       },
       { status: 500 }
     );
@@ -189,13 +183,69 @@ export async function PUT(req: NextRequest) {
     const { action, notificationIds, notificationId } = body;
 
     switch (action) {
-      case "mark_as_read": {
-        // For now, we'll implement this as a placeholder
-        // In a full implementation, you'd want a separate table to track read status per user
+      case "mark_read": {
+        if (!notificationId) {
+          return NextResponse.json(
+            { error: "notificationId is required" },
+            { status: 400 }
+          );
+        }
 
+        // Verify the notification belongs to user's uploads
+        const notification = await prisma.notification.findFirst({
+          where: {
+            id: notificationId,
+            upload: {
+              customerId: session.userId,
+            },
+          },
+        });
+
+        if (!notification) {
+          return NextResponse.json(
+            { error: "Notification not found or unauthorized" },
+            { status: 404 }
+          );
+        }
+
+        // For now, we'll just return success since our schema doesn't have read status
+        // In a production app, you'd want to add a read field or separate user_notification_read table
+        return NextResponse.json(
+          {
+            message: "Notification marked as read",
+            notificationId,
+          },
+          { status: 200 }
+        );
+      }
+
+      case "mark_all_read": {
+        // Get all user's notifications through their uploads
+        const userUploads = await prisma.upload.findMany({
+          where: {
+            customerId: session.userId,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        const uploadIds = userUploads.map((upload) => upload.id);
+
+        // For now, we'll just return success
+        // In a production app, you'd mark all as read in a user_notification_read table
+        return NextResponse.json(
+          {
+            message: "All notifications marked as read",
+            uploadIds: uploadIds.length,
+          },
+          { status: 200 }
+        );
+      }
+
+      case "mark_as_read": {
+        // Legacy support - for now, we'll implement this as a placeholder
         if (notificationId) {
-          // Mark single notification as read
-          // This would require a user_notification_read table in a full implementation
           return NextResponse.json(
             {
               message: "Notification marked as read",
@@ -206,7 +256,6 @@ export async function PUT(req: NextRequest) {
         }
 
         if (notificationIds && Array.isArray(notificationIds)) {
-          // Mark multiple notifications as read
           return NextResponse.json(
             {
               message: "Notifications marked as read",
@@ -216,23 +265,9 @@ export async function PUT(req: NextRequest) {
           );
         }
 
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             error: "Either notificationId or notificationIds array is required",
-          },
-          { status: 400 }
-        );
-      }
-
-      case "mark_all_as_read": {
-        // Mark all user's notifications as read
-        // This would require implementation with a user_notification_read table
-        return NextResponse.json(
-          {
-            message: "All notifications marked as read",
-          },
-          { status: 200 }
-        );
+        }, { status: 400 });
       }
 
       default: {

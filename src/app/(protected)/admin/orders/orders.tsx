@@ -1,65 +1,107 @@
 'use client';
 
 import PrintOrderModal from "@/components/PrintOrderModal";
-import { fetchAllPrintOrders } from "@/services/Admin";
-import { useQuery } from "@tanstack/react-query";
+import { useWebSocket } from "@/contexts/WebSocketContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { fetchAllPrintOrders, updateUploadStatus } from "@/services/Admin";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, Info } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-type PrintOrder = {
-    id: string;
-    filename: string;
-    fileData: string;
-    status: string;
-    needed_amount?: number;
-    customer?: {
-        name?: string;
-        id?: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-    format: string;
-};
-
-function getPrintOrderStatus(status: string) {
-    switch (status) {
-        case "pending":
-            return "text-yellow-500";
-        case "printing":
-            return "text-blue-500";
-        case "ready_to_pickup":
-            return "text-green-500";
-        case "completed":
-            return "text-gray-500";
-        case "cancelled":
-            return "text-red-500";
-        default:
-            return "text-gray-500";
-    }
-}
+import { toast } from "react-toastify";
+import { getPrintOrderStatus, getStatus } from "@/utils/formatters";
+import { PrintOrder } from "@/types/Admin";
 
 export default function Orders() {
     const [openModalId, setOpenModalId] = useState<string | number | false>(false);
+    const queryClient = useQueryClient();
+
+    const { webSocketService } = useWebSocket();
+
+    useNotifications({
+        webSocketService,
+        showToasts: false
+    });
 
     const { data } = useQuery({
         queryKey: ['printOrders'],
         queryFn: () => fetchAllPrintOrders(),
     });
 
+    const updateStatusMutation = useMutation({
+        mutationFn: ({ 
+            uploadId, 
+            newStatus, 
+            rejectionReason 
+        }: { 
+            uploadId: string; 
+            newStatus: string; 
+            rejectionReason?: string 
+        }) => updateUploadStatus({ uploadId, newStatus, rejectionReason }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['printOrders'] });
+            queryClient.refetchQueries({ queryKey: ['printOrders'] });
+            toast.success("Print order marked as ready for pickup");
+            setOpenModalId(false);
+        },
+        onError: (error: Error) => {
+            console.error(`Failed to update order status: ${error}`);
+            toast.error("Failed to update print order status. Please try again.");
+        }
+    });
+
     const orders: PrintOrder[] = data?.printOrders || [];
     const selectedOrder = orders.find((order) => order.id === openModalId);
 
-    const handleCloseModal = () => setOpenModalId(false);
-    
-    const handleReject = () => {
-        // TODO: Implement reject logic (API call)
-        setOpenModalId(false);
+    const handleCloseModal = () => {
+        if (!updateStatusMutation.isPending) {
+            setOpenModalId(false);
+        }
     };
-    const handleReadyToPickup = () => {
-        // TODO: Implement ready to pickup logic (API call)
-        setOpenModalId(false);
+
+    const handleReject = async (orderId: string, reason: string) => {
+        try {
+            await updateStatusMutation.mutateAsync({
+                uploadId: orderId,
+                newStatus: "rejected",
+                rejectionReason: reason
+            });
+
+            toast.success("Print order rejected successfully");
+            setOpenModalId(false);
+        } catch (error) {
+            console.error(`Failed to reject order: ${error}`);
+            toast.error("Failed to reject print order. Please try again.");
+        }
     };
+
+    const handleReadyToPickup = async (orderId: string, amount: number) => {
+        try {
+            await updateStatusMutation.mutateAsync({
+                uploadId: orderId,
+                newStatus: "ready_to_pickup"
+            });
+            toast.success(`Print order marked as ready for pickup with amount ₱${amount}`);
+            setOpenModalId(false);
+        } catch (error) {
+            console.error(`Failed to mark order as ready: ${error}`);
+            toast.error("Failed to update print order status. Please try again.");
+        }
+    };
+
+    const handleCompleteOrder = async (orderId: string) => {
+        try {
+            await updateStatusMutation.mutateAsync({
+                uploadId: orderId,
+                newStatus: "completed"
+            });
+            toast.success("Print order marked as completed");
+            setOpenModalId(false);
+        } catch (error) {
+            console.error(`Failed to complete order: ${error}`);
+            toast.error("Failed to mark print order as completed. Please try again.");
+        }
+    }
 
     return (
         <div className="min-h-screen bg-white p-4">
@@ -92,12 +134,11 @@ export default function Orders() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-primary">
                                         <span>{order.filename}</span>
                                     </td>
-                                    <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{order.status}</td>
+                                    <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{getStatus(order.status)}</td>
                                     <td className="px-6 py-4 text-md text-center text-primary">
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm flex gap-2 items-center justify-center">
-                                        {/* Redirect to Order Details Button with Tooltip */}
                                         <div className="relative group">
                                             <Link
                                                 href={`/admin/orders/${order.id}`}
@@ -109,11 +150,11 @@ export default function Orders() {
                                                 View Details
                                             </span>
                                         </div>
-                                        {/* Open Modal Icon Button with Tooltip */}
                                         <div className="relative group">
                                             <button
                                                 onClick={() => setOpenModalId(order.id)}
-                                                className="flex items-center justify-center cursor-pointer text-accent border border-border-light rounded p-2"
+                                                disabled={updateStatusMutation.isPending}
+                                                className="flex items-center justify-center cursor-pointer text-accent border border-border-light rounded p-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Info size={20} />
                                             </button>
@@ -135,6 +176,8 @@ export default function Orders() {
                     onClose={handleCloseModal}
                     onReject={handleReject}
                     onReadyToPickup={handleReadyToPickup}
+                    isSubmitting={updateStatusMutation.isPending}
+                    onCompleteOrder={handleCompleteOrder}
                 />
             )}
         </div>
