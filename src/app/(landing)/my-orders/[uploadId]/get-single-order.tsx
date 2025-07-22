@@ -20,9 +20,7 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
     const fileUrl = data?.fileData;
 
     const renderFilePreview = () => {
-        if (!fileUrl) {
-            return <div className="text-gray-500 text-center">No file available for preview.</div>;
-        }
+        if (!fileUrl) return <div className="text-gray-500 text-center">No file available for preview.</div>;
 
         if (isPDF) {
             return (
@@ -111,7 +109,7 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
                                     <DetailItem
                                         label="Status"
                                         value={
-                                            <span className={`px-3 py-1 rounded-full uppercase text-sm font-medium border ${getStatusColor(data?.status || 'pending')}`}>
+                                            <span className={`px-3 py-1 rounded-full uppercase text-sm font-medium border ${getStatusColor(data?.status)}`}>
                                                 {getStatus(data.status)}
                                             </span>
                                         }
@@ -125,7 +123,7 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
                                         value={data?.updatedAt ? new Date(data.updatedAt).toLocaleString() : 'Loading...'}
                                     />
                                     {data?.needed_amount && (
-                                        <DetailItem label="Amount" value={`$${data.needed_amount}`} />
+                                        <DetailItem label="Amount" value={`₱${data.needed_amount}`} />
                                     )}
                                     {data?.rejection_reason && (
                                         <DetailItem

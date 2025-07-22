@@ -81,7 +81,7 @@ export const markNotificationAsRead = async (
     await API.put(
       "/notifications",
       {
-        action: "mark_as_read",
+        action: "mark_read",
         notificationId,
       },
       {
@@ -123,7 +123,7 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
     await API.put(
       "/notifications",
       {
-        action: "mark_all_as_read",
+        action: "mark_all_read",
       },
       {
         headers: { "Content-Type": "application/json" },
@@ -209,8 +209,10 @@ export const createStatusUpdateNotification = async (
 // Get unread count for UI badge
 export const getUnreadNotificationCount = async (): Promise<number> => {
   try {
-    const response = await fetchUserNotifications(1000, 0, true); // Fetch all unread
-    return response.notifications.length;
+    const response = await API.get("/notifications/count", {
+      withCredentials: true,
+    });
+    return response.data.unreadCount || 0;
   } catch (error) {
     console.error("Error getting unread count:", error);
     return 0;

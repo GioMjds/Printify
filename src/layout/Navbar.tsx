@@ -1,11 +1,13 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
+import ProfileIcon from '@/components/ProfileIcon';
 import { navbar } from '@/constants/navbar';
 import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { logout } from '@/services/Auth';
-import ProfileSpinner from '@/skeletons/ProfileSpinner';
 import { NavbarProps } from '@/types/Navbar';
 import { formatNotificationTime } from '@/utils/notifications';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
@@ -14,10 +16,6 @@ import { motion } from 'framer-motion';
 import { Bell, BellDot, LogIn, LogOut, UserRoundPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
-
-const ProfileIcon = lazy(() => import('@/components/ProfileIcon'));
 
 export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -26,16 +24,13 @@ export default function Navbar({ userDetails }: NavbarProps) {
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
     const notificationRef = useRef<HTMLDivElement>(null);
 
-    // Use the new notifications hook
-    const { 
-        notifications, 
-        unreadCount, 
-        hasUnread, 
+    const {
+        notifications,
+        unreadCount,
+        hasUnread,
         isLoading: notificationsLoading,
-        isConnected,
         markAsRead,
-        markAllAsRead,
-        refreshNotifications
+        markAllAsRead
     } = useNavbarNotifications();
 
     const router = useRouter();
@@ -70,12 +65,12 @@ export default function Navbar({ userDetails }: NavbarProps) {
     };
 
     const handleLogout = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             await logout();
-            setShowLogoutModal(false);
             router.prefetch('/');
             router.refresh();
+            setShowLogoutModal(false);
         } catch (error) {
             console.error(`Logout failed: ${error}`);
         } finally {
@@ -83,12 +78,20 @@ export default function Navbar({ userDetails }: NavbarProps) {
         }
     }
 
-    const markNotificationAsRead = (notificationId: string) => {
-        markAsRead(notificationId);
+    const markNotificationAsRead = async (notificationId: string) => {
+        try {
+            await markAsRead(notificationId);
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+        }
     };
 
-    const handleMarkAllAsRead = () => {
-        markAllAsRead();
+    const handleMarkAllAsRead = async () => {
+        try {
+            await markAllAsRead();
+        } catch (error) {
+            console.error("Failed to mark all notifications as read:", error);
+        }
     };
 
     useEffect(() => {
@@ -193,14 +196,8 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                             <div className="flex items-center justify-between">
                                                 <h3 className="text-lg font-semibold text-primary">
                                                     Notifications
-                                                    {notificationsLoading && (
-                                                        <span className="ml-2 text-xs text-gray-500">(Loading...)</span>
-                                                    )}
                                                 </h3>
                                                 <div className="flex items-center gap-2">
-                                                    {/* Connection status */}
-                                                    <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} 
-                                                          title={isConnected ? 'Connected' : 'Disconnected'} />
                                                     {unreadCount > 0 && (
                                                         <button
                                                             onClick={handleMarkAllAsRead}
@@ -280,9 +277,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 ]}
                                 position="bottom"
                             >
-                                <Suspense fallback={<ProfileSpinner />}>
-                                    <ProfileIcon profileImage={userDetails.profileImage} />
-                                </Suspense>
+                                <ProfileIcon profileImage={userDetails.profileImage} />
                             </Dropdown>
                         ) : (
                             <>

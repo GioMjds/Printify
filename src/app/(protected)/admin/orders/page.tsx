@@ -6,7 +6,7 @@ import {
 import dynamic from "next/dynamic";
 import { fetchAllPrintOrders } from "@/services/Admin";
 
-const Orders = dynamic(() => import("./orders"))
+const OrderDataTable = dynamic(() => import("@/components/admin/OrderDataTable"));
 
 export const metadata = {
     title: "Orders",
@@ -25,7 +25,13 @@ export default async function AdminOrders() {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <Orders />
+            <div className="min-h-screen bg-white p-4">
+                <div className="mb-2">
+                    <h1 className="text-3xl font-bold text-primary mb-2">Customer Orders</h1>
+                    <p className="text-text-light">Manage and review all print orders submitted by customers.</p>
+                </div>
+                <OrderDataTable />
+            </div>
         </HydrationBoundary>
     );
 }

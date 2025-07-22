@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWebSocket } from "@/contexts/WebSocketContext";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 export interface NotificationItem {
   id: string;
@@ -121,14 +121,25 @@ export const useNavbarNotifications = () => {
         setLocalNotifications((prev) =>
           prev.map((n) => (n.id === notificationId ? { ...n, read: false } : n))
         );
+        throw new Error("Failed to mark notification as read");
+      } else {
+        // Invalidate queries to ensure consistency
+        queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
       }
     } catch (error) {
       console.error("Error marking notification as read:", error);
+      // Revert optimistic update on any error
+      setLocalNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: false } : n))
+      );
     }
   };
 
   const markAllAsRead = async () => {
     try {
+      // Store current state for potential revert
+      const previousNotifications = localNotifications;
+
       // Optimistically update local state
       setLocalNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
@@ -147,7 +158,11 @@ export const useNavbarNotifications = () => {
       if (!response.ok) {
         console.error("Failed to mark all notifications as read");
         // Revert optimistic update
-        refetch();
+        setLocalNotifications(previousNotifications);
+        throw new Error("Failed to mark all notifications as read");
+      } else {
+        // Invalidate queries to ensure consistency
+        queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
       }
     } catch (error) {
       console.error("Error marking all notifications as read:", error);

@@ -48,12 +48,13 @@ export const formatNotificationTime = (createdAt: string): string => {
   });
 };
 
-export const generateNotificationMessage = (filename: string, status: string, rejectionReason?: string): string => {
+export const generateNotificationMessage = (filename: string, status: string, rejectionReason?: string, amount?: number): string => {
   switch (status) {
     case "printing":
       return `Your print order "${filename}" is now being printed.`;
     case "ready_to_pickup":
-      return `Your print order "${filename}" is ready for pickup!`;
+      const amountText = amount ? ` Amount: ₱${amount}.` : "";
+      return `Your print order "${filename}" is ready for pickup. Please pay ${amountText}`;
     case "completed":
       return `Your print order "${filename}" has been completed.`;
     case "cancelled":

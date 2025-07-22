@@ -28,6 +28,7 @@ export async function GET(
             filename: printUpload.filename,
             fileData: printUpload.fileData,
             status: printUpload.status,
+            needed_amount: printUpload.needed_amount,
             customer: printUpload.customer.name,
             createdAt: printUpload.createdAt,
             updatedAt: printUpload.updatedAt,

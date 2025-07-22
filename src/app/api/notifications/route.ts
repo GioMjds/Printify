@@ -33,9 +33,7 @@ export async function GET(req: NextRequest) {
     };
 
     if (unreadOnly) {
-      // For unread notifications, we need to check if they haven't been marked as read
-      // Since we don't have a direct read status in the Notification model,
-      // we'll extend this when we add user-notification tracking
+      whereClause.markAsRead = false;
     }
 
     const notifications = await prisma.notification.findMany({
@@ -60,7 +58,7 @@ export async function GET(req: NextRequest) {
     const transformedNotifications = notifications.map((notification) => ({
       id: notification.id,
       message: notification.message,
-      read: false,
+      read: !!notification.markAsRead,
       createdAt: notification.sentAt.toISOString(),
       orderId: notification.uploadId,
     }));
@@ -83,7 +81,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - Create a new notification (typically called by admin actions)
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
@@ -92,19 +89,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { uploadId, message, notificationType } = body;
+    const { uploadId, message } = body;
 
-    // Validate required fields
     if (!uploadId || !message) {
-      return NextResponse.json(
-        {
+      return NextResponse.json({
           error: "Missing required fields: uploadId and message",
-        },
-        { status: 400 }
-      );
+      }, { status: 400 });
     }
 
-    // Verify the upload exists
     const upload = await prisma.upload.findUnique({
       where: { id: uploadId },
       select: {
@@ -124,12 +116,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create the notification
     const notification = await prisma.notification.create({
       data: {
         uploadId: uploadId,
         message: message,
         sentAt: new Date(),
+        markAsRead: false, // Ensure new notifications are unread
       },
       include: {
         upload: {
@@ -143,7 +135,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Transform for response
     const responseNotification = {
       id: notification.id,
       message: notification.message,
@@ -171,7 +162,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PUT - Mark notifications as read or update notification status
 export async function PUT(req: NextRequest) {
   try {
     const session = await getSession();
@@ -208,8 +198,16 @@ export async function PUT(req: NextRequest) {
           );
         }
 
-        // For now, we'll just return success since our schema doesn't have read status
-        // In a production app, you'd want to add a read field or separate user_notification_read table
+        // Update the notification to mark it as read
+        await prisma.notification.update({
+          where: {
+            id: notificationId,
+          },
+          data: {
+            markAsRead: true,
+          },
+        });
+
         return NextResponse.json(
           {
             message: "Notification marked as read",
@@ -232,20 +230,57 @@ export async function PUT(req: NextRequest) {
 
         const uploadIds = userUploads.map((upload) => upload.id);
 
-        // For now, we'll just return success
-        // In a production app, you'd mark all as read in a user_notification_read table
+        // Mark all notifications as read for this user's uploads
+        const updateResult = await prisma.notification.updateMany({
+          where: {
+            uploadId: {
+              in: uploadIds,
+            },
+            markAsRead: false, // Only update unread notifications
+          },
+          data: {
+            markAsRead: true,
+          },
+        });
+
         return NextResponse.json(
           {
             message: "All notifications marked as read",
-            uploadIds: uploadIds.length,
+            updatedCount: updateResult.count,
           },
           { status: 200 }
         );
       }
 
       case "mark_as_read": {
-        // Legacy support - for now, we'll implement this as a placeholder
+        // Legacy support for multiple notifications
         if (notificationId) {
+          // Single notification
+          const notification = await prisma.notification.findFirst({
+            where: {
+              id: notificationId,
+              upload: {
+                customerId: session.userId,
+              },
+            },
+          });
+
+          if (!notification) {
+            return NextResponse.json(
+              { error: "Notification not found or unauthorized" },
+              { status: 404 }
+            );
+          }
+
+          await prisma.notification.update({
+            where: {
+              id: notificationId,
+            },
+            data: {
+              markAsRead: true,
+            },
+          });
+
           return NextResponse.json(
             {
               message: "Notification marked as read",
@@ -256,18 +291,47 @@ export async function PUT(req: NextRequest) {
         }
 
         if (notificationIds && Array.isArray(notificationIds)) {
+          // Multiple notifications
+          const userUploads = await prisma.upload.findMany({
+            where: {
+              customerId: session.userId,
+            },
+            select: {
+              id: true,
+            },
+          });
+
+          const uploadIds = userUploads.map((upload) => upload.id);
+
+          const updateResult = await prisma.notification.updateMany({
+            where: {
+              id: {
+                in: notificationIds,
+              },
+              uploadId: {
+                in: uploadIds,
+              },
+            },
+            data: {
+              markAsRead: true,
+            },
+          });
+
           return NextResponse.json(
             {
               message: "Notifications marked as read",
-              count: notificationIds.length,
+              count: updateResult.count,
             },
             { status: 200 }
           );
         }
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             error: "Either notificationId or notificationIds array is required",
-        }, { status: 400 });
+          },
+          { status: 400 }
+        );
       }
 
       default: {

@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import CancellationModal from "./CancellationModal";
+import CancellationModal from "../CancellationModal";
 import { rejectionReasons } from "@/constants/dropdown";
 import { getStatus } from "@/utils/formatters";
 import { PrintOrderModalProps } from "@/types/Modal";
 
 export default function PrintOrderModal({ order, onClose, onReject, onReadyToPickup, isSubmitting, onCompleteOrder }: PrintOrderModalProps) {
-    const [amount, setAmount] = useState<number>(order.needed_amount || 0);
+    const [amount, setAmount] = useState<number>(0);
     const [showCancellationModal, setShowCancellationModal] = useState<boolean>(false);
 
     useEffect(() => {

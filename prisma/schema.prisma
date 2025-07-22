@@ -7,6 +7,19 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  customer
+  admin
+}
+
+enum UploadStatus {
+  pending // Default status for new document uploads (customer-side)
+  cancelled // Customer can cancel the upload at any time
+  rejected // Admin can reject the upload if it doesn't meet requirements w/ specific reason
+  ready_to_pickup // Admin can set this when the document is ready for pickup
+  completed // Final status when the document has been picked up by the customer
+} 
+
 model User {
   id                String        @id 
   email             String        @unique
@@ -41,17 +54,5 @@ model Notification {
   uploadId          String
   sentAt            DateTime      @default(now())
   message           String
+  markAsRead        Boolean?      @default(false)
 }
-
-enum UserRole {
-  customer
-  admin
-}
-
-enum UploadStatus {
-  pending // Default status for new document uploads (customer-side)
-  cancelled // Customer can cancel the upload at any time
-  rejected // Admin can reject the upload if it doesn't meet requirements w/ specific reason
-  ready_to_pickup // Admin can set this when the document is ready for pickup
-  completed // Final status when the document has been picked up by the customer
-} 
