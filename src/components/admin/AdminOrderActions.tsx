@@ -5,7 +5,7 @@ import { useState } from "react";
 import PrintOrderModal from "./PrintOrderModal";
 import { PrintOrder } from "@/types/Admin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUploadStatus } from "@/services/Admin";
+import { updateUploadStatus } from "@/actions/admin-actions";
 import { toast } from "react-toastify";
 
 interface OrderActionsProps {
@@ -27,7 +27,10 @@ export default function OrderActions({ order }: OrderActionsProps) {
             rejectionReason?: string
         }) => updateUploadStatus({ uploadId, newStatus, rejectionReason }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['printOrders'] });
+            queryClient.invalidateQueries({ 
+                queryKey: ['printOrders'],
+                refetchType: 'active'
+            });
             toast.success("Status updated successfully");
             setOpenModalId(false);
         },

@@ -5,7 +5,6 @@ import {
     QueryClient
 } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 
 const ProfilePage = dynamic(() => import("./profile"))

@@ -1,16 +1,9 @@
 'use client';
 
 import { fetchUsers } from "@/services/Admin";
+import { User } from "@/types/Admin";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    isVerified: boolean;
-}
 
 export default function AdminUsers() {
     const { data } = useQuery({

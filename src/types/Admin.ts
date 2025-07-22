@@ -1,4 +1,3 @@
-// orders.tsx
 export type PrintOrder = {
     id: string;
     filename: string;
@@ -13,3 +12,11 @@ export type PrintOrder = {
     updatedAt: string;
     format: string;
 };
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isVerified: boolean;
+}

@@ -8,6 +8,8 @@ import { getSession } from "@/lib/auth";
 import { fetchCustomerPrintUploads } from "@/services/Customer";
 import { AuthRequired } from "@/components/ProtectedRoutes";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
     title: "My Orders",
 }

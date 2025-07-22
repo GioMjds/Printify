@@ -1,12 +1,17 @@
+import { use } from "react";
 import { fetchAllPrintOrders } from "@/services/Admin";
 import { PrintOrder } from "@/types/Admin";
 import { getPrintOrderStatus, getStatus } from "@/utils/formatters";
-import { use } from "react";
 import OrderActions from "./AdminOrderActions";
 
 async function getPrintOrders() {
-    const response = await fetchAllPrintOrders();
-    return response.printOrders;
+    try {
+        const response = await fetchAllPrintOrders();
+        return response.printOrders;
+    } catch (error) {
+        console.error(`Failed to fetch print orders: ${error}`);
+        throw error;
+    }
 }
 
 export default function OrderDataTable() {

@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     '*',
   ],
-  serverExternalPackages: ['ws'],
+  serverExternalPackages: ['ws', '@prisma/client'],
+  output: 'standalone'
 };
 
 export default nextConfig;
