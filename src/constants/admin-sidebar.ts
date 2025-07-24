@@ -1,8 +1,10 @@
 import {
+    BadgePercent,
     ClipboardList,
     Gauge,
     LucideIcon,
-    Users
+    Users,
+    UserCog
 } from "lucide-react";
 
 interface AdminSidebar {
@@ -18,12 +20,22 @@ export const adminSidebar: AdminSidebar[] = [
         href: "/admin",
     },
     {
-        name: "Orders",
+        name: "Sales",
+        icon: BadgePercent,
+        href: "/admin/sales",
+    },
+    {
+        name: "Manage Orders",
         icon: ClipboardList,
         href: "/admin/orders",
     },
     {
-        name: "Users",
+        name: "Manage Staff",
+        icon: UserCog,
+        href: "/admin/staff",
+    },
+    {
+        name: "Manage Users",
         icon: Users,
         href: "/admin/users",
     },

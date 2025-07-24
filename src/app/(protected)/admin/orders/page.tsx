@@ -3,13 +3,11 @@ import {
     HydrationBoundary,
     QueryClient,
 } from "@tanstack/react-query"
-import dynamic from "next/dynamic";
 import { fetchAllPrintOrders } from "@/services/Admin";
-
-const OrderDataTable = dynamic(() => import("@/components/admin/OrderDataTable"));
+import OrderDataTable from "@/components/admin/OrderDataTable";
 
 export const metadata = {
-    title: "Orders",
+    title: "Manage Orders",
 }
 
 export default async function AdminOrders() {
@@ -21,6 +19,7 @@ export default async function AdminOrders() {
         });
     } catch (error) {
         console.error(`Failed to prefetch orders: ${error}`);
+        throw error;
     }
 
     return (

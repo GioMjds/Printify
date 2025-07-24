@@ -3,8 +3,8 @@
 
 import logo from "@/../public/printify_logo.png";
 import { login } from "@/services/Auth";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+    import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+    import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import Image from "next/image";

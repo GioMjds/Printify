@@ -1,7 +1,7 @@
 "use client";
 
-import { UploadDropzone } from "@/utils/uploadthing";
 import { useState } from "react";
+import { UploadDropzone } from "@/utils/uploadthing";
 import SuccessFallback from "./success-fallback";
 
 export default function UploadPage() {

@@ -46,11 +46,6 @@ export async function updateUploadStatus(params: {
             updateData.needed_amount = amount;
         }
 
-        const updatedUpload = await prisma.upload.update({
-            where: { id: uploadId },
-            data: updateData,
-        });
-
         const notificationMessage = generateNotificationMessage(
             existingUpload.filename,
             newStatus,

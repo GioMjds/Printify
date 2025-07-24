@@ -1,17 +1,15 @@
-'use client';
-
+import { use } from "react";
 import { fetchUsers } from "@/services/Admin";
 import { User } from "@/types/Admin";
-import { useQuery } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
 
-export default function AdminUsers() {
-    const { data } = useQuery({
-        queryKey: ['adminUsers'],
-        queryFn: fetchUsers,
-    });
+async function showUsers() {
+    const response = await fetchUsers();
+    return response.users;
+}
 
-    const users = data?.users || [];
+export default function AdminUsers() {
+    const users = use(showUsers());
 
     return (
         <div className="min-h-screen bg-white p-8">

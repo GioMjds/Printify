@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { 
     dehydrate,
     HydrationBoundary,
@@ -8,8 +9,8 @@ import { fetchUsers } from "@/services/Admin";
 
 const AdminUsers = dynamic(() => import("./users"));
 
-export const metadata = {
-    title: "Users",
+export const metadata: Metadata = {
+    title: "Manage Users",
 }
 
 export default async function UsersPage() {
@@ -18,7 +19,7 @@ export default async function UsersPage() {
     await queryClient.prefetchQuery({
         queryKey: ['adminUsers'],
         queryFn: fetchUsers,
-    })
+    });
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
