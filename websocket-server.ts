@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 import { URL } from 'url';
 
 interface ClientInfo {
@@ -57,7 +57,6 @@ wss.on('connection', (ws: WebSocket, req) => {
     ws.on('message', (data: Buffer) => {
         try {
             const message = JSON.parse(data.toString());
-            
             switch (message.type) {
                 case 'heartbeat':
                     ws.send(JSON.stringify({ 
@@ -72,7 +71,18 @@ wss.on('connection', (ws: WebSocket, req) => {
                         timestamp: Date.now()
                     }));
                     break;
-                    
+                case "send_notification": 
+                    const targetClient = clients.get(message.targetUserId);
+                    if (targetClient && targetClient.ws.readyState === WebSocket.OPEN) {
+                        targetClient.ws.send(JSON.stringify({
+                            type: 'notification',
+                            data: message.notification,
+                            timestamp: Date.now()
+                        }));
+                        console.log(`📬 Notification sent to user ${message.targetUserId}`);
+                    } else {
+                        console.warn(`⚠️ Target user ${message.targetUserId} not connected`);
+                    }
                 default:
                     console.log(`📨 Message from ${userId}:`, message);
             }
@@ -147,7 +157,6 @@ export function broadcastToAll(message: any): number {
                 clients.delete(userId);
             }
         } else {
-            // Clean up disconnected clients
             clients.delete(userId);
         }
     });

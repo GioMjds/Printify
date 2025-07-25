@@ -426,15 +426,10 @@ export async function DELETE(req: NextRequest) {
         );
       }
 
-      // Check permissions
       if (upload.customerId !== session.userId && session.role !== "admin") {
-        return NextResponse.json(
-          {
-            error:
-              "Forbidden: You can only delete notifications for your own uploads",
-          },
-          { status: 403 }
-        );
+        return NextResponse.json({
+            error: "Forbidden: You can only delete notifications for your own uploads",
+        }, { status: 403 });
       }
 
       const deletedCount = await prisma.notification.deleteMany({

@@ -2,6 +2,8 @@ import { API } from "./_axios";
 
 type PrintUploads = {
     userId: string;
+    page?: number;
+    limit?: number;
 }
 
 export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
@@ -16,9 +18,10 @@ export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
     }
 };
 
-export const fetchCustomerPrintUploads = async ({ userId }: PrintUploads) => {
+export const fetchCustomerPrintUploads = async ({ userId, page, limit }: PrintUploads) => {
     try {
         const response = await API.get(`/profile/uploads/${userId}`, {
+            params: { page, limit },
             withCredentials: true,
         });
         return response.data;

@@ -15,7 +15,7 @@ export default async function AdminOrders() {
     try {
         await queryClient.prefetchQuery({
             queryKey: ['printOrders'],
-            queryFn: () => fetchAllPrintOrders()
+            queryFn: fetchAllPrintOrders
         });
     } catch (error) {
         console.error(`Failed to prefetch orders: ${error}`);

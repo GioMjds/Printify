@@ -21,7 +21,7 @@ const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [webSocketService] = useState(() => new WebSocketService(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001'));
+    const [webSocketService] = useState(() => new WebSocketService(process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3001'));
     const [userId, setUserId] = useState<string | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
@@ -32,15 +32,14 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             try {
                 const session = await getSession();
                 if (session?.userId) {
-                    setUserId(session.userId);
-                    console.log('✅ Got user session:', session.userId);
+                    setUserId(session?.userId);
+                    console.log('✅ Got user session:', session.user.userId);
                 }
             } catch (error) {
                 console.error('❌ Failed to get user session:', error);
                 setConnectionStatus('error');
             }
         };
-
         getUserSession();
     }, []);
 
@@ -57,7 +56,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                         'Content-Type': 'application/json',
                     },
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     const notifications = data.notifications || [];

@@ -112,9 +112,6 @@ export function createWebSocketServer(server: any) {
             createdAt: new Date().toISOString()
         };
 
-        // Save to database (you'd implement this)
-        // saveNotificationToDB(notification);
-
         // Send to all clients for this user
         clients.forEach(client => {
             if (client.userId === userId) {

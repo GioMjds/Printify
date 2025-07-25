@@ -13,7 +13,7 @@ export default function UploadPage() {
             {success ? (
                 <SuccessFallback />
             ) : (
-                <main className="flex flex-col items-center justify-center min-h-screen p-4 mt-8 bg-gradient-to-br from-bg-primary to-bg-accent relative overflow-hidden">
+                <main className="flex flex-col items-center justify-center min-h-screen p-4 mt-8 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
                     {/* Decorative Blobs */}
                     <div className="absolute top-0 left-0 w-72 h-72 bg-bg-accent opacity-20 rounded-full blur-3xl z-0" />
                     <div className="absolute bottom-0 right-0 w-96 h-96 bg-bg-highlight opacity-15 rounded-full blur-3xl z-0" />

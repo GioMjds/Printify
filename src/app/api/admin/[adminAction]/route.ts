@@ -222,22 +222,15 @@ export async function PUT(req: NextRequest) {
         }
 
         if (newStatus === "rejected" && !rejectionReason) {
-          return NextResponse.json(
-            {
+          return NextResponse.json({
               error: "Rejection reason is required when status is 'rejected'",
-            },
-            { status: 400 }
-          );
+          }, { status: 400 });
         }
 
         if (newStatus === "ready_to_pickup" && (!amount || amount <= 0)) {
-          return NextResponse.json(
-            {
-              error:
-                "Amount is required and must be greater than 0 when status is 'ready_to_pickup'",
-            },
-            { status: 400 }
-          );
+          return NextResponse.json({
+              error: "Amount is required and must be greater than 0 when status is 'ready_to_pickup'",
+          }, { status: 400 });
         }
 
         const existingUpload = await prisma.upload.findUnique({

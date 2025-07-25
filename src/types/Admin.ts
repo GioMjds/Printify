@@ -20,3 +20,10 @@ export interface User {
     role: string;
     isVerified: boolean;
 }
+
+export type UpdateStatusParams = {
+    uploadId: string;
+    newStatus: string;
+    rejectionReason?: string;
+    amount?: number;
+};

@@ -5,8 +5,8 @@ import { useState } from "react";
 import PrintOrderModal from "./PrintOrderModal";
 import { PrintOrder } from "@/types/Admin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUploadStatus } from "@/actions/admin-actions";
 import { toast } from "react-toastify";
+import { updateUploadStatus } from "@/services/Admin";
 
 interface OrderActionsProps {
     order: PrintOrder;
@@ -20,16 +20,17 @@ export default function OrderActions({ order }: OrderActionsProps) {
         mutationFn: ({
             uploadId,
             newStatus,
-            rejectionReason
+            rejectionReason,
+            amount
         }: {
             uploadId: string;
             newStatus: string;
-            rejectionReason?: string
-        }) => updateUploadStatus({ uploadId, newStatus, rejectionReason }),
+            rejectionReason?: string;
+            amount?: number;
+        }) => updateUploadStatus({ uploadId, newStatus, rejectionReason, amount }),
         onSuccess: () => {
             queryClient.invalidateQueries({ 
                 queryKey: ['printOrders'],
-                refetchType: 'active'
             });
             toast.success("Status updated successfully");
             setOpenModalId(false);
@@ -57,7 +58,8 @@ export default function OrderActions({ order }: OrderActionsProps) {
         try {
             await updateStatusMutation.mutateAsync({
                 uploadId: orderId,
-                newStatus: "ready_to_pickup"
+                newStatus: "ready_to_pickup",
+                amount
             });
             toast.success(`Print order marked as ready for pickup with amount ₱${amount}`);
         } catch (error) {

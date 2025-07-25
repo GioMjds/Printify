@@ -3,7 +3,7 @@
 
 > **Seamless document-to-print platform**
 >
-> Upload your `.pdf` or `.docx`, customize print settings, pay securely, and track your order in real time.
+> Upload your `.pdf` or `.docx`, pay securely, and track your order in real time.
 
 ---
 
@@ -24,8 +24,7 @@
 Printify is a professional web portal that transforms your PDF and DOCX documents into high-quality prints—fast, reliable, and user-friendly. Designed for local print shops, it offers a streamlined, end-to-end experience:
 
 * **Upload** documents in seconds
-* **Configure** print options (paper size, color, duplex)
-* **Pay** securely online
+* **Pay** physically
 * **Track** order status in real time
 
 ---
@@ -33,8 +32,7 @@ Printify is a professional web portal that transforms your PDF and DOCX document
 ## ✨ Features
 
 * 🔒 **Secure Uploads & Payments**: SSL encryption and Stripe integration for peace of mind
-* ⚡ **Live Price Calculator**: Instant cost estimates based on options
-* 🕒 **Real-Time Tracking**: WebSocket (Socket.IO) notifications for status changes
+* 🕒 **Real-Time Tracking**: WebSockets notifications for status changes
 * 📄 **Document Preview**: In-browser preview before you submit
 * 📧 **Order Confirmation & Receipts**: Email receipts with unique Order ID
 

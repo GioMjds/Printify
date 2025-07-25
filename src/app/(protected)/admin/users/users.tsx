@@ -27,18 +27,24 @@ export default function AdminUsers() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-border-light">
-                        {users.map((user: User) => (
-                            <tr key={user.id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-text flex items-center gap-2">
-                                    {user.name}
-                                    {user.isVerified && (
-                                        <CheckCircle className="text-green-500 w-4 h-4" />
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-text">{user.email}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-text capitalize">{user.role}</td>
+                        {users.length === 0 ? (
+                            <tr>
+                                <td colSpan={3} className="text-center py-6 text-text-light">No users found.</td>
                             </tr>
-                        ))}
+                        ) : (
+                            users.map((user: User) => (
+                                <tr key={user.id}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text flex items-center gap-2">
+                                        {user.name}
+                                        {user.isVerified && (
+                                            <CheckCircle className="text-green-500 w-4 h-4" />
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text">{user.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-text capitalize">{user.role}</td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

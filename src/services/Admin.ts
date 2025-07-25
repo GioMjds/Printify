@@ -8,6 +8,7 @@ type UploadStatusUpdate = {
   uploadId: string;
   newStatus: string;
   rejectionReason?: string;
+  amount?: number;
 }
 
 type DashboardMonthPick = {
@@ -80,13 +81,14 @@ export const fetchUsers = async () => {
   }
 };
 
-export const updateUploadStatus = async ({ uploadId, newStatus, rejectionReason }: UploadStatusUpdate) => {
+export const updateUploadStatus = async ({ uploadId, newStatus, rejectionReason, amount }: UploadStatusUpdate) => {
   try {
     const response = await API.put("/admin/[adminAction]", {
         adminAction: "update_upload_status",
         uploadId,
         newStatus,
         rejectionReason,
+        amount
     }, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,

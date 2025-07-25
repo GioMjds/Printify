@@ -41,7 +41,7 @@ export const useNavbarNotifications = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["navbar-notifications"],
     queryFn: fetchNotifications,
-    enabled: !!userId, // Only fetch when userId is available
+    enabled: true, // Only fetch when userId is available
     refetchInterval: 30000, // Refetch every 30 seconds as backup
     refetchOnWindowFocus: true,
     staleTime: 10000, // Consider data stale after 10 seconds
