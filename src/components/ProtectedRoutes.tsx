@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { ReactNode } from "react";
 
 /**
@@ -17,11 +17,9 @@ export async function AuthRequired({ children }: { children: ReactNode }) {
 export async function AuthRedirect({ children }: { children: ReactNode }) {
     const session = await getSession();
     if (session) {
-        if (session.role === "admin") {
-            redirect("/admin");
-        } else if (session.role === "customer") {
-            redirect("/");
-        }
+        if (session.role === "admin") redirect("/admin", RedirectType.replace);
+        else if (session.role === "staff") redirect("/admin", RedirectType.replace);
+        else redirect("/", RedirectType.replace);
     }
     return <>{children}</>;
 }
@@ -32,10 +30,19 @@ export async function AuthRedirect({ children }: { children: ReactNode }) {
 export async function RoleRequired({ allowedRoles, children }: { allowedRoles: string[], children: ReactNode }) {
     const session = await getSession();
     if (!session) redirect("/login");
+
+    if (session.role === "staff" && typeof window !== "undefined") {
+        const path = window.location.pathname;
+        if (path.startsWith("/admin") && path !== "/admin/orders" && !path.startsWith("/admin/orders")) {
+            redirect("/admin/orders", RedirectType.replace);
+        }
+    }
+
     if (!allowedRoles.includes(session.role)) {
-        if (session.role === "admin") redirect("/admin");
-        if (session.role === "customer") redirect("/");
-        redirect("/");
+        if (session.role === "admin") redirect("/admin", RedirectType.replace);
+        if (session.role === "staff") redirect('/admin/orders', RedirectType.replace);
+        if (session.role === "customer") redirect("/", RedirectType.replace);
+        redirect("/", RedirectType.replace);
     }
     return <>{children}</>;
 }
@@ -45,7 +52,7 @@ export async function RoleRequired({ allowedRoles, children }: { allowedRoles: s
  * Redirects to /login otherwise. (Client-side only)
  */
 export async function RegisterPhaseRequired({ children }: { children: ReactNode }) {
-    if (typeof window === "undefined") redirect("/login");
-    if (!localStorage.getItem("register_email")) redirect("/login");
+    if (typeof window === "undefined") redirect("/login", RedirectType.replace);
+    if (!localStorage.getItem("register_email")) redirect("/login", RedirectType.replace);
     return <>{children}</>;
 }

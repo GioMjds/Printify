@@ -22,7 +22,7 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    let userDetails = null;
+    let userDetails: null | object = null;
     const session = await getSession();
     if (session) {
         const user = await getCurrentUser();

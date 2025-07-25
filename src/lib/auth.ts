@@ -51,7 +51,7 @@ export async function createSession(userId: string, role: string) {
         const refreshToken = await new SignJWT({ userId })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
-            .setExpirationTime("7d")
+            .setExpirationTime("30d")
             .sign(encodedKey);
 
         return { sessionData, accessToken, refreshToken };

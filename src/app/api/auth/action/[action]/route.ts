@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
         switch (action) {
             case "logout": {
                 const sessionId = req.cookies.get("access_token")?.value;
+                
                 if (!sessionId) {
                     return NextResponse.json({
                         error: "No session found"
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
                 }, { status: 200 });
 
                 const cookiesToDelete = await getSessionCookiesToDelete();
+                
                 for (const cookie of cookiesToDelete) {
                     response.cookies.delete(cookie);
                 }

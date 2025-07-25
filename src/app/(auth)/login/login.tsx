@@ -3,10 +3,11 @@
 
 import logo from "@/../public/printify_logo.png";
 import { login } from "@/services/Auth";
-    import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-    import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDoorOpen, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -33,6 +34,7 @@ export default function LoginPage() {
         onSuccess: (response) => {
             if (response?.user) {
                 if (response.user.role === 'admin') router.push("/admin");
+                else if (response.user.role === 'staff') router.push('/admin/orders');
                 else router.push("/");
             }
         },
@@ -162,7 +164,13 @@ export default function LoginPage() {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >
-                        {isPending ? "Logging in..." : "Log In"}
+                        {isPending ? 
+                            "Logging in..." : 
+                        <>
+                            <LogIn className="inline-block mr-2" size={28} />
+                            Log In
+                        </>
+                        }
                     </motion.button>
                 </form>
                 <div className="flex justify-between items-center">

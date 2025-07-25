@@ -21,7 +21,7 @@ export default async function AdminDashboard({
     const resolvedSearchParams = await searchParams;
     const month = resolvedSearchParams?.month ? parseInt(resolvedSearchParams.month) : new Date().getMonth() + 1;
     const year = resolvedSearchParams?.year ? parseInt(resolvedSearchParams.year) : new Date().getFullYear();
-
+    
     try {
         await queryClient.prefetchQuery({
             queryKey: ['adminDashboard', month, year],

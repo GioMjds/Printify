@@ -194,9 +194,12 @@ export async function PUT(req: NextRequest) {
         const { uploadId, newStatus, rejectionReason, amount } = body;
 
         if (!uploadId || !newStatus) {
-          return NextResponse.json({
+          return NextResponse.json(
+            {
               error: "Missing required fields: uploadId and newStatus",
-          }, { status: 400 });
+            },
+            { status: 400 }
+          );
         }
 
         const validStatuses = [
@@ -380,18 +383,39 @@ export async function POST(req: NextRequest) {
     const { adminAction } = body;
     switch (adminAction) {
       case "add_staff": {
-        const { firstName, middleName, lastName, email, password, confirmPassword, role } = body;
+        const {
+          firstName,
+          middleName,
+          lastName,
+          email,
+          password,
+          confirmPassword,
+          role,
+        } = body;
 
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !role) {
-          return NextResponse.json({
-          error: "Missing required fields.",
-          }, { status: 400 });
+        if (
+          !firstName ||
+          !lastName ||
+          !email ||
+          !password ||
+          !confirmPassword ||
+          !role
+        ) {
+          return NextResponse.json(
+            {
+              error: "Missing required fields.",
+            },
+            { status: 400 }
+          );
         }
 
         if (role !== "staff") {
-          return NextResponse.json({
-          error: "Role must be 'staff'",
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              error: "Role must be 'staff'",
+            },
+            { status: 400 }
+          );
         }
 
         const name = middleName
@@ -403,17 +427,23 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingUser) {
-          return NextResponse.json({
-            error: "User with this email already exists.",
-          }, { status: 409 });
+          return NextResponse.json(
+            {
+              error: "User with this email already exists.",
+            },
+            { status: 409 }
+          );
         }
 
         const hashedPassword = await hash(password, 12);
 
         if (password !== confirmPassword) {
-          return NextResponse.json({
-            error: "Passwords do not match.",
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              error: "Passwords do not match.",
+            },
+            { status: 400 }
+          );
         }
 
         const newStaff = await prisma.user.create({
@@ -427,25 +457,34 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        return NextResponse.json({
-          staff: {
-            id: newStaff.id,
-            name: newStaff.name,
-            email: newStaff.email,
-            role: newStaff.role,
-            isVerified: newStaff.isVerified,
+        return NextResponse.json(
+          {
+            staff: {
+              id: newStaff.id,
+              name: newStaff.name,
+              email: newStaff.email,
+              role: newStaff.role,
+              isVerified: newStaff.isVerified,
+            },
           },
-        }, { status: 201 });
+          { status: 201 }
+        );
       }
       default: {
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             error: "Invalid admin action",
-        }, { status: 400 });
+          },
+          { status: 400 }
+        );
       }
     }
   } catch (error) {
-    return NextResponse.json({
+    return NextResponse.json(
+      {
         error: `/api/admin/[adminAction] POST error: ${error}`,
-    }, { status: 500 });
+      },
+      { status: 500 }
+    );
   }
 }

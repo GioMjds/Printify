@@ -7,6 +7,7 @@ import Sidebar from "../sidebar";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { getCurrentUser } from "@/lib/auth";
 
 const lexend = Lexend({
     variable: "--font-lexend",
@@ -21,20 +22,22 @@ export const metadata: Metadata = {
     description: "Printify is your go-to platform for print on demand services, offering a wide range of customizable products and seamless integration with e-commerce platforms.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const user = await getCurrentUser();
+
     return (
         <html lang="en">
             <body className={`${lexend.variable} antialiased`}>
                 <WebSocketProvider>
                     <Providers>
-                        <RoleRequired allowedRoles={['admin']}>
+                        <RoleRequired allowedRoles={['admin', 'staff']}>
                             <div className="flex min-h-screen">
                                 <div className="sticky top-0 h-screen flex-shrink-0 z-30">
-                                    <Sidebar />
+                                    <Sidebar role={user?.role} />
                                 </div>
                                 <main className="flex-1 flex flex-col overflow-y-auto min-h-screen p-4">
                                     {children}

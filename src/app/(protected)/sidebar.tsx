@@ -9,12 +9,16 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role?: string }) {
     const router = useRouter();
     const pathname = usePathname();
 
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+
+    const sidebarItems = role === "staff"
+        ? adminSidebar.filter(item => item.name === "Manage Orders")
+        : adminSidebar;
 
     const handleLogout = async () => {
         try {
@@ -37,7 +41,7 @@ export default function Sidebar() {
                         <span className="text-2xl font-bold tracking-wide">Printify</span>
                     </div>
                     <ul className="space-y-2">
-                        {adminSidebar.map((item) => {
+                        {sidebarItems.map((item) => {
                             const isActive = pathname === item.href;
                             return (
                                 <li key={item.name}>
