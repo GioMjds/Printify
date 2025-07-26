@@ -102,36 +102,73 @@ export const updateUploadStatus = async ({ uploadId, newStatus, rejectionReason,
 
 // Manage Staff
 export const fetchStaff = async () => {
-  try {
-    const response = await API.get("/admin/[adminAction]?action=fetch_staff",  {
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to fetch staff: ${error}`);
-    throw error;
-  }
+    try {
+        const response = await API.get("/admin/[adminAction]/?action=fetch_staff",  {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to fetch staff: ${error}`);
+        throw error;
+    }
 }
 
 export const addNewStaff = async ({ firstName, middleName, lastName, email, password, confirmPassword, role }: NewStaff) => {
-  try {
-    const response = await API.post("/admin/add_staff", {
-      adminAction: "add_staff",
-      firstName: firstName,
-      middleName: middleName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      confirmPassword: confirmPassword,
-      role: role,
-    }, {
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to add new staff: ${error}`);
-    throw error;
-  }
+    try {
+        const response = await API.post("/admin/add_staff", {
+            adminAction: "add_staff",
+            firstName: firstName,
+            middleName: middleName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword,
+            role: role,
+        }, {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to add new staff: ${error}`);
+        throw error;
+    }
+}
+
+export const updateStaff = async ({ staffId, firstName, middleName, lastName, email }: { staffId: string; firstName: string; middleName?: string; lastName: string; email: string; }) => {
+    try {
+        const response = await API.put("/admin/[adminAction]", {
+            adminAction: "update_staff",
+            staffId,
+            firstName,
+            middleName,
+            lastName,
+            email,
+        }, {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to update staff: ${error}`);
+        throw error;
+    }
+}
+
+export const deleteStaff = async ({ staffId }: { staffId: string }) => {
+    try {
+        const response = await API.delete(`/admin/[adminAction]`, {
+            data: {
+                adminAction: "delete_staff",
+                staffId,
+            },
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to delete staff: ${error}`);
+        throw error;
+    }
 }

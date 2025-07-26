@@ -32,7 +32,6 @@ export default function OrderActions({ order }: OrderActionsProps) {
             queryClient.invalidateQueries({ 
                 queryKey: ['printOrders'],
             });
-            toast.success("Status updated successfully");
             setOpenModalId(false);
         },
         onError: (error: Error) => {
@@ -48,6 +47,7 @@ export default function OrderActions({ order }: OrderActionsProps) {
                 newStatus: "rejected",
                 rejectionReason: reason
             });
+            toast.success("Print order rejected successfully");
         } catch (error) {
             console.error(`Failed to reject order: ${error}`);
             throw error;

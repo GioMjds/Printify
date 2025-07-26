@@ -7,10 +7,13 @@ import {
 import StaffPage from "./staff"
 import { fetchStaff } from "@/services/Admin"
 import AddStaffButton from "@/components/admin/AddStaffButton"
+import { User } from "@/types/Admin"
 
 export const metadata: Metadata = {
     title: "Manage Staff",
 }
+
+export const dynamic = 'force-dynamic';
 
 export default async function Staff() {
     const queryClient = new QueryClient()
@@ -18,7 +21,7 @@ export default async function Staff() {
     try {
         await queryClient.prefetchQuery({
             queryKey: ['adminStaff'],
-            queryFn: () => fetchStaff(),
+            queryFn: fetchStaff,
         });
     } catch (error) {
         console.error(`Failed to prefetch staff data: ${error}`);
@@ -26,8 +29,8 @@ export default async function Staff() {
     }
 
     return (
-        <HydrationBoundary state={dehydrate(new QueryClient())}>
-            <div className="min-h-screen bg-white p-8">
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <div className="min-h-screen bg-white p-4">
                 <AddStaffButton />
                 <StaffPage />
             </div>

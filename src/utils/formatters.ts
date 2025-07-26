@@ -75,3 +75,18 @@ export function getStatus(status: string) {
             return "Unknown Status";
     }
 }
+
+export function splitName(name: string) {
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) {
+        return { firstName: parts[0], middleName: "", lastName: "" };
+    }
+    if (parts.length === 2) {
+        return { firstName: parts[0], middleName: "", lastName: parts[1] };
+    }
+    return {
+        firstName: parts[0],
+        middleName: parts[1],
+        lastName: parts.slice(2).join(" "),
+    };
+}

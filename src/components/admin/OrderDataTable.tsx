@@ -1,32 +1,30 @@
-import { use } from "react";
+'use client';
+
+import { useQuery } from "@tanstack/react-query";
 import { fetchAllPrintOrders } from "@/services/Admin";
 import { PrintOrder } from "@/types/Admin";
 import { getPrintOrderStatus, getStatus } from "@/utils/formatters";
 import OrderActions from "./AdminOrderActions";
 
-async function getPrintOrders() {
-    try {
-        const response = await fetchAllPrintOrders();
-        return response.printOrders;
-    } catch (error) {
-        console.error(`Failed to fetch print orders: ${error}`);
-        throw error;
-    }
-}
+export default function OrderDataTable({ initialData }: { initialData?: PrintOrder[] }) {
+    const { data } = useQuery({
+        queryKey: ['printOrders'],
+        queryFn: fetchAllPrintOrders,
+        initialData,
+    });
 
-export default function OrderDataTable() {
-    const printOrders = use(getPrintOrders());
+    const printOrders = data.printOrders || [];
 
     return (
         <div className="overflow-x-auto rounded-lg shadow-md bg-white">
             <table className="min-w-full divide-y divide-border-light table-fixed">
                 <thead className="bg-bg-soft">
                     <tr>
-                        <th className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">Customer</th>
-                        <th className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">File</th>
-                        <th className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">Actions</th>
+                        {['Customer', 'File', 'Status', 'Date', 'Actions'].map((header) => (
+                            <th key={header} className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">
+                                {header}
+                            </th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-border-light">

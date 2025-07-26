@@ -27,3 +27,13 @@ export type UpdateStatusParams = {
     rejectionReason?: string;
     amount?: number;
 };
+
+export interface Staff {
+    id: string;
+    name: string;
+    firstName?: string;
+    middleName?: string;
+    lastName?: string;
+    email?: string;
+    role?: string;
+}

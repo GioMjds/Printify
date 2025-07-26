@@ -20,8 +20,7 @@ export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
 
 export const fetchCustomerPrintUploads = async ({ userId, page, limit }: PrintUploads) => {
     try {
-        const response = await API.get(`/profile/uploads/${userId}`, {
-            params: { page, limit },
+        const response = await API.get(`/profile/uploads/${userId}?page=${page}&limit=${limit}`, {
             withCredentials: true,
         });
         return response.data;

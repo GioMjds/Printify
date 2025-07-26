@@ -1,8 +1,8 @@
-import prisma from "@/lib/prisma";
-import { generateNotificationMessage } from "@/utils/notifications";
-import axios from "axios";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { generateNotificationMessage } from "@/utils/notifications";
+import prisma from "@/lib/prisma";
+import axios from "axios";
 import path from "path";
 import { hash } from "bcrypt";
 
@@ -83,8 +83,7 @@ export async function GET(req: NextRequest) {
 
         const statusOptions = availableStatuses.map((item) => item.status);
 
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             printOrders: printOrders,
             statusOptions: statusOptions,
             totalCount: printOrders.length,
@@ -92,9 +91,7 @@ export async function GET(req: NextRequest) {
               status: statusFilter || "all",
               search: searchQuery || "",
             },
-          },
-          { status: 200 }
-        );
+        }, { status: 200 });
       }
       case "download_file": {
         if (!uploadId) {
@@ -145,12 +142,9 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "asc" },
         });
 
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             users: users,
-          },
-          { status: 200 }
-        );
+        }, { status: 200 });
       }
       case "fetch_staff": {
         const staffs = await prisma.user.findMany({
@@ -158,29 +152,20 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "asc" },
         });
 
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             staff: staffs,
-          },
-          { status: 200 }
-        );
+        }, { status: 200 });
       }
       default: {
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             error: "Invalid admin action",
-          },
-          { status: 400 }
-        );
+        }, { status: 400 });
       }
     }
   } catch (error) {
-    return NextResponse.json(
-      {
+    return NextResponse.json({
         error: `/api/admin/[adminAction] GET error: ${error}`,
-      },
-      { status: 500 }
-    );
+    }, { status: 500 });
   }
 }
 
@@ -351,22 +336,54 @@ export async function PUT(req: NextRequest) {
           { status: 200 }
         );
       }
-      default: {
-        return NextResponse.json(
-          {
-            error: "Invalid admin action",
+      case "update_staff": {
+        const { staffId, firstName, middleName, lasName, email } = body;
+
+        if (!staffId || !firstName || !lasName || !email) {
+          return NextResponse.json({
+              error: "Missing required fields: staffId, firstName, lastName, email",
+          }, { status: 400 });
+        }
+
+        const existingStaff = await prisma.user.findUnique({
+          where: { id: staffId },
+        });
+
+        if (!existingStaff) {
+          return NextResponse.json({
+              error: "Staff member not found",
+          }, { status: 404 });
+        }
+
+        const updatedStaff = await prisma.user.update({
+          where: { id: staffId },
+          data: {
+            name: middleName
+              ? `${firstName} ${middleName} ${lasName}`
+              : `${firstName} ${lasName}`,
+            email,
           },
-          { status: 400 }
-        );
+        });
+
+        return NextResponse.json({
+            message: "Staff member updated successfully",
+            staff: {
+              id: updatedStaff.id,
+              name: updatedStaff.name,
+              email: updatedStaff.email,
+            },
+        }, { status: 200 });
+      }
+      default: {
+        return NextResponse.json({
+            error: "Invalid admin action",
+        }, { status: 400 });
       }
     }
   } catch (error) {
-    return NextResponse.json(
-      {
+    return NextResponse.json({
         error: `/api/admin/[adminAction] PUT error: ${error}`,
-      },
-      { status: 500 }
-    );
+    }, { status: 500 });
   }
 }
 
@@ -374,6 +391,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { adminAction } = body;
+
     switch (adminAction) {
       case "add_staff": {
         const {
@@ -464,20 +482,70 @@ export async function POST(req: NextRequest) {
         );
       }
       default: {
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             error: "Invalid admin action",
-          },
-          { status: 400 }
-        );
+        }, { status: 400 });
       }
     }
   } catch (error) {
-    return NextResponse.json(
-      {
+    return NextResponse.json({
         error: `/api/admin/[adminAction] POST error: ${error}`,
-      },
-      { status: 500 }
-    );
+    }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { adminAction } = body;
+
+    switch (adminAction) {
+      case "delete_staff": {
+        const { staffId } = body;
+
+        if (!staffId) {
+          return NextResponse.json({
+            error: "Missing required field: staffId",
+          }, { status: 400 });
+        }
+
+        const existingStaff = await prisma.user.findUnique({
+          where: { id: staffId },
+        });
+
+        if (!existingStaff) {
+          return NextResponse.json({
+            error: "Staff member not found",
+          }, { status: 404 });
+        }
+
+        await prisma.user.delete({
+          where: { id: staffId },
+        });
+
+        if (!existingStaff) {
+          return NextResponse.json({
+            error: "Staff member not found",
+          }, { status: 404 });
+        }
+
+        await prisma.user.delete({
+          where: { id: staffId },
+        });
+
+        return NextResponse.json({
+            message: "Staff member deleted successfully",
+        }, { status: 200 });
+      }
+      default: {
+        return NextResponse.json({
+          error: "Invalid admin action",
+        }, { status: 400 })
+      }
+    }
+  } catch (error) {
+    return NextResponse.json({
+      error: `/api/admin/[adminAction] DELETE error: ${error}`,
+    }, { status: 500 })
   }
 }

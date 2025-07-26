@@ -109,12 +109,9 @@ const Modal: FC<ModalProps> = ({
 
                             {/* Content */}
                             <div className="bg-bg-secondary/90 backdrop-blur-sm rounded-xl p-6 shadow-inner">
-                                {description && (
-                                    <p className="text-white mb-6">
-                                        {description}
-                                    </p>
-                                )}
-
+                                <h2 className="text-white mb-6 text-lg break-words whitespace-pre-line max-w-[28rem]">
+                                    {description}
+                                </h2>
                                 {/* Action Buttons */}
                                 <div className="flex gap-4 justify-end">
                                     <button
