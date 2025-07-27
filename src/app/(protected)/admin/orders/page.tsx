@@ -26,9 +26,6 @@ export default async function AdminOrders() {
         throw error;
     }
 
-    const initialData = queryClient.getQueryData
-    <{ printOrders: PrintOrder[] }>(['printOrders'])?.printOrders;
-
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
             <div className="min-h-screen bg-white p-4">
@@ -36,7 +33,7 @@ export default async function AdminOrders() {
                     <h1 className="text-3xl font-bold text-primary mb-2">Customer Orders</h1>
                     <p className="text-text-light">Manage and review all print orders submitted by customers.</p>
                 </div>
-                <OrderDataTable initialData={initialData ?? []} />
+                <OrderDataTable />
             </div>
         </HydrationBoundary>
     );

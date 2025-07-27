@@ -20,9 +20,9 @@ export const adminSidebar: AdminSidebar[] = [
         href: "/admin",
     },
     {
-        name: "Sales",
+        name: "Shop Expenses",
         icon: BadgePercent,
-        href: "/admin/sales",
+        href: "/admin/expenses",
     },
     {
         name: "Manage Orders",

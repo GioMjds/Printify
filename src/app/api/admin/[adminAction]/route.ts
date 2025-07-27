@@ -404,29 +404,16 @@ export async function POST(req: NextRequest) {
           role,
         } = body;
 
-        if (
-          !firstName ||
-          !lastName ||
-          !email ||
-          !password ||
-          !confirmPassword ||
-          !role
-        ) {
-          return NextResponse.json(
-            {
+        if (!firstName || !lastName || !email || !password || !confirmPassword || !role) {
+          return NextResponse.json({
               error: "Missing required fields.",
-            },
-            { status: 400 }
-          );
+          }, { status: 400 });
         }
 
         if (role !== "staff") {
-          return NextResponse.json(
-            {
+          return NextResponse.json({
               error: "Role must be 'staff'",
-            },
-            { status: 400 }
-          );
+          }, { status: 400 });
         }
 
         const name = middleName
@@ -438,23 +425,17 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingUser) {
-          return NextResponse.json(
-            {
+          return NextResponse.json({
               error: "User with this email already exists.",
-            },
-            { status: 409 }
-          );
+          }, { status: 409 });
         }
 
         const hashedPassword = await hash(password, 12);
 
         if (password !== confirmPassword) {
-          return NextResponse.json(
-            {
+          return NextResponse.json({
               error: "Passwords do not match.",
-            },
-            { status: 400 }
-          );
+          }, { status: 400 });
         }
 
         const newStaff = await prisma.user.create({
@@ -468,8 +449,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        return NextResponse.json(
-          {
+        return NextResponse.json({
             staff: {
               id: newStaff.id,
               name: newStaff.name,
@@ -477,9 +457,7 @@ export async function POST(req: NextRequest) {
               role: newStaff.role,
               isVerified: newStaff.isVerified,
             },
-          },
-          { status: 201 }
-        );
+        }, { status: 201 });
       }
       default: {
         return NextResponse.json({
@@ -510,16 +488,6 @@ export async function DELETE(req: NextRequest) {
         }
 
         const existingStaff = await prisma.user.findUnique({
-          where: { id: staffId },
-        });
-
-        if (!existingStaff) {
-          return NextResponse.json({
-            error: "Staff member not found",
-          }, { status: 404 });
-        }
-
-        await prisma.user.delete({
           where: { id: staffId },
         });
 

@@ -6,11 +6,10 @@ import { PrintOrder } from "@/types/Admin";
 import { getPrintOrderStatus, getStatus } from "@/utils/formatters";
 import OrderActions from "./AdminOrderActions";
 
-export default function OrderDataTable({ initialData }: { initialData?: PrintOrder[] }) {
+export default function OrderDataTable() {
     const { data } = useQuery({
         queryKey: ['printOrders'],
         queryFn: fetchAllPrintOrders,
-        initialData,
     });
 
     const printOrders = data.printOrders || [];

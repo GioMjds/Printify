@@ -106,8 +106,8 @@ export default function AddStaffButton() {
                             </div>
 
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                                <div className="flex gap-3">
-                                    <div className="flex-1">
+                                <div className="flex gap-2">
+                                    <div className="w-1/2">
                                         <input
                                             type="text"
                                             {...register("firstName", { required: "First Name is required" })}
@@ -120,13 +120,12 @@ export default function AddStaffButton() {
                                                 className="text-red-500 text-xs mt-1"
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.2 }}
                                             >
                                                 {errors.firstName.message}
                                             </motion.p>
                                         )}
                                     </div>
-                                    <div className="flex-1">
+                                    <div className="w-1/2">
                                         <input
                                             type="text"
                                             {...register("lastName", { required: "Last Name is required" })}
@@ -139,7 +138,6 @@ export default function AddStaffButton() {
                                                 className="text-red-500 text-xs mt-1"
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.2 }}
                                             >
                                                 {errors.lastName.message}
                                             </motion.p>
@@ -175,73 +173,78 @@ export default function AddStaffButton() {
                                             className="text-red-500 text-xs mt-1"
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.2 }}
                                         >
                                             {errors.email.message}
                                         </motion.p>
                                     )}
                                 </div>
-
-                                <div className="relative">
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        {...register("password", {
-                                            required: "Password is required",
-                                            minLength: {
-                                                value: 8,
-                                                message: "Password must be at least 8 characters"
-                                            }
-                                        })}
-                                        placeholder="Password"
-                                        className={`border-2 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 ${errors.password ? "border-red-500 focus:ring-red-200" : "border-gray-200 focus:ring-accent/50"
-                                            }`}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-accent transition-colors"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size="lg" />
-                                    </button>
+                                <div>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            {...register("password", {
+                                                required: "Password is required",
+                                                minLength: {
+                                                    value: 8,
+                                                    message: "Password must be at least 8 characters"
+                                                }
+                                            })}
+                                            placeholder="Password"
+                                            className={`border-2 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 ${errors.password ? "border-red-500 focus:ring-red-200" : "border-gray-200 focus:ring-accent/50"
+                                                }`}
+                                        />
+                                        <motion.button
+                                            type="button"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-accent transition-colors"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} size="xl" />
+                                        </motion.button>
+                                    </div>
                                     {errors.password && (
-                                        <motion.p className="text-red-500 text-xs mt-1"
+                                        <motion.span
+                                            className="text-red-500 text-xs -mt-3"
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.2 }}
                                         >
                                             {errors.password.message}
-                                        </motion.p>
+                                        </motion.span>
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        {...register("confirmPassword", {
-                                            required: "Please confirm your password",
-                                            validate: value =>
-                                                value === password || "Passwords do not match"
-                                        })}
-                                        placeholder="Confirm Password"
-                                        className={`border-2 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 ${errors.confirmPassword ? "border-red-500 focus:ring-red-200" : "border-gray-200 focus:ring-accent/50"
-                                            }`}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-accent transition-colors"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    >
-                                        <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} size="lg" />
-                                    </button>
+                                <div>
+                                    <div className="relative">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            {...register("confirmPassword", {
+                                                required: "Please confirm your password",
+                                                validate: value =>
+                                                    value === password || "Passwords do not match"
+                                            })}
+                                            placeholder="Confirm Password"
+                                            className={`border-2 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 ${errors.confirmPassword ? "border-red-500 focus:ring-red-200" : "border-gray-200 focus:ring-accent/50"
+                                                }`}
+                                        />
+                                        <motion.button
+                                            type="button"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-accent transition-colors"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} size="xl" />
+                                        </motion.button>
+                                    </div>
                                     {errors.confirmPassword && (
-                                        <motion.p
+                                        <motion.span
                                             className="text-red-500 text-xs mt-1"
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.2 }}
                                         >
                                             {errors.confirmPassword.message}
-                                        </motion.p>
+                                        </motion.span>
                                     )}
                                 </div>
 

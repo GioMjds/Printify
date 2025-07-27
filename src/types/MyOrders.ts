@@ -11,6 +11,15 @@ export interface Upload {
     updatedAt: string;
 }
 
+export interface Pagination {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+}
+
 export interface UploadResponse {
     uploads: Upload[];
     pagination: {
@@ -21,4 +30,10 @@ export interface UploadResponse {
         hasNextPage: boolean;
         hasPreviousPage: boolean;
     }
+}
+
+export interface MyOrdersProps {
+    userId: string;
+    page: number;
+    limit: number;
 }

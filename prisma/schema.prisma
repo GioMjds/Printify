@@ -57,3 +57,14 @@ model Notification {
   message           String
   markAsRead        Boolean?      @default(false)
 }
+
+model Expense {
+  id                Int           @id @default(autoincrement())
+  expenseName       String
+  amount            Decimal
+  category          String
+  description       String?
+  occuredAt         DateTime
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}

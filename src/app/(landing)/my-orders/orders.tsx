@@ -1,43 +1,42 @@
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
 import { fetchCustomerPrintUploads } from "@/services/Customer";
 import { formatDate, getStatus, getStatusColor } from "@/utils/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Upload, UploadResponse } from "@/types/MyOrders";
+import { MyOrdersProps, Upload, UploadResponse } from "@/types/MyOrders";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
-export default function MyOrdersPage({ 
-    userId, 
-    initialPage = 1, 
-    limit = 6 
-}: { 
-    userId: string; 
-    initialPage?: number; 
-    limit?: number; 
-}) {
-    const [page, setPage] = useState<number>(initialPage);
-    
+export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     const { data } = useQuery<UploadResponse>({
-        queryKey: ["myOrders", userId, page],
-        queryFn: () => fetchCustomerPrintUploads({ 
-            userId, 
-            page, 
-            limit 
+        queryKey: ["myOrders", userId, page, limit],
+        queryFn: () => fetchCustomerPrintUploads({
+            userId,
+            page,
+            limit
         }),
-    }); 
+    });
 
     const uploads = data?.uploads || [];
     const pagination = data?.pagination;
 
+    const setPage = (pageNum: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', String(pageNum));
+        router.replace(`?${params.toString()}`);
+    }
+
     const handlePrevPage = () => {
-        if (pagination?.hasPreviousPage) setPage(prev => prev - 1);
+        if (pagination?.hasPreviousPage) setPage(page - 1);
     };
 
     const handleNextPage = () => {
-        if (pagination?.hasNextPage) setPage(prev => prev + 1);
+        if (pagination?.hasNextPage) setPage(page + 1);
     };
 
     const handlePageChange = (pageNum: number) => {
@@ -54,66 +53,7 @@ export default function MyOrdersPage({
                 <h1 className="text-3xl md:text-4xl font-bold text-bg-soft mb-8 text-center tracking-tight">
                     My Print Orders
                 </h1>
-
-                {/* Pagination Controls - Top */}
-                {pagination && pagination.totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                        <div className="text-bg-soft">
-                            Showing {uploads.length} of {pagination.total} orders
-                        </div>
-                        
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={handlePrevPage}
-                                disabled={!pagination.hasPreviousPage}
-                                className={`px-4 py-2 rounded-md ${
-                                    pagination.hasPreviousPage
-                                        ? "bg-bg-accent text-white hover:bg-bg-highlight"
-                                        : "bg-gray-300 cursor-not-allowed text-gray-500"
-                                }`}
-                            >
-                                Previous
-                            </button>
-                            
-                            <span className="text-bg-soft">
-                                Page {pagination.page} of {pagination.totalPages}
-                            </span>
-                            
-                            <button
-                                onClick={handleNextPage}
-                                disabled={!pagination.hasNextPage}
-                                className={`px-4 py-2 rounded-md ${
-                                    pagination.hasNextPage
-                                        ? "bg-bg-accent text-white hover:bg-bg-highlight"
-                                        : "bg-gray-300 cursor-not-allowed text-gray-500"
-                                }`}
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {uploads.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Image
-                            src="/file.svg"
-                            alt="No Orders"
-                            width={80}
-                            height={80}
-                            className="mb-4 opacity-70"
-                        />
-                        <p className="text-xl text-bg-soft mb-4">
-                            No print orders found.
-                        </p>
-                        <button 
-                            onClick={() => setPage(1)}
-                            className="bg-bg-accent text-white px-4 py-2 rounded-md hover:bg-bg-highlight transition-colors"
-                        >
-                            Refresh
-                        </button>
-                    </div>
-                ) : (
+                {uploads.length > 0 ? (
                     <>
                         <motion.div
                             className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
@@ -142,10 +82,9 @@ export default function MyOrdersPage({
                                 >
                                     <div className="flex items-center gap-3 mb-2">
                                         <span
-                                            className={`px-2 py-1 uppercase rounded-full text-xs font-semibold border transition-colors duration-200 ${
-                                                getStatusColor(upload.status) ||
+                                            className={`px-2 py-1 uppercase rounded-full text-xs font-semibold border transition-colors duration-200 ${getStatusColor(upload.status) ||
                                                 "bg-gray-100 text-gray-700 border-gray-300"
-                                            }`}
+                                                }`}
                                         >
                                             {getStatus(upload.status)}
                                         </span>
@@ -176,32 +115,64 @@ export default function MyOrdersPage({
                                 {/* Page Numbers */}
                                 <div className="flex justify-center mb-4">
                                     <div className="flex flex-wrap justify-center gap-2">
+                                        <button
+                                            onClick={handlePrevPage}
+                                            disabled={!pagination.hasPreviousPage}
+                                            className={`px-4 py-2 rounded-md ${pagination.hasPreviousPage
+                                                ? "bg-bg-accent cursor-pointer text-white hover:bg-bg-highlight"
+                                                : "bg-gray-300 cursor-not-allowed text-gray-500"
+                                                }`}
+                                        >
+                                            Previous
+                                        </button>
                                         {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
                                             (pageNum) => (
                                                 <button
                                                     key={pageNum}
                                                     onClick={() => handlePageChange(pageNum)}
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                                        page === pageNum
-                                                            ? "bg-bg-highlight text-white"
-                                                            : "bg-bg-soft/20 text-bg-soft hover:bg-bg-soft/40"
-                                                    }`}
+                                                    className={`w-10 h-10 rounded-full flex items-center justify-center ${page === pageNum
+                                                        ? "bg-bg-highlight text-white"
+                                                        : "bg-bg-soft/20 text-bg-soft hover:bg-bg-soft/40"
+                                                        }`}
                                                 >
                                                     {pageNum}
                                                 </button>
                                             )
                                         )}
+                                        <button
+                                            onClick={handleNextPage}
+                                            disabled={!pagination.hasNextPage}
+                                            className={`px-4 py-2 rounded-md ${pagination.hasNextPage
+                                                ? "bg-bg-accent cursor-pointer text-white hover:bg-bg-highlight"
+                                                : "bg-gray-300 cursor-not-allowed text-gray-500"
+                                                }`}
+                                        >
+                                            Next
+                                        </button>
                                     </div>
-                                </div>
-
-                                {/* Pagination Info */}
-                                <div className="text-center text-bg-soft text-sm">
-                                    Showing {Math.min(pagination.limit * (pagination.page - 1) + 1, pagination.total)}-
-                                    {Math.min(pagination.limit * pagination.page, pagination.total)} of {pagination.total} orders
                                 </div>
                             </div>
                         )}
                     </>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <Image
+                            src="/file.svg"
+                            alt="No Orders"
+                            width={80}
+                            height={80}
+                            className="mb-4 opacity-70"
+                        />
+                        <p className="text-xl text-bg-soft mb-4">
+                            No print orders found.
+                        </p>
+                        <button
+                            onClick={() => setPage(1)}
+                            className="bg-bg-accent text-white px-4 py-2 rounded-md hover:bg-bg-highlight transition-colors"
+                        >
+                            Refresh
+                        </button>
+                    </div>
                 )}
             </div>
         </section>
