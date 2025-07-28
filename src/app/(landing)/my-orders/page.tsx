@@ -32,19 +32,14 @@ export default async function MyOrders({ searchParams }: SearchParams) {
     const page: number = Number(resolvedSearchParams?.page ?? 1);
     const limit: number = Number(resolvedSearchParams?.limit ?? 6);
 
-    try {
-        await queryClient.prefetchQuery({
-            queryKey: ['myOrders', userId, page, limit],
-            queryFn: () => fetchCustomerPrintUploads({ 
-                userId: session?.userId as string, 
-                page: page, 
-                limit: limit
-            }),
-        });
-    } catch (error) {
-        console.error(`Failed to prefetch orders for user ${userId}:`, error);
-        throw error;
-    }
+    await queryClient.prefetchQuery({
+        queryKey: ['myOrders', userId, page, limit],
+        queryFn: () => fetchCustomerPrintUploads({
+            userId: session?.userId as string,
+            page: page,
+            limit: limit
+        }),
+    });
 
     return (
         <AuthRequired>

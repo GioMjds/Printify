@@ -5,29 +5,29 @@
 
 @theme {
   /* Main Color Palette */
-  --color-primary: #0E2148;
-  --color-secondary: #483AA0;
-  --color-accent: #7965C1;
-  --color-highlight: #E3D095;
+  --color-primary: #0e2148;
+  --color-secondary: #483aa0;
+  --color-accent: #7965c1;
+  --color-highlight: #e3d095;
 
   /* Text Colors */
-  --color-text: #0E2148;
-  --color-text-light: #483AA0;
+  --color-text: #0e2148;
+  --color-text-light: #483aa0;
   --color-text-dark: #1a1a1a;
-  --color-text-primary: #483AA0;
+  --color-text-primary: #483aa0;
 
   /* Background Colors */
-  --color-bg-primary: #0E2148;
-  --color-bg-secondary: #483AA0;
-  --color-bg-accent: #7965C1;
-  --color-bg-highlight: #E3D095;
+  --color-bg-primary: #0e2148;
+  --color-bg-secondary: #483aa0;
+  --color-bg-accent: #7965c1;
+  --color-bg-highlight: #e3d095;
   --color-bg-white: #ffffff;
-  --color-bg-soft: #E3D095;
+  --color-bg-soft: #e3d095;
 
   /* Border Colors */
-  --color-border-light: #7965C1;
-  --color-border: #483AA0;
-  --color-border-dark: #0E2148;
+  --color-border-light: #7965c1;
+  --color-border: #483aa0;
+  --color-border-dark: #0e2148;
 
   /* Shadow Colors */
   --color-shadow-light: rgba(14, 33, 72, 0.1);
@@ -35,13 +35,13 @@
   --color-shadow-dark: rgba(14, 33, 72, 0.3);
 
   /* Gradient Colors */
-  --gradient-primary: linear-gradient(135deg, #0E2148 0%, #483AA0 100%);
-  --gradient-secondary: linear-gradient(135deg, #7965C1 0%, #E3D095 100%);
+  --gradient-primary: linear-gradient(135deg, #0e2148 0%, #483aa0 100%);
+  --gradient-secondary: linear-gradient(135deg, #7965c1 0%, #e3d095 100%);
   --gradient-soft: linear-gradient(
     135deg,
-    #E3D095 0%,
-    #7965C1 50%,
-    #483AA0 100%
+    #e3d095 0%,
+    #7965c1 50%,
+    #483aa0 100%
   );
 }
 
@@ -62,4 +62,28 @@ body {
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   border: 1.5px solid rgba(255, 255, 255, 0.28);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
 }

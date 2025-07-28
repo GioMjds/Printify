@@ -4,10 +4,8 @@ import {
     QueryClient 
 } from '@tanstack/react-query';
 import { getSession } from '@/lib/auth';
-import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
-
-const UploadFilePage = dynamic(() => import("./upload-file"));
+import UploadPage from './upload-file';
 
 export const metadata = {
     title: "Upload Your Files",
@@ -21,7 +19,7 @@ export default async function Upload() {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <UploadFilePage />
+            <UploadPage />
         </HydrationBoundary>
     )
 }

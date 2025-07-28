@@ -3,7 +3,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Loading() {
     return (
-        <section className="w-full min-h-screen py-6 md:py-10 mt-16 md:mt-20 px-4 sm:px-6 md:px-8 lg:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
+        <section className="w-full min-h-screen py-6 md:py-10 mt-16 md:mt-16 px-4 sm:px-6 md:px-8 lg:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
             {/* Decorative Blobs */}
             <div className="absolute top-0 left-0 w-48 sm:w-60 md:w-72 h-48 sm:h-60 md:h-72 bg-bg-accent/20 rounded-full blur-xl sm:blur-2xl md:blur-3xl z-0" />
             <div className="absolute bottom-0 right-0 w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 bg-bg-highlight/15 rounded-full blur-xl sm:blur-2xl md:blur-3xl z-0" />

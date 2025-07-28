@@ -79,10 +79,9 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
                                     }}
                                 >
                                     <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                                        <span
-                                            className={`px-2 py-1 uppercase rounded-full text-xs font-semibold border transition-colors duration-200 ${getStatusColor(upload.status) ||
-                                                "bg-gray-100 text-gray-700 border-gray-300"
-                                                }`}
+                                        <span className={`px-2 py-1 uppercase rounded-full text-xs font-semibold border transition-colors duration-200 ${getStatusColor(upload.status) ||
+                                            "bg-gray-100 text-gray-700 border-gray-300"
+                                            }`}
                                         >
                                             {getStatus(upload.status)}
                                         </span>

@@ -23,6 +23,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
     const notificationRef = useRef<HTMLDivElement>(null);
+    const profileRef = useRef<HTMLDivElement>(null);
 
     const {
         notifications,
@@ -99,16 +100,19 @@ export default function Navbar({ userDetails }: NavbarProps) {
             if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
                 setShowNotifications(false);
             }
+            if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+                // Close profile dropdown if needed
+            }
         };
 
-        if (showNotifications) document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showNotifications]);
+    }, []);
 
     return (
         <>
             <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-primary shadow-lg">
-                <div className="max-w-7xl mx-auto flex justify-between items-center h-16 lg:h-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
                     {/* Logo */}
                     <motion.div
                         className="flex-shrink-0"
@@ -117,7 +121,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         whileTap={{ scale: 0.95 }}
                     >
                         <Link prefetch={false} href="/" className="flex items-center space-x-2">
-                            <div className="relative w-10 h-10 lg:w-12 lg:h-12">
+                            <div className="relative w-10 h-10 sm:w-12 sm:h-12">
                                 <Image
                                     src="/printify_logo.png"
                                     alt="Printify Logo"
@@ -127,13 +131,13 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                     priority
                                 />
                             </div>
-                            <span className="text-xl lg:text-2xl font-bold text-highlight drop-shadow-md">
+                            <span className="text-xl sm:text-2xl font-bold text-highlight drop-shadow-md">
                                 Printify
                             </span>
                         </Link>
                     </motion.div>
 
-                    {/* CTA Buttons or Profile Icon */}
+                    {/* Desktop Navigation */}
                     <motion.div
                         className="hidden lg:flex items-center space-x-4"
                         variants={itemVariants}
@@ -171,11 +175,9 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                     whileTap={{ scale: 0.95 }}
                                 >
                                     {hasUnread ? (
-                                        <>
-                                            <FontAwesomeIcon icon={faBell} size='xl' />
-                                        </>
+                                        <BellDot className="w-5 h-5" />
                                     ) : (
-                                        <FontAwesomeIcon icon={faBell} size='xl' />
+                                        <Bell className="w-5 h-5" />
                                     )}
                                     {unreadCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-5">
@@ -272,7 +274,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                     {
                                         label: 'Log Out',
                                         onClick: () => setShowLogoutModal(true),
-                                        icon: <LogOut size={16} className='w-4 h-4' />,
+                                        icon: <LogOut className="w-4 h-4" />,
                                     },
                                 ]}
                                 position="bottom"
@@ -286,7 +288,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                         href="/login"
                                         className="flex items-center gap-2 text-base font-medium nav-link px-4 py-2 text-highlight hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
                                     >
-                                        <LogIn size={24} />
+                                        <LogIn className="w-5 h-5" />
                                         Login
                                     </Link>
                                 </motion.div>
@@ -295,7 +297,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                         href="/register"
                                         className="flex items-center gap-2 text-primary font-medium bg-highlight nav-link px-4 py-2 hover:text-bg-white hover:bg-accent rounded-full transition-colors duration-200"
                                     >
-                                        <UserRoundPlus size={24} />
+                                        <UserRoundPlus className="w-5 h-5" />
                                         Register
                                     </Link>
                                 </motion.div>
@@ -303,46 +305,168 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         )}
                     </motion.div>
 
-                    {/* Mobile menu button */}
-                    <motion.div
-                        className="lg:hidden"
-                        variants={itemVariants}
-                    >
-                        <motion.button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                            whileTap={{ scale: 0.95 }}
-                            aria-expanded="false"
-                        >
-                            <span className="sr-only">Open main menu</span>
-                            <motion.div
-                                animate={isOpen ? "open" : "closed"}
-                                className="w-6 h-6 flex flex-col justify-center items-center"
+                    {/* Mobile Navigation (Profile + Notification + Menu) */}
+                    <div className="flex items-center lg:hidden space-x-4">
+                        {userDetails && (
+                            <>
+                                {/* Mobile Notification Bell */}
+                                <div className="relative mt-1" ref={notificationRef}>
+                                    <motion.button
+                                        onClick={() => setShowNotifications(!showNotifications)}
+                                        className="relative group cursor-pointer p-2 text-highlight rounded-full transition-colors duration-200"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        {hasUnread ? (
+                                            <BellDot className="w-5 h-5" />
+                                        ) : (
+                                            <Bell className="w-5 h-5" />
+                                        )}
+                                        {unreadCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center min-w-4">
+                                                {unreadCount > 99 ? '99+' : unreadCount}
+                                            </span>
+                                        )}
+                                    </motion.button>
+
+                                    {/* Mobile Notification Dropdown */}
+                                    {showNotifications && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            className="fixed right-4 left-4 mt-2 bg-white rounded-lg shadow-lg border border-border-light z-50 max-h-96 overflow-hidden"
+                                        >
+                                            <div className="p-4 border-b border-border-light">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-lg font-semibold text-primary">
+                                                        Notifications
+                                                    </h3>
+                                                    <div className="flex items-center gap-2">
+                                                        {unreadCount > 0 && (
+                                                            <button
+                                                                onClick={handleMarkAllAsRead}
+                                                                className="text-sm text-accent hover:text-primary transition-colors"
+                                                            >
+                                                                Mark all as read
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="max-h-64 overflow-y-auto">
+                                                {notificationsLoading ? (
+                                                    <div className="p-4 text-center text-gray-500">
+                                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-accent mx-auto"></div>
+                                                        <p className="mt-2 text-sm">Loading notifications...</p>
+                                                    </div>
+                                                ) : notifications.length === 0 ? (
+                                                    <div className="p-4 text-center text-gray-500">
+                                                        <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                        <p>No notifications yet</p>
+                                                        <p className="text-xs mt-1">You'll see updates about your orders here</p>
+                                                    </div>
+                                                ) : (
+                                                    notifications.map((notification) => (
+                                                        <div
+                                                            key={notification.id}
+                                                            className={`p-4 border-b border-gray-100 last:border-b-0 cursor-pointer hover:bg-bg-soft transition-colors ${!notification.read ? 'bg-blue-50 border-l-4 border-l-accent' : ''
+                                                                }`}
+                                                            onClick={() => {
+                                                                markNotificationAsRead(notification.id);
+                                                                if (notification.orderId) {
+                                                                    router.push(`/my-orders/${notification.orderId}`);
+                                                                    setShowNotifications(false);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <div className="flex justify-between items-start">
+                                                                <p className={`text-sm ${!notification.read ? 'font-semibold text-primary' : 'text-gray-700'}`}>
+                                                                    {notification.message}
+                                                                </p>
+                                                                {!notification.read && (
+                                                                    <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 ml-2 mt-1"></div>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                {formatNotificationTime(notification.createdAt)}
+                                                            </p>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </div>
+                                {/* Mobile Profile Icon */}
+                                <div className="relative mt-3" ref={profileRef}>
+                                    <Dropdown
+                                        userDetails={{
+                                            name: userDetails.name ?? '',
+                                            email: userDetails.email ?? "",
+                                            profileImage: userDetails.profileImage ?? null,
+                                        }}
+                                        options={[
+                                            {
+                                                label: 'Profile',
+                                                onClick: () => {
+                                                    router.push(`/profile/${userDetails.id}`);
+                                                    setIsOpen(false);
+                                                },
+                                            },
+                                            {
+                                                label: 'Log Out',
+                                                onClick: () => setShowLogoutModal(true),
+                                                icon: <LogOut className="w-4 h-4" />,
+                                            },
+                                        ]}
+                                        position="bottom"
+                                    >
+                                        <ProfileIcon profileImage={userDetails.profileImage} />
+                                    </Dropdown>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Mobile menu button */}
+                        <motion.div variants={itemVariants}>
+                            <motion.button
+                                onClick={() => setIsOpen(!isOpen)}
+                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                                whileTap={{ scale: 0.95 }}
+                                aria-expanded="false"
                             >
-                                <motion.span
-                                    variants={{
-                                        closed: { rotate: 0, y: 0 },
-                                        open: { rotate: 45, y: 6 }
-                                    }}
-                                    className="w-5 h-0.5 bg-current block transition-all duration-300"
-                                />
-                                <motion.span
-                                    variants={{
-                                        closed: { opacity: 1 },
-                                        open: { opacity: 0 }
-                                    }}
-                                    className="w-5 h-0.5 bg-current block mt-1 transition-all duration-300"
-                                />
-                                <motion.span
-                                    variants={{
-                                        closed: { rotate: 0, y: 0 },
-                                        open: { rotate: -45, y: -6 }
-                                    }}
-                                    className="w-5 h-0.5 bg-current block mt-1 transition-all duration-300"
-                                />
-                            </motion.div>
-                        </motion.button>
-                    </motion.div>
+                                <span className="sr-only">Open main menu</span>
+                                <motion.div
+                                    animate={isOpen ? "open" : "closed"}
+                                    className="w-6 h-6 flex flex-col justify-center items-center"
+                                >
+                                    <motion.span
+                                        variants={{
+                                            closed: { rotate: 0, y: 0 },
+                                            open: { rotate: 45, y: 6 }
+                                        }}
+                                        className="w-5 h-0.5 bg-current block transition-all duration-300"
+                                    />
+                                    <motion.span
+                                        variants={{
+                                            closed: { opacity: 1 },
+                                            open: { opacity: 0 }
+                                        }}
+                                        className="w-5 h-0.5 bg-current block mt-1 transition-all duration-300"
+                                    />
+                                    <motion.span
+                                        variants={{
+                                            closed: { rotate: 0, y: 0 },
+                                            open: { rotate: -45, y: -6 }
+                                        }}
+                                        className="w-5 h-0.5 bg-current block mt-1 transition-all duration-300"
+                                    />
+                                </motion.div>
+                            </motion.button>
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* Mobile Navigation Menu */}
@@ -361,74 +485,22 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 transition={{ delay: navbar.length * 0.1 }}
                                 className="space-y-2"
                             >
-                                <Link
-                                    href="/upload"
-                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Upload
-                                </Link>
-                                <Link
-                                    href="/about"
-                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    About
-                                </Link>
-                                <Link
-                                    href="/contact"
-                                    className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Contact Us
-                                </Link>
                                 {userDetails ? (
                                     <>
-                                        {/* Mobile Notifications */}
-                                        <div className="px-3 py-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-base font-medium text-highlight">Notifications</span>
-                                                <div className="flex items-center space-x-2">
-                                                    {unreadCount > 0 && (
-                                                        <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-5">
-                                                            {unreadCount > 99 ? '99+' : unreadCount}
-                                                        </span>
-                                                    )}
-                                                    <button
-                                                        onClick={() => setShowNotifications(!showNotifications)}
-                                                        className="text-highlight hover:text-bg-white"
-                                                    >
-                                                        {hasUnread ? <BellDot size={20} /> : <Bell size={20} />}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            {showNotifications && (
-                                                <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
-                                                    {notifications.length === 0 ? (
-                                                        <p className="text-sm text-gray-400">No notifications yet</p>
-                                                    ) : (
-                                                        notifications.map((notification) => (
-                                                            <div
-                                                                key={notification.id}
-                                                                className={`p-2 rounded text-sm ${!notification.read ? 'bg-blue-50 border-l-2 border-l-accent text-primary' : 'text-gray-600'
-                                                                    }`}
-                                                                onClick={() => {
-                                                                    markNotificationAsRead(notification.id);
-                                                                    if (notification.orderId) {
-                                                                        router.push(`/my-orders/${notification.orderId}`);
-                                                                        setIsOpen(false);
-                                                                        setShowNotifications(false);
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {notification.message}
-                                                            </div>
-                                                        ))
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <ProfileIcon profileImage={userDetails.profileImage} />
+                                        <Link
+                                            href="/upload"
+                                            className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            Upload
+                                        </Link>
+                                        <Link
+                                            href="/my-orders"
+                                            className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            My Orders
+                                        </Link>
                                     </>
                                 ) : (
                                     <>
@@ -464,7 +536,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                     onConfirm={handleLogout}
                     loading={loading}
                     loadingText='Logging out...'
-                    icon={<LogOut size={24} className='w-6 h-6' />}
+                    icon={<LogOut className="w-6 h-6" />}
                 />
             )}
         </>
