@@ -5,6 +5,7 @@ import { fetchAllPrintOrders } from "@/services/Admin";
 import { PrintOrder } from "@/types/Admin";
 import { getPrintOrderStatus, getStatus } from "@/utils/formatters";
 import OrderActions from "./AdminOrderActions";
+import { File } from "lucide-react";
 
 export default function OrderDataTable() {
     const { data } = useQuery({
@@ -19,7 +20,7 @@ export default function OrderDataTable() {
             <table className="min-w-full divide-y divide-border-light table-fixed">
                 <thead className="bg-bg-soft">
                     <tr>
-                        {['Customer', 'File', 'Status', 'Date', 'Actions'].map((header) => (
+                        {['Customer', 'File', 'Status', 'Date', 'Amount', 'Actions'].map((header) => (
                             <th key={header} className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">
                                 {header}
                             </th>
@@ -29,7 +30,8 @@ export default function OrderDataTable() {
                 <tbody className="bg-white divide-y divide-border-light">
                     {printOrders.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className="py-12 text-center text-lg text-gray-500">
+                            <td colSpan={6} className="py-12 text-center text-lg text-gray-500">
+                                <File className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                                 No print orders yet.
                             </td>
                         </tr>
@@ -47,6 +49,11 @@ export default function OrderDataTable() {
                                 <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{getStatus(order.status)}</td>
                                 <td className="px-6 py-4 text-md text-center text-primary">
                                     {new Date(order.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4 text-center whitespace-nowrap text-lg text-primary">
+                                    <span className="text-md text-primary font-semibold">
+                                        ₱{order.needed_amount}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm flex gap-2 items-center justify-center">
                                     <OrderActions order={order} />

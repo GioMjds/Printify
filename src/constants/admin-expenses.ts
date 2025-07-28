@@ -1,0 +1,17 @@
+export const expensesCategories = [
+    "Supplies",
+    "Utilities",
+    "Rent",
+    "Salaries & Wages",
+    "Maintenance & Repairs",
+    "Marketing & Advertising",
+    "Shipping & Delivery",
+    "Software & Subscriptions",
+    "Office Equipment",
+    "Printing Costs",
+    "Travel & Transportation",
+    "Training & Development",
+    "Insurance",
+    "Taxes & Licenses",
+    "Miscellaneous",
+];

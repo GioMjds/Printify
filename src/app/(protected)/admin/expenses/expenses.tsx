@@ -8,6 +8,8 @@ import { fetchExpenses, addExpense, updateExpense, deleteExpense } from "@/servi
 import { Plus, X, Edit, Trash2, Filter, ChevronDown, ChevronUp, Calendar, DollarSign, Tag, FileText } from 'lucide-react';
 import { Expense, ExpenseFormData, ExpenseResponse } from '@/types/Admin';
 import { format } from 'date-fns';
+import { expensesCategories } from '@/constants/admin-expenses';
+import { formatExpenseCategories } from '@/utils/formatters';
 
 export default function ExpensesPage() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -50,6 +52,7 @@ export default function ExpensesPage() {
     });
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ExpenseFormData>({
+        mode: 'onBlur',
         defaultValues: editingExpense ? {
             expenseName: editingExpense.expenseName,
             amount: editingExpense.amount,
@@ -59,13 +62,8 @@ export default function ExpensesPage() {
         } : {}
     });
 
-    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
     const categories = [...new Set(expenses.map(expense => expense.category))];
-    const categoryStats = categories.map(category => {
-        const categoryExpenses = expenses.filter(e => e.category === category);
-        const total = categoryExpenses.reduce((sum, e) => sum + e.amount, 0);
-        return { category, total, percentage: (total / totalExpenses) * 100 };
-    });
 
     const filteredExpenses = expenses.filter(expense => {
         const matchesCategory = categoryFilter === 'all' || expense.category === categoryFilter;
@@ -73,6 +71,11 @@ export default function ExpensesPage() {
             format(new Date(expense.occuredAt), 'yyyy-MM') === dateFilter;
         return matchesCategory && matchesDate;
     });
+
+    const currentMonth = format(new Date(), 'yyyy-MM');
+    const totalThisMonth = expenses
+        .filter(exp => format(new Date(exp.occuredAt), 'yyyy-MM') === currentMonth)
+        .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
     const onSubmit = (data: ExpenseFormData) => {
         const expenseData = {
@@ -90,7 +93,6 @@ export default function ExpensesPage() {
         }
     };
 
-    // Open modal for editing
     const handleEdit = (expense: Expense) => {
         setEditingExpense(expense);
         setIsModalOpen(true);
@@ -103,7 +105,6 @@ export default function ExpensesPage() {
         });
     };
 
-    // Reset form when modal closes
     const handleModalClose = () => {
         setIsModalOpen(false);
         setEditingExpense(null);
@@ -120,7 +121,7 @@ export default function ExpensesPage() {
                     className="glass-card p-6 rounded-xl"
                 >
                     <h3 className="text-text-light text-sm font-medium">Total Expenses</h3>
-                    <p className="text-3xl font-bold text-text mt-2">₱{totalExpenses.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-text mt-2">₱{totalExpenses}</p>
                 </motion.div>
 
                 <motion.div
@@ -131,39 +132,10 @@ export default function ExpensesPage() {
                 >
                     <h3 className="text-text-light text-sm font-medium">Expenses This Month</h3>
                     <p className="text-3xl font-bold text-text mt-2">
-                        ₱{expenses
-                            .filter(e => new Date(e.occuredAt).getMonth() === new Date().getMonth())
-                            .reduce((sum, e) => sum + e.amount, 0)
-                            .toFixed(2)}
+                        ₱{totalThisMonth}
                     </p>
                 </motion.div>
             </div>
-
-            {/* Category Breakdown */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="glass-card p-6 rounded-xl mb-8"
-            >
-                <h3 className="text-text font-semibold mb-4">Expense Breakdown by Category</h3>
-                <div className="space-y-4">
-                    {categoryStats.map((stat, index) => (
-                        <div key={index} className="space-y-1">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-text">{stat.category}</span>
-                                <span className="text-text-light">${stat.total.toFixed(2)} ({stat.percentage.toFixed(1)}%)</span>
-                            </div>
-                            <div className="w-full bg-bg-soft rounded-full h-2">
-                                <div
-                                    className="bg-accent h-2 rounded-full"
-                                    style={{ width: `${stat.percentage}%` }}
-                                ></div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </motion.div>
 
             {/* Expense List Header */}
             <div className="flex justify-between items-center mb-6">
@@ -196,7 +168,7 @@ export default function ExpensesPage() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="glass-card p-4 mb-6 rounded-xl overflow-hidden"
+                        className="glass-card p-4 mb-6 rounded-sm overflow-hidden"
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -231,12 +203,12 @@ export default function ExpensesPage() {
             </AnimatePresence>
 
             {/* Expense List */}
-            <div className="glass-card rounded-xl overflow-hidden">
+            <div className="rounded-md shadow-xl overflow-hidden">
                 <table className="min-w-full">
                     <thead>
-                        <tr className="bg-bg-soft text-text font-semibold">
-                            {['Expense Name', 'Amount', 'Category', 'Date', 'Actions'].map(header => (
-                                <th key={header} className="px-4 py-3 font-semibold text text-light text-left">
+                        <tr className="bg-bg-soft text-text uppercase font-semibold">
+                            {['Expense Name', 'Amount', 'Category', 'Occured At', 'Actions'].map(header => (
+                                <th key={header} className="px-4 py-3 font-semibold text text-light text-center">
                                     {header}
                                 </th>
                             ))}
@@ -249,37 +221,43 @@ export default function ExpensesPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="hover:bg-bg-soft/50 border-b border-border-light"
+                                className="border-b border-border-light text-center"
                             >
-                                <td className="px-4 py-3 font-medium text-text">{expense.expenseName}</td>
-                                <td className="px-4 py-3 text-text">${expense.amount.toFixed(2)}</td>
+                                <td className="px-4 py-3 font-medium text-text truncate">{expense.expenseName}</td>
+                                <td className="px-4 py-3 text-lg text-text font-semibold">₱{expense.amount}</td>
                                 <td className="px-4 py-3">
-                                    <span className="px-2 py-1 bg-bg-soft rounded-full text-xs text-text">
-                                        {expense.category}
-                                    </span>
+                                    {(() => {
+                                        const { label, icon: Icon, color } = formatExpenseCategories(expense.category);
+                                        return (
+                                            <span className={`p-3 uppercase font-semibold ${color} rounded-full text-xs text-text`}>
+                                                <Icon className="inline-block mr-1" size={25} />
+                                                {label}
+                                            </span>
+                                        );
+                                    })()}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-text-light">
-                                    {format(new Date(expense.occuredAt), 'MMM dd, yyyy')}
+                                <td className="px-4 py-3 text-lg text-text-light">
+                                    {format(new Date(expense.occuredAt), 'yyyy/MM/dd')}
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-4 py-3 flex justify-center items-center space-x-2">
                                     <div className="flex space-x-2">
                                         <button
                                             onClick={() => handleEdit(expense)}
-                                            className="p-2 text-accent hover:bg-accent/10 rounded-full"
+                                            className="p-2 text-accent cursor-pointer hover:bg-accent/10 rounded-full"
                                         >
-                                            <Edit size={18} />
+                                            <Edit size={28} />
                                         </button>
                                         <button
                                             onClick={() => deleteMutation.mutate({ expenseId: expense.id })}
-                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-full"
+                                            className="p-2 text-red-500 cursor-pointer hover:bg-red-500/10 rounded-full"
                                         >
-                                            <Trash2 size={18} />
+                                            <Trash2 size={28} />
                                         </button>
                                     </div>
                                 </td>
                             </motion.tr>
                         ))}
-                        {filteredExpenses.length >= 0 && (
+                        {filteredExpenses.length === 0 && (
                             <motion.tr
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -322,7 +300,7 @@ export default function ExpensesPage() {
                                     </h3>
                                     <button
                                         onClick={handleModalClose}
-                                        className="text-text-light hover:text-text"
+                                        className="text-text-light cursor-pointer hover:text-text"
                                     >
                                         <X size={24} />
                                     </button>
@@ -339,7 +317,7 @@ export default function ExpensesPage() {
                                                 type="text"
                                                 {...register('expenseName', { required: 'Expense name is required' })}
                                                 className="w-full pl-10 p-2 border border-border-light rounded-lg"
-                                                placeholder="Office supplies"
+                                                placeholder='Enter expense name'
                                             />
                                         </div>
                                         {errors.expenseName && (
@@ -374,13 +352,16 @@ export default function ExpensesPage() {
                                             Category
                                         </label>
                                         <div className="relative">
-                                            <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-light" size={18} />
-                                            <input
-                                                type="text"
+                                            <select 
                                                 {...register('category', { required: 'Category is required' })}
-                                                className="w-full pl-10 p-2 border border-border-light rounded-lg"
-                                                placeholder="Office"
-                                            />
+                                                className="w-full p-2 border border-border-light rounded-lg bg-white"
+                                            >
+                                                {expensesCategories.map((category) => (
+                                                    <option key={category} value={category}>
+                                                        {category}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                         {errors.category && (
                                             <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
@@ -393,7 +374,7 @@ export default function ExpensesPage() {
                                         </label>
                                         <textarea
                                             {...register('description')}
-                                            className="w-full p-2 border border-border-light rounded-lg"
+                                            className="w-full p-2 border resize-none border-border-light rounded-lg"
                                             rows={3}
                                             placeholder="Additional details about the expense"
                                         />
@@ -401,7 +382,7 @@ export default function ExpensesPage() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-text-light mb-1">
-                                            Date
+                                            Occured At
                                         </label>
                                         <div className="relative">
                                             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-light" size={18} />
@@ -417,23 +398,27 @@ export default function ExpensesPage() {
                                     </div>
 
                                     <div className="flex justify-end space-x-3 pt-4">
-                                        <button
+                                        <motion.button
                                             type="button"
                                             onClick={handleModalClose}
-                                            className="px-4 py-2 border border-border rounded-lg text-text"
+                                            className="px-4 py-2 cursor-pointer border border-border rounded-lg text-text"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
                                         >
                                             Cancel
-                                        </button>
-                                        <button
+                                        </motion.button>
+                                        <motion.button
                                             type="submit"
                                             disabled={addMutation.isPending || updateMutation.isPending}
-                                            className="px-4 py-2 bg-accent text-white rounded-lg disabled:opacity-50"
+                                            className="px-4 py-2 cursor-pointer bg-accent text-white rounded-lg disabled:opacity-50"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
                                         >
                                             {editingExpense ? 'Update Expense' : 'Add Expense'}
                                             {(addMutation.isPending || updateMutation.isPending) && (
                                                 <span className="ml-2">...</span>
                                             )}
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 </form>
                             </div>
