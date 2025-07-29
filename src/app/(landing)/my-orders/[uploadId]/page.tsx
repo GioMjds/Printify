@@ -41,7 +41,7 @@ export default async function GetSingleOrder(context: { params: Promise<{ upload
             queryFn: () => fetchSinglePrintUpload({ uploadId: uploadId }),
         });
         if (!data || data.error) notFound();
-    } catch (error) {
+    } catch {
         notFound();
     }
 

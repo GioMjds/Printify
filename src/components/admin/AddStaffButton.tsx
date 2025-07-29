@@ -9,6 +9,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { UserPlus2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { AddStaffFormData } from "@/types/Admin";
 
 export default function AddStaffButton() {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -34,7 +35,7 @@ export default function AddStaffButton() {
     });
 
     const addMutation = useMutation({
-        mutationFn: async (data: any) => {
+        mutationFn: async (data: AddStaffFormData) => {
             return await addNewStaff({
                 firstName: data.firstName,
                 middleName: data.middleName,
@@ -52,7 +53,7 @@ export default function AddStaffButton() {
         }
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: AddStaffFormData) => {
         if (data.password !== data.confirmPassword) {
             return;
         }

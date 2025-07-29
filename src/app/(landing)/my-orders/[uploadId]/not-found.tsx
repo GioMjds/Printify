@@ -24,7 +24,7 @@ export default function NotFound() {
                             Order Not Found
                         </motion.h1>
                         <p className="text-white/80 mt-1 sm:mt-2 text-sm sm:text-base">
-                            The order you're looking for doesn't exist
+                            The order you&apos;re looking for doesn&apos;t exist
                         </p>
                     </div>
 
@@ -62,7 +62,7 @@ export default function NotFound() {
                                     Oops! Order Not Found
                                 </h2>
                                 <p className="text-gray-600 text-sm sm:text-base max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-                                    The order you're trying to access doesn't exist or may have been removed.
+                                    The order you&apos;re trying to access doesn&apos;t exist or may have been removed.
                                     Please check the order ID or return to your orders list.
                                 </p>
                             </motion.div>

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchExpenses, addExpense, updateExpense, deleteExpense } from "@/services/Admin";
-import { Plus, X, Edit, Trash2, Filter, ChevronDown, ChevronUp, Calendar, DollarSign, Tag, FileText } from 'lucide-react';
+import { Plus, X, Edit, Trash2, Filter, ChevronDown, ChevronUp, Calendar, DollarSign, FileText } from 'lucide-react';
 import { Expense, ExpenseFormData, ExpenseResponse } from '@/types/Admin';
 import { format } from 'date-fns';
 import { expensesCategories } from '@/constants/admin-expenses';

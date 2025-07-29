@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     const uploadIds = userUploads.map((upload) => upload.id);
 
-    const whereClause: any = {
+    const whereClause: Prisma.NotificationWhereInput = {
       uploadId: {
         in: uploadIds,
       },

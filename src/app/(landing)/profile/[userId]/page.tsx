@@ -41,10 +41,9 @@ export default async function Profile(context: { params: Promise<{ userId: strin
             queryFn: () => fetchCustomerProfile({ userId })
         });
         if (!data || data.error) notFound();
-    } catch (error) {
+    } catch {
         notFound();
     }
-
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>

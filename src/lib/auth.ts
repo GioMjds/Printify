@@ -80,7 +80,7 @@ export async function getSession(): Promise<SessionData | null> {
         } catch {
             return null;
         }
-    } catch (error: any) {
+    } catch (error) {
         console.error(`Error getting session: ${error}`);
         return null;
     }

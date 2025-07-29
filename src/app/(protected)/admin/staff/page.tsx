@@ -7,7 +7,6 @@ import {
 import StaffPage from "./staff"
 import { fetchStaff } from "@/services/Admin"
 import AddStaffButton from "@/components/admin/AddStaffButton"
-import { User } from "@/types/Admin"
 
 export const metadata: Metadata = {
     title: "Manage Staff",

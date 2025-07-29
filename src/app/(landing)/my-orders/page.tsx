@@ -3,30 +3,27 @@ import {
     HydrationBoundary,
     QueryClient
 } from "@tanstack/react-query";
-import dynamic from "next/dynamic";
 import { getSession } from "@/lib/auth";
 import { fetchCustomerPrintUploads } from "@/services/Customer";
 import { AuthRequired } from "@/components/ProtectedRoutes";
+import { Metadata } from "next";
+import MyOrdersPage from "./orders";
 
-const MyOrdersPage = dynamic(() => import("./orders"))
-
-export const metadata = {
+export const metadata: Metadata = {
     title: "My Orders",
 }
 
-interface SearchParams {
-    searchParams?: {
-        [key: string]: string | string[] | undefined;
-    }
+export const dynamic = "force-dynamic";
+
+interface PageProps {
+    searchParams: Promise<{ page?: string; limit?: string }>;
 }
 
-export default async function MyOrders({ searchParams }: SearchParams) {
+export default async function MyOrders({ searchParams }: PageProps) {
+    const resolvedSearchParams = await searchParams
+    
     const session = await getSession();
     const queryClient: QueryClient = new QueryClient();
-
-    const resolvedSearchParams = typeof searchParams?.then === "function"
-        ? await searchParams
-        : searchParams;
 
     const userId: string = session?.userId as string;
     const page: number = Number(resolvedSearchParams?.page ?? 1);

@@ -5,7 +5,6 @@ import {
 } from "@tanstack/react-query"
 import { fetchAllPrintOrders } from "@/services/Admin";
 import OrderDataTable from "@/components/admin/OrderDataTable";
-import { PrintOrder } from "@/types/Admin";
 
 export const metadata = {
     title: "Manage Orders",

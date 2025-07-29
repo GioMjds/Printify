@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateStaff, deleteStaff } from "@/services/Admin";
 import { useForm } from "react-hook-form";
-import { Staff } from "@/types/Admin";
+import { Staff, StaffFormData } from "@/types/Admin";
 import { toast } from "react-toastify";
 import { splitName } from "@/utils/formatters";
 import { Pen, Trash2 } from "lucide-react";
@@ -25,34 +25,34 @@ export default function StaffActions({ staff }: { staff: Staff }) {
             firstName: firstName,
             middleName: middleName,
             lastName: lastName,
-            email: staff.email,
+            email: staff.email ?? "",
         }
     })
 
     const updateMutation = useMutation({
-        mutationFn: (data: any) => updateStaff(data),
+        mutationFn: (data: StaffFormData & { staffId: string }) => updateStaff(data),
         onSuccess: () => {
             toast.success("Staff member updated successfully");
             queryClient.invalidateQueries({ queryKey: ['adminStaff'] });
             setIsEditing(false);
             reset();
         },
-        onError: (error: any) => {
+        onError: (error: string) => {
             console.error(`Failed to update staff: ${error}`);
-            toast.error(`Failed to update staff: ${error.message}`);
+            toast.error(`Failed to update staff: ${error}`);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (data: any) => deleteStaff(data),
+        mutationFn: (data: { staffId: string }) => deleteStaff(data),
         onSuccess: () => {
             toast.success("Staff member deleted successfully");
             queryClient.invalidateQueries({ queryKey: ['adminStaff'] });
             setIsDeleting(false);
         },
-        onError: (error: any) => {
+        onError: (error: string) => {
             console.error(`Failed to delete staff: ${error}`);
-            toast.error(`Failed to delete staff: ${error.message}`);
+            toast.error(`Failed to delete staff: ${error}`);
         }
     });
 
@@ -65,7 +65,7 @@ export default function StaffActions({ staff }: { staff: Staff }) {
 
     const handleConfirmDelete = () => deleteMutation.mutate({ staffId: staff.id })
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: StaffFormData) => {
         updateMutation.mutate({
             staffId: staff.id,
             firstName: data.firstName,
@@ -199,7 +199,7 @@ export default function StaffActions({ staff }: { staff: Staff }) {
                                 {updateMutation.isError && (
                                     <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
                                         <p className="text-red-700 text-sm">
-                                            {updateMutation.error?.name || "An error occurred while updating staff"}
+                                            {updateMutation.error || "An error occurred while updating staff"}
                                         </p>
                                     </div>
                                 )}
@@ -243,6 +243,7 @@ export default function StaffActions({ staff }: { staff: Staff }) {
                     cancelText="Cancel"
                     onConfirm={handleConfirmDelete}
                     loading={deleteMutation.isPending}
+                    loadingText="Deleting..."
                 />
             )}
         </div>

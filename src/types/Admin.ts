@@ -102,3 +102,19 @@ export type ExpenseFormData = {
     description?: string;
     occuredAt: string;
 };
+
+export type AddStaffFormData = {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export type StaffFormData = {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+}

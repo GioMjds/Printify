@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import logo from "@/../public/printify_logo.png";
 import { login } from "@/services/Auth";
-import { faDoorOpen, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -17,6 +16,15 @@ import { SubmitHandler, useForm } from "react-hook-form";
 interface LoginForm {
     email: string;
     password: string;
+}
+
+type APIError = {
+    response?: {
+        data?: {
+            error?: string;
+        }
+        status?: number;
+    }
 }
 
 export default function LoginPage() {
@@ -38,10 +46,10 @@ export default function LoginPage() {
                 else router.push("/");
             }
         },
-        onError: (error: any) => {
+        onError: (error: APIError) => {
             console.error(`Login failed: ${error}`);
-            const errData = error?.response?.data;
-            const statusCode = error?.response?.status;
+            const errData = error.response?.data;
+            const statusCode = error.response?.status;
 
             if (statusCode === 403) {
                 setError("email", {
@@ -164,12 +172,12 @@ export default function LoginPage() {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >
-                        {isPending ? 
-                            "Logging in..." : 
-                        <>
-                            <LogIn className="inline-block mr-2" size={28} />
-                            Log In
-                        </>
+                        {isPending ?
+                            "Logging in..." :
+                            <>
+                                <LogIn className="inline-block mr-2" size={28} />
+                                Log In
+                            </>
                         }
                     </motion.button>
                 </form>

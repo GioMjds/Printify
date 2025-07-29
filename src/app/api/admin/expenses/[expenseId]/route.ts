@@ -4,11 +4,12 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { expenseId: string } }
+    { params }: { params: Promise<{ expenseId: string }> }
 ) {
-    const expenseId = Number(params.expenseId);
+    const { expenseId } = await params;
+    const expenseIdNum = Number(expenseId);
 
-    if (isNaN(expenseId)) {
+    if (isNaN(expenseIdNum)) {
         return NextResponse.json({
             error: "Invalid expense ID"
         }, { status: 400 });
@@ -25,7 +26,7 @@ export async function PUT(
         }
 
         const updatedExpense = await prisma.expense.update({
-            where: { id: expenseId },
+            where: { id: expenseIdNum },
             data: {
                 expenseName,
                 amount: parseFloat(amount),

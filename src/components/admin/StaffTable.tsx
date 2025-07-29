@@ -1,18 +1,13 @@
-// app/admin/staff/StaffTable.tsx
 'use client';
 
 import { User } from "@prisma/client";
 import { Edit, Trash2 } from "lucide-react";
-import { useState } from "react";
 
 interface StaffTableProps {
     staff: User[];
-    onStaffAdded: () => void;
 }
 
-export default function StaffTable({ staff, onStaffAdded }: StaffTableProps) {
-    const [staffToDelete, setStaffToDelete] = useState<User | null>(null);
-
+export default function StaffTable({ staff }: StaffTableProps) {
     return (
         <>
             <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
@@ -67,10 +62,7 @@ export default function StaffTable({ staff, onStaffAdded }: StaffTableProps) {
                                     <button className="text-primary hover:text-primary-dark mr-4">
                                         <Edit className="w-5 h-5" />
                                     </button>
-                                    <button
-                                        onClick={() => setStaffToDelete(staffMember)}
-                                        className="text-red-600 hover:text-red-900"
-                                    >
+                                    <button className="text-red-600 hover:text-red-900">
                                         <Trash2 className="w-5 h-5" />
                                     </button>
                                 </td>
@@ -79,12 +71,6 @@ export default function StaffTable({ staff, onStaffAdded }: StaffTableProps) {
                     </tbody>
                 </table>
             </div>
-
-            <DeleteStaffModal
-                staff={staffToDelete}
-                onClose={() => setStaffToDelete(null)}
-                onStaffDeleted={onStaffAdded}
-            />
         </>
     );
 }

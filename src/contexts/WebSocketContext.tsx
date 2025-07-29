@@ -17,6 +17,26 @@ interface WebSocketContextType {
     webSocketService: WebSocketService;
 }
 
+interface NotificationMessageData {
+    id: string;
+    message: string;
+    createdAt: string;
+    orderId?: string;
+}
+
+interface WebSocketMessage {
+    type: string;
+    data?: NotificationMessageData;
+}
+
+// Type guards for runtime safety
+function isWebSocketMessage(data: unknown): data is WebSocketMessage {
+    return typeof data === 'object' && data !== null && 'type' in data;
+}
+function isNotificationMessageData(data: unknown): data is NotificationMessageData {
+    return typeof data === 'object' && data !== null && 'id' in data && 'message' in data && 'createdAt' in data;
+}
+
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export const WebSocketProvider = ({ children }: { children: React.ReactNode }) => {
@@ -51,7 +71,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             try {
                 console.log('📥 Fetching initial notifications...');
                 const response = await fetch('/api/notifications', {
-                    credentials: 'include', // Include cookies for authentication
+                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -129,30 +149,34 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         });
 
         // Listen for new notifications
-        webSocketService.on('message', (message) => {
-            console.log('🔔 Received message via WebSocket:', message);
+        webSocketService.on('message', (data) => {
+            if (isWebSocketMessage(data)) {
+                console.log('🔔 Received message via WebSocket:', data);
 
-            if (message.type === 'notification') {
-                addNotification({
-                    id: message.data.id,
-                    message: message.data.message,
-                    read: false,
-                    createdAt: message.data.createdAt,
-                    orderId: message.data.orderId
-                });
+                if (data.type === 'notification' && data.data) {
+                    addNotification({
+                        id: data.data.id,
+                        message: data.data.message,
+                        read: false,
+                        createdAt: data.data.createdAt,
+                        orderId: data.data.orderId
+                    });
+                }
             }
         });
 
         // Listen for direct notifications (legacy support)
-        webSocketService.on('notification', (message) => {
-            console.log('🔔 Received notification via WebSocket:', message);
-            addNotification({
-                id: message.id,
-                message: message.message,
-                read: false,
-                createdAt: message.createdAt,
-                orderId: message.orderId
-            });
+        webSocketService.on('notification', (data) => {
+            if (isNotificationMessageData(data)) {
+                console.log('🔔 Received notification via WebSocket:', data);
+                addNotification({
+                    id: data.id,
+                    message: data.message,
+                    read: false,
+                    createdAt: data.createdAt,
+                    orderId: data.orderId
+                });
+            }
         });
 
         // Listen for heartbeat acknowledgments
@@ -197,4 +221,4 @@ export const useWebSocket = () => {
         throw new Error('useWebSocket must be used within a WebSocketProvider');
     }
     return context;
-};
+}

@@ -1,6 +1,10 @@
+type WebSocketEventData = Record<string, unknown>;
+
+// Define a generic event handler type
+type WebSocketEventHandler<T = WebSocketEventData> = (data: T) => void;
+
 export class WebSocketService {
     private socket: WebSocket | null = null;
-    private callbacks: Map<string, (data: any) => void> = new Map();
     private retries = 0;
     private maxRetries = 5;
     private retryDelay = 3000;
@@ -11,6 +15,7 @@ export class WebSocketService {
     private reconnectTimer?: NodeJS.Timeout;
     private lastConnectTime: number = 0;
     private channels: Set<string> = new Set();
+    private callbacks: Map<string, WebSocketEventHandler> = new Map();
 
     constructor(private url: string) {}
 
@@ -33,8 +38,8 @@ export class WebSocketService {
 
             this.socket.onmessage = (event) => {
                 try {
-                    const data = JSON.parse(event.data);
-                    if (data.type) {
+                    const data: WebSocketEventData = JSON.parse(event.data);
+                    if (typeof data.type === "string") {
                         this.triggerEvent(data.type, data);
                     }
                 } catch (error) {
@@ -88,8 +93,8 @@ export class WebSocketService {
         }
     }
 
-    on<T extends string>(eventType: T, handler: (data: any) => void): void {
-        this.callbacks.set(eventType, handler);
+    on<T extends WebSocketEventData = WebSocketEventData>(eventType: string, handler: WebSocketEventHandler<T>): void {
+        this.callbacks.set(eventType, handler as WebSocketEventHandler);
     }
 
     off(eventType: string): void {
@@ -154,7 +159,7 @@ export class WebSocketService {
         }
     }
 
-    private triggerEvent(type: string, data: any): void {
+    private triggerEvent(type: string, data: WebSocketEventData): void {
         const handler = this.callbacks.get(type);
         if (handler) {
             handler(data);

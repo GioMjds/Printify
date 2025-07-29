@@ -5,6 +5,8 @@ export const metadata = {
     title: "Verify your account",
 }
 
+export const dynamic = "force-dynamic";
+
 export default function VerifyPage() {
     return (
         <RegisterPhaseRequired>

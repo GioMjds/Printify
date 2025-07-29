@@ -67,11 +67,11 @@ export default function GlobalNotFound() {
                             {/* Message */}
                             <div className="space-y-4">
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
-                                    Oops! You've Found a Digital Void
+                                    Oops! You&apos;ve Found a Digital Void
                                 </h2>
                                 <p className="text-white/80 text-sm sm:text-base max-w-md mx-auto">
-                                    The page you're seeking has vanished into the digital ether.
-                                    But don't worry - we'll help you navigate back to familiar territory.
+                                    The page you&apos;re seeking has vanished into the digital ether.
+                                    But don&apos;t worry - we&apos;ll help you navigate back to familiar territory.
                                 </p>
                             </div>
 

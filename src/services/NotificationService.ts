@@ -11,6 +11,10 @@ export interface NotificationData {
   read: boolean;
 }
 
+type WebSocketMessage =
+  | { type: "notification"; data: NotificationData }
+  | { type: string; [key: string]: unknown };
+
 export class NotificationService {
   private static instance: NotificationService;
   private webSocketService: WebSocketService | null = null;
@@ -28,11 +32,26 @@ export class NotificationService {
     this.webSocketService = wsService;
 
     // Listen for notification messages
-    this.webSocketService.on("message", (data: any) => {
-      if (data.type === "notification") {
-        this.handleNotification(data.data);
+    this.webSocketService.on("message", (data: WebSocketMessage) => {
+      const isNotification = data.type === "notification" && this.isNotificationData(data.data);
+      if (isNotification) {
+        this.handleNotification((data as { data: NotificationData }).data);
       }
     });
+  }
+
+  private isNotificationData(data: unknown): data is NotificationData {
+    return (
+      typeof data === "object" &&
+      data !== null &&
+      typeof (data as NotificationData).id === "string" &&
+      typeof (data as NotificationData).message === "string" &&
+      typeof (data as NotificationData).orderId === "string" &&
+      typeof (data as NotificationData).orderFilename === "string" &&
+      typeof (data as NotificationData).status === "string" &&
+      typeof (data as NotificationData).createdAt === "string" &&
+      typeof (data as NotificationData).read === "boolean"
+    );
   }
 
   private handleNotification(notificationData: NotificationData) {

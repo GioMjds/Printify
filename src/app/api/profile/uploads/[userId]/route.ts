@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
     req: NextRequest,
-    params: Promise<{ userId: string }>
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     const { userId } = await params;
     const { searchParams } = new URL(req.url);

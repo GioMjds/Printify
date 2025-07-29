@@ -12,6 +12,18 @@ export interface NotificationItem {
   orderId: string;
 }
 
+interface NotificationMessageData {
+  id: string;
+  message: string;
+  createdAt: string;
+  orderId: string;
+}
+
+interface NotificationMessage {
+  type: string;
+  data: NotificationMessageData;
+}
+
 const fetchNotifications = async (): Promise<{
   notifications: NotificationItem[];
   total: number;
@@ -45,6 +57,29 @@ export const useNavbarNotifications = () => {
     staleTime: 10000,
   });
 
+  const isNotificationMessage = (data: unknown): data is NotificationMessage => {
+    const isNotification =
+      typeof data === "object" &&
+      data !== null &&
+      "type" in data &&
+      (data as { type: unknown }).type === "notification" &&
+      "data" in data;
+    if (isNotification) {
+      const messageData = (data as { data: unknown }).data;
+      if (
+        typeof messageData === "object" &&
+        messageData !== null &&
+        "id" in messageData &&
+        "message" in messageData &&
+        "createdAt" in messageData &&
+        "orderId" in messageData
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   useEffect(() => {
     if (data?.notifications) setLocalNotifications(data.notifications);
   }, [data]);
@@ -52,14 +87,14 @@ export const useNavbarNotifications = () => {
   useEffect(() => {
     if (!webSocketService || !isConnected) return;
 
-    const handleMessage = (message: any) => {
-      if (message.type === "notification") {
+    const handleMessage = (data: unknown) => {
+      if (isNotificationMessage(data)) {
         const newNotification: NotificationItem = {
-          id: message.data.id,
-          message: message.data.message,
+          id: data.data.id,
+          message: data.data.message,
           read: false,
-          createdAt: message.data.createdAt,
-          orderId: message.data.orderId,
+          createdAt: data.data.createdAt,
+          orderId: data.data.orderId,
         };
         setLocalNotifications((prev) => [newNotification, ...prev]);
         queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
@@ -68,9 +103,7 @@ export const useNavbarNotifications = () => {
 
     webSocketService.on("message", handleMessage);
 
-    return () => {
-      webSocketService.off("message");
-    };
+    return () => webSocketService.off("message");
   }, [webSocketService, isConnected, queryClient]);
 
   const markAsRead = async (notificationId: string) => {
@@ -154,6 +187,6 @@ export const useNavbarNotifications = () => {
     isConnected,
     markAsRead,
     markAllAsRead,
-    refreshNotifications,
+    refreshNotifications
   };
-};
+}

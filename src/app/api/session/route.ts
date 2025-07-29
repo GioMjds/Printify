@@ -6,6 +6,9 @@ export async function GET() {
         const session = await getSession();
         return NextResponse.json({ user: session });
     } catch (error) {
-        return NextResponse.json({ user: null }, { status: 401 });
+        return NextResponse.json({ 
+            user: null,
+            error: `Session API GET error: ${error}` 
+        }, { status: 401 });
     }
 }

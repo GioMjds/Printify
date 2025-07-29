@@ -168,7 +168,6 @@ export const deleteUploadNotifications = async (
 export const createStatusNotificationMessage = (
   status: string,
   filename: string,
-  uploadId: string
 ): string => {
   switch (status) {
     case "pending":
@@ -197,7 +196,7 @@ export const createStatusUpdateNotification = async (
 ): Promise<CreateNotificationResponse> => {
   const message =
     customMessage ||
-    createStatusNotificationMessage(newStatus, filename, uploadId);
+    createStatusNotificationMessage(newStatus, filename);
 
   return createNotification({
     uploadId,

@@ -5,6 +5,14 @@ import prisma from "@/lib/prisma";
 import axios from "axios";
 import path from "path";
 import { hash } from "bcrypt";
+import { UploadStatus } from "@prisma/client";
+
+type UploadUpdateData = {
+  status: UploadStatus;
+  updatedAt: Date;
+  rejection_reason?: string | null;
+  needed_amount?: number;
+};
 
 export async function GET(req: NextRequest) {
   try {
@@ -240,19 +248,17 @@ export async function PUT(req: NextRequest) {
           );
         }
 
-        const updateData: any = {
+        const updateData: UploadUpdateData = {
           status: newStatus,
           updatedAt: new Date(),
+          rejection_reason: newStatus === "rejected" ? (rejectionReason || "No reason provided") : null,
+            ...(newStatus === "ready_to_pickup" && amount ? { needed_amount: amount } : {}),
         };
 
         if (newStatus === "rejected") {
           updateData.rejection_reason = rejectionReason || "No reason provided";
         } else {
           updateData.rejection_reason = null;
-        }
-
-        if (newStatus === "ready_to_pickup" && amount) {
-          updateData.needed_amount = amount;
         }
 
         const updatedUpload = await prisma.upload.update({

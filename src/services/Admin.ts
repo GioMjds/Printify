@@ -1,4 +1,4 @@
-import { AddExpense, DashboardMonthPick, NewStaff, UpdateStaff, UploadID, UploadStatusUpdate } from "@/types/Admin";
+import { AddExpense, DashboardMonthPick, NewStaff, UpdateStaff, UploadStatusUpdate } from "@/types/Admin";
 import { API } from "./_axios";
 
 // /admin

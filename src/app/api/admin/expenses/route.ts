@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 // Get all expenses
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const expenses = await prisma.expense.findMany({
             orderBy: { createdAt: 'asc' },

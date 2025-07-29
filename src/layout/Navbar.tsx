@@ -10,7 +10,6 @@ import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { logout } from '@/services/Auth';
 import { NavbarProps } from '@/types/Navbar';
 import { formatNotificationTime } from '@/utils/notifications';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import { Bell, BellDot, LogIn, LogOut, UserRoundPlus } from 'lucide-react';
@@ -222,7 +221,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                                 <div className="p-4 text-center text-gray-500">
                                                     <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
                                                     <p>No notifications yet</p>
-                                                    <p className="text-xs mt-1">You'll see updates about your orders here</p>
+                                                    <p className="text-xs mt-1">You&apos;ll see updates about your orders here</p>
                                                 </div>
                                             ) : (
                                                 notifications.map((notification) => (
@@ -365,7 +364,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                                     <div className="p-4 text-center text-gray-500">
                                                         <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
                                                         <p>No notifications yet</p>
-                                                        <p className="text-xs mt-1">You'll see updates about your orders here</p>
+                                                        <p className="text-xs mt-1">You&apos;ll see updates about your orders here</p>
                                                     </div>
                                                 ) : (
                                                     notifications.map((notification) => (

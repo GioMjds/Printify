@@ -1,16 +1,24 @@
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
+import type { Server as HttpServer } from 'http';
 
 interface Client {
-    ws: any;
+    ws: WebSocket;
     userId: string;
     channels: Set<string>;
 }
 
+type WebSocketMessage =
+    | { type: 'joinChannel'; channel: string }
+    | { type: 'leaveChannel'; channel: string }
+    | { type: 'heartbeat' }
+    | { type: 'notification'; userId: string; message: string; orderId?: string }
+    | { type: string; [key: string]: unknown }; // fallback for unknown types
+
 const clients = new Map<string, Client>();
 const channels = new Map<string, Set<string>>();
 
-export function createWebSocketServer(server: any) {
+export function createWebSocketServer(server: HttpServer) {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', (ws, req) => {
@@ -27,7 +35,7 @@ export function createWebSocketServer(server: any) {
 
         ws.on('message', (message: string) => {
             try {
-                const data = JSON.parse(message);
+                const data: WebSocketMessage = JSON.parse(message);
                 handleMessage(clientId, data);
             } catch (error) {
                 console.error('Error parsing message:', error);
@@ -36,7 +44,7 @@ export function createWebSocketServer(server: any) {
 
         ws.on('close', () => {
             // Leave all channels when client disconnects
-            client.channels.forEach(channel => {
+            client.channels.forEach((channel: string) => {
                 leaveChannel(clientId, channel);
             });
             clients.delete(clientId);
@@ -49,22 +57,25 @@ export function createWebSocketServer(server: any) {
         }));
     });
 
-    function handleMessage(clientId: string, data: any) {
+    function handleMessage(clientId: string, data: WebSocketMessage) {
         const client = clients.get(clientId);
         if (!client) return;
 
         switch (data.type) {
             case 'joinChannel':
-                joinChannel(clientId, data.channel);
+                joinChannel(clientId, data.channel as string);
                 break;
             case 'leaveChannel':
-                leaveChannel(clientId, data.channel);
+                leaveChannel(clientId, data.channel as string);
                 break;
             case 'heartbeat':
-                // Just keep the connection alive
                 break;
             case 'notification':
-                sendNotification(data.userId, data.message, data.orderId);
+                sendNotification(
+                    data.userId as string, 
+                    data.message as string, 
+                    data.orderId as string | undefined
+                );
                 break;
             default:
                 console.log('Unknown message type:', data.type);

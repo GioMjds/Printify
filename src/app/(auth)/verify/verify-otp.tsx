@@ -39,8 +39,8 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
             localStorage.removeItem("register_email");
             router.push("/");
         },
-        onError: (error: any) => {
-            setError(error.response?.data?.error || "An error occurred while verifying OTP.");
+        onError: (error: string) => {
+            setError(error || "An error occurred while verifying OTP.");
             setOtp(new Array(6).fill(""));
             inputRefs.current[0]?.focus();
         }

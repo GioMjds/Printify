@@ -38,8 +38,8 @@ export default function ForgotPasswordPage() {
             setEmail(emailForm.getValues("email"));
             emailForm.reset();
         },
-        onError: (error: any) => {
-            const errorMessage = error.response?.data?.error || 'Failed to send OTP.';
+        onError: (error: string) => {
+            const errorMessage = error || 'Failed to send OTP.';
             emailForm.setError("email", { message: errorMessage });
         }
     });
@@ -51,8 +51,8 @@ export default function ForgotPasswordPage() {
             setOtp(otpForm.getValues("otp"));
             otpForm.reset();
         },
-        onError: (error: any) => {
-            const errorMessage = error.response?.data?.error || "OTP verification failed.";
+        onError: (error: string) => {
+            const errorMessage = error || "OTP verification failed.";
             otpForm.setError("otp", { message: errorMessage });
         }
     });
@@ -62,8 +62,8 @@ export default function ForgotPasswordPage() {
         onSuccess: () => {
             router.push("/login");
         },
-        onError: (error: any) => {
-            const errorMessage = error.response?.data?.error || "Password reset failed.";
+        onError: (error: string) => {
+            const errorMessage = error || "Password reset failed.";
             passwordForm.setError("newPassword", { message: errorMessage });
         }
     });

@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     title: "Admin Dashboard",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard({
     searchParams
 }: {
