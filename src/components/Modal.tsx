@@ -9,12 +9,12 @@ interface ModalProps {
     description?: string;
     onCancel: () => void;
     onConfirm: () => void;
-    cancelText?: string;
-    confirmText?: string;
+    cancelText: string;
+    confirmText: string;
     className?: string;
     isOpen: boolean;
-    loading?: boolean;
-    loadingText?: string;
+    loading: boolean;
+    loadingText: string;
 }
 
 const Modal: FC<ModalProps> = ({
@@ -23,12 +23,12 @@ const Modal: FC<ModalProps> = ({
     description,
     onCancel,
     onConfirm,
-    cancelText = "Cancel",
-    confirmText = "Confirm",
+    cancelText,
+    confirmText,
     className,
     isOpen,
-    loading = false,
-    loadingText = "Processing...",
+    loading,
+    loadingText,
 }) => {
     const handleCancel = useCallback(() => {
         onCancel();

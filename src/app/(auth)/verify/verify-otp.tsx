@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { resendRegisterOtp, verifyRegisterOtp } from "@/services/Auth";
@@ -12,10 +11,10 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
     const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const [resendLoading, setResendLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState<boolean>(false);
     const [resendMessage, setResendMessage] = useState<string | null>(null);
-    const [cooldownTime, setCooldownTime] = useState(0);
-    const [isCooldown, setIsCooldown] = useState(false);
+    const [cooldownTime, setCooldownTime] = useState<number>(0);
+    const [isCooldown, setIsCooldown] = useState<boolean>(false);
     const [email, setEmail] = useState<string>(propEmail);
 
     const router = useRouter();
@@ -133,18 +132,18 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
     if (!email) return null;
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-bg-accent)]">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bg-primary to-bg-accent">
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="bg-white/90 shadow-xl rounded-2xl p-8 w-full max-w-md flex flex-col items-center border border-[var(--color-border-light)] backdrop-blur-md"
+                className="bg-white/90 shadow-xl rounded-2xl p-8 w-full max-w-md flex flex-col items-center border border-border-light backdrop-blur-md"
             >
-                <h1 className="text-3xl font-bold text-[var(--color-primary)] mb-2 tracking-tight">Verify Your Account</h1>
+                <h1 className="text-3xl font-bold text-primary mb-2 tracking-tight">Verify Your Account</h1>
                 {email && (
-                    <div className="mb-2 text-lg font-semibold text-[var(--color-primary)] break-all">{email}</div>
+                    <div className="mb-2 text-lg font-semibold text-primary break-all">{email}</div>
                 )}
-                <p className="text-[var(--color-text-light)] mb-6 text-center text-base">
+                <p className="text-text-light mb-6 text-center text-base">
                     Enter the 6-digit code sent to your email to verify your account.
                 </p>
                 <form
@@ -194,18 +193,18 @@ export default function VerifyOTP({ email: propEmail = "" }: { email?: string })
                         whileTap={{ scale: 0.97 }}
                         whileHover={{ scale: 1.03 }}
                         type="submit"
-                        className={`w-full py-2 rounded-lg bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-accent)] text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 ${isPending ? "opacity-50 cursor-not-allowed" : " cursor-pointer"}`}
+                        className={`w-full py-2 rounded-lg bg-gradient-to-r from-secondary to-accent text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 ${isPending ? "opacity-50 cursor-not-allowed" : " cursor-pointer"}`}
                         disabled={otp.some(num => num === "") || isPending}
                     >
                         {isPending ? "Verifying..." : "Verify OTP"}
                     </motion.button>
                 </form>
-                <div className="mt-6 text-sm text-[var(--color-text-light)]">
+                <div className="mt-6 text-sm text-text-light">
                     Didn&apos;t receive a code? {isCooldown ? (
                         <span className="text-gray-400">Resend available in {formatCooldownTime()}</span>
                     ) : (
                         <button
-                            className={`text-[var(--color-accent)] hover:underline font-medium ${resendLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`text-accent hover:underline font-medium ${resendLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                             onClick={handleResendOtp}
                             disabled={resendLoading || isCooldown}
                         >

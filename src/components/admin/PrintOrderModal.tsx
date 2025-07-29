@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import CancellationModal from "../CancellationModal";
 import { rejectionReasons } from "@/constants/dropdown";
-import { getStatus } from "@/utils/formatters";
 import { PrintOrderModalProps } from "@/types/Modal";
+import { getStatus } from "@/utils/formatters";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import CancellationModal from "../CancellationModal";
+import { MessageCircleWarning } from "lucide-react";
 
 export default function PrintOrderModal({ order, onClose, onReject, onReadyToPickup, isSubmitting, onCompleteOrder }: PrintOrderModalProps) {
     const [amount, setAmount] = useState<number>(0);
@@ -54,7 +55,7 @@ export default function PrintOrderModal({ order, onClose, onReject, onReadyToPic
             await onReject(order.id, reason);
             setShowCancellationModal(false);
         } catch (error) {
-            console.error("Error rejecting print order:", error);
+            console.error(`Error rejecting print order: ${error}`);
         }
     };
 
@@ -121,36 +122,51 @@ export default function PrintOrderModal({ order, onClose, onReject, onReadyToPic
 
                     {/* Pending Status Actions */}
                     {order.status === "pending" && (
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="amount" className="font-semibold text-text-light">
-                                    Set Amount: <span className="text-primary">₱</span>
-                                </label>
-                                <input
-                                    id="amount"
-                                    type="number"
-                                    min={0}
-                                    value={amount}
-                                    onChange={e => setAmount(Number(e.target.value))}
-                                    className="border border-border-light rounded px-2 py-1 w-24 text-primary focus:outline-none focus:ring-2 focus:ring-accent"
-                                    disabled={isSubmitting}
-                                />
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-lg font-semibold text-primary">
+                                Set Amount
+                            </h3>
+                            <div className="flex flex-col sm:flex-row items-center gap-2">
+                                <div className="relative flex-1 w-full">
+                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span className="text-primary text-xl">₱</span>
+                                    </div>
+                                    <motion.input
+                                        whileFocus={{ boxShadow: "0 0 0 3px rgba(121, 101, 193, 0.3)" }}
+                                        id="amount"
+                                        type="number"
+                                        min={0}
+                                        value={amount}
+                                        onChange={e => setAmount(Number(e.target.value))}
+                                        placeholder="Enter print order amount"
+                                        className="w-full pl-10 py-2 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-white"
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
                             </div>
                             <div className="flex gap-3 mt-2 justify-between">
                                 <button
-                                    className="bg-red-500 cursor-pointer hover:bg-red-600 text-white font-semibold px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    className="flex-1 cursor-pointer bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
                                     onClick={() => setShowCancellationModal(true)}
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? "Processing..." : "Reject Print Order"}
                                 </button>
-                                <button
-                                    className="bg-green-500 cursor-pointer hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    onClick={handleReadyToPickupClick}
-                                    disabled={isSubmitting || amount <= 0}
-                                >
-                                    {isSubmitting ? "Processing..." : "Ready To Pickup"}
-                                </button>
+                                <div className="flex-1 relative group">
+                                    <button
+                                        className={`w-full bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md ${isSubmitting || amount <= 0 ? "cursor-not-allowed" : "cursor-pointer"}`}
+                                        onClick={handleReadyToPickupClick}
+                                        disabled={isSubmitting || amount <= 0}
+                                    >
+                                        {isSubmitting ? "Processing..." : "Ready To Pickup"}
+                                    </button>
+                                    {amount <= 0 && (
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-max max-w-xs px-2 py-1 bg-gray-700 text-white text-sm rounded shadow-lg z-20">
+                                            <MessageCircleWarning className="inline mr-1" />
+                                            Please set a valid amount first
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}

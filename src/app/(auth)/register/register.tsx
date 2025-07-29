@@ -95,12 +95,12 @@ export default function RegisterPage() {
     const onSubmit: SubmitHandler<RegisterForm> = (data) => mutate(data);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <div className="min-h-screen flex items-center justify-center bg-bg-primary px-6 relative">
             {/* Full-page loading overlay */}
             {isPending && (
                 <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
                     <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-                    <span className="ml-4 text-white font-semibold text-2xl">Registering account....</span>
+                    <span className="ml-4 text-white font-semibold text-2xl sm:text-xl md:text-lg">Registering account....</span>
                 </div>
             )}
             <motion.div
@@ -122,6 +122,9 @@ export default function RegisterPage() {
                 <h2 className="text-3xl font-bold text-center text-primary -mt-3">
                     Create Account
                 </h2>
+                <p className="text-center text-text-light -mt-2">
+                    Register to start using Printify
+                </p>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex gap-2">
                         <div className="w-1/2">
@@ -240,7 +243,7 @@ export default function RegisterPage() {
                     <motion.button
                         type="submit"
                         disabled={isPending}
-                        className={`mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all flex items-center justify-center ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                        className={`mt-2 bg-secondary text-white font-bold py-3 rounded-lg hover:bg-primary transition-all flex items-center justify-center ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >

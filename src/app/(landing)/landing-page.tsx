@@ -7,12 +7,13 @@ import { processSteps } from '@/constants/hero';
 import { getSession } from '@/services/Auth';
 
 export default function LandingPage() {
+    const [checkingSession, setCheckingSession] = useState<boolean>(false);
+    
     const heroRef = useRef<HTMLDivElement>(null);
     const processRef = useRef<HTMLDivElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
 
     const router = useRouter();
-    const [checkingSession, setCheckingSession] = useState<boolean>(false);
 
     const handleGetStarted = async () => {
         setCheckingSession(true);

@@ -51,7 +51,7 @@ export const addExpense = async ({ expenseName, amount, category, description, o
     }
 };
 
-export const updateExpense = async ({ expenseId, expenseName, amount, category, description, occuredAt }: { expenseId: number } & AddExpense) => {
+export const updateExpense = async ({ expenseId, expenseName, amount, category, description, occuredAt }: { expenseId: string | number } & AddExpense) => {
     try {
         const response = await API.put(`/admin/expenses/${expenseId}`, {
             expenseName: expenseName,
@@ -70,7 +70,7 @@ export const updateExpense = async ({ expenseId, expenseName, amount, category, 
     }
 }
 
-export const deleteExpense = async ({ expenseId }: { expenseId: number }) => {
+export const deleteExpense = async ({ expenseId }: { expenseId: string | number }) => {
     try {
         const response = await API.delete(`/admin/expenses/${expenseId}`, {
             headers: { "Content-Type": "application/json" },
@@ -94,19 +94,6 @@ export const fetchAllPrintOrders = async () => {
         console.error(`Failed to fetch print orders: ${error}`);
         throw error;
     }
-};
-
-export const fetchPrintOrder = async ({ uploadId }: UploadID) => {
-  try {
-    const response = await API.get(`/admin/upload/${uploadId}`, {
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to fetch print order: ${error}`);
-    throw error;
-  }
 };
 
 export const fetchUsers = async () => {
@@ -198,18 +185,18 @@ export const updateStaff = async ({ staffId, firstName, middleName, lastName, em
 };
 
 export const deleteStaff = async ({ staffId }: { staffId: string }) => {
-  try {
-    const response = await API.delete(`/admin/[adminAction]/delete_staff`, {
-      data: {
-        adminAction: "delete_staff",
-        staffId,
-      },
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to delete staff: ${error}`);
-    throw error;
-  }
+    try {
+        const response = await API.delete(`/admin/[adminAction]/delete_staff`, {
+            data: {
+                adminAction: "delete_staff",
+                staffId,
+            },
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to delete staff: ${error}`);
+        throw error;
+    }
 };

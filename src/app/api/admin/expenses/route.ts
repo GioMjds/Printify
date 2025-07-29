@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 export async function GET(req: NextRequest) {
     try {
         const expenses = await prisma.expense.findMany({
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: 'asc' },
         });
 
         return NextResponse.json({
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { expenseName, amount, category, description, occuredAt } = body;
 
-        if (!expenseName || !amount || !category || !description || !occuredAt) {
+        if (!expenseName || !amount || !category || !occuredAt) {
             return NextResponse.json({
                 error: "All fields are required"
             }, { status: 400 });

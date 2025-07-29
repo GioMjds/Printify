@@ -20,6 +20,16 @@ export async function GET(req: NextRequest) {
             }
         });
 
+        const expenses = await prisma.expense.findMany({
+            where: {
+                occuredAt: {
+                    gte: startDate,
+                    lte: endDate,
+                }
+            },
+            orderBy: { occuredAt: 'asc' },
+        })
+
         const totalOrders = uploads.length;
         const completedOrders = uploads.filter(u => u.status === "completed").length;
         const totalRevenue = uploads.reduce((sum, upload) => sum + (upload.needed_amount || 0), 0);
@@ -38,6 +48,7 @@ export async function GET(req: NextRequest) {
             "completedOrders": completedOrders,
             "totalRevenue": totalRevenue,
             "uploadsByStatus": uploadsByStatus,
+            "expenses": expenses,
         }, { status: 200 });
     } catch (error) {
         return NextResponse.json({

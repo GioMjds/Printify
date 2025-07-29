@@ -31,40 +31,28 @@ const fetchNotifications = async (): Promise<{
 };
 
 export const useNavbarNotifications = () => {
-  const queryClient = useQueryClient();
-  const { webSocketService, isConnected, userId } = useWebSocket();
-  const [localNotifications, setLocalNotifications] = useState<
-    NotificationItem[]
-  >([]);
+  const { webSocketService, isConnected } = useWebSocket();
+  const [localNotifications, setLocalNotifications] = useState<NotificationItem[]>([]);
 
-  // Query for fetching notifications
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["navbar-notifications"],
     queryFn: fetchNotifications,
-    enabled: true, // Only fetch when userId is available
-    refetchInterval: 30000, // Refetch every 30 seconds as backup
+    enabled: true,
+    refetchInterval: 30000,
     refetchOnWindowFocus: true,
-    staleTime: 10000, // Consider data stale after 10 seconds
+    staleTime: 10000,
   });
 
-  // Initialize local notifications from query data
   useEffect(() => {
-    if (data?.notifications) {
-      console.log(
-        "📋 Navbar: Setting notifications from query data:",
-        data.notifications.length
-      );
-      setLocalNotifications(data.notifications);
-    }
+    if (data?.notifications) setLocalNotifications(data.notifications);
   }, [data]);
 
-  // WebSocket real-time updates
   useEffect(() => {
     if (!webSocketService || !isConnected) return;
 
     const handleMessage = (message: any) => {
-      console.log("📨 Navbar received WebSocket message:", message);
-
       if (message.type === "notification") {
         const newNotification: NotificationItem = {
           id: message.data.id,
@@ -73,21 +61,11 @@ export const useNavbarNotifications = () => {
           createdAt: message.data.createdAt,
           orderId: message.data.orderId,
         };
-
-        // Add to local state immediately for instant UI update
         setLocalNotifications((prev) => [newNotification, ...prev]);
-
-        // Invalidate query to refetch from server
         queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
-
-        console.log(
-          "🔔 New notification added to navbar:",
-          newNotification.message
-        );
       }
     };
 
-    // Listen for WebSocket messages
     webSocketService.on("message", handleMessage);
 
     return () => {
@@ -97,12 +75,10 @@ export const useNavbarNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // Optimistically update local state
       setLocalNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
       );
 
-      // Make API call to mark as read
       const response = await fetch("/api/notifications", {
         method: "PUT",
         credentials: "include",
@@ -117,18 +93,15 @@ export const useNavbarNotifications = () => {
 
       if (!response.ok) {
         console.error("Failed to mark notification as read");
-        // Revert optimistic update
         setLocalNotifications((prev) =>
           prev.map((n) => (n.id === notificationId ? { ...n, read: false } : n))
         );
         throw new Error("Failed to mark notification as read");
       } else {
-        // Invalidate queries to ensure consistency
         queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
       }
     } catch (error) {
       console.error("Error marking notification as read:", error);
-      // Revert optimistic update on any error
       setLocalNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, read: false } : n))
       );
@@ -137,13 +110,9 @@ export const useNavbarNotifications = () => {
 
   const markAllAsRead = async () => {
     try {
-      // Store current state for potential revert
       const previousNotifications = localNotifications;
-
-      // Optimistically update local state
       setLocalNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
-      // Make API call to mark all as read
       const response = await fetch("/api/notifications", {
         method: "PUT",
         credentials: "include",
@@ -157,11 +126,9 @@ export const useNavbarNotifications = () => {
 
       if (!response.ok) {
         console.error("Failed to mark all notifications as read");
-        // Revert optimistic update
         setLocalNotifications(previousNotifications);
         throw new Error("Failed to mark all notifications as read");
       } else {
-        // Invalidate queries to ensure consistency
         queryClient.invalidateQueries({ queryKey: ["navbar-notifications"] });
       }
     } catch (error) {

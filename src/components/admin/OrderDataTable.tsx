@@ -20,7 +20,7 @@ export default function OrderDataTable() {
             <table className="min-w-full divide-y divide-border-light table-fixed">
                 <thead className="bg-bg-soft">
                     <tr>
-                        {['Customer', 'File', 'Status', 'Date', 'Amount', 'Actions'].map((header) => (
+                        {['Customer', 'File', 'Status', 'Date', 'Actions'].map((header) => (
                             <th key={header} className="px-6 py-3 text-center text-sm font-semibold text-primary uppercase tracking-wider">
                                 {header}
                             </th>
@@ -49,11 +49,6 @@ export default function OrderDataTable() {
                                 <td className={`uppercase font-semibold text-center ${getPrintOrderStatus(order.status)}`}>{getStatus(order.status)}</td>
                                 <td className="px-6 py-4 text-md text-center text-primary">
                                     {new Date(order.createdAt).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4 text-center whitespace-nowrap text-lg text-primary">
-                                    <span className="text-md text-primary font-semibold">
-                                        ₱{order.needed_amount}
-                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm flex gap-2 items-center justify-center">
                                     <OrderActions order={order} />

@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { resetForgotPassword, sendForgotOtp, verifyForgotOtp } from "@/services/Auth";
+import { Step, EmailFormData, OtpFormData, PasswordFormData } from "@/types/CustomerAuth";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
@@ -9,25 +9,6 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-enum Step {
-    email = 'email',
-    otp = 'otp',
-    newPassword = 'newPassword'
-}
-
-interface EmailFormData {
-    email: string;
-}
-
-interface OtpFormData {
-    otp: string;
-}
-
-interface PasswordFormData {
-    newPassword: string;
-    confirmPassword: string;
-}
 
 export default function ForgotPasswordPage() {
     const [step, setStep] = useState<Step>(Step.email);
@@ -67,7 +48,7 @@ export default function ForgotPasswordPage() {
         mutationFn: (data: { email: string; otp: string }) => verifyForgotOtp({ email: data.email, otp: data.otp }),
         onSuccess: () => {
             setStep(Step.newPassword);
-            setOtp(otpForm.getValues("otp")); // Save OTP for next step
+            setOtp(otpForm.getValues("otp"));
             otpForm.reset();
         },
         onError: (error: any) => {
@@ -100,7 +81,7 @@ export default function ForgotPasswordPage() {
             passwordForm.setError("confirmPassword", { message: "Passwords do not match." });
             return;
         }
-        resetPasswordMutation.mutate({ email, otp, newPassword: data.newPassword }); // Use OTP from state
+        resetPasswordMutation.mutate({ email, otp, newPassword: data.newPassword });
     });
 
     const resendOtp = () => {
@@ -108,7 +89,7 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-primary)] to-[var(--color-bg-accent)]">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-bg-accent">
             <motion.div
                 className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-6"
                 initial={{ opacity: 0, y: 40 }}

@@ -160,3 +160,12 @@ export const formatExpenseCategories = (category: string) => {
             return { label: category, icon: Tag, color: "bg-slate-200 text-slate-800" };
     }
 };
+
+export const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(price);
+}

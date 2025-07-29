@@ -76,16 +76,16 @@ export type AddExpense = {
     expenseName: string;
     amount: number;
     category: string;
-    description: string;
+    description?: string;
     occuredAt: string;
 }
 
 export type Expense = {
-    id: number;
+    id: string | number;
     expenseName: string;
     amount: number;
     category: string;
-    description: string;
+    description?: string;
     occuredAt: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -99,6 +99,6 @@ export type ExpenseFormData = {
     expenseName: string;
     amount: number;
     category: string;
-    description: string;
+    description?: string;
     occuredAt: string;
 };

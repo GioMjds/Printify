@@ -67,16 +67,16 @@ export default function LoginPage() {
     const onSubmit: SubmitHandler<LoginForm> = (data) => mutate(data)
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-bg-primary relative">
+        <div className="min-h-screen flex items-center justify-center bg-bg-primary relative px-6">
             {/* Full-page loading overlay */}
             {isPending && (
                 <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
                     <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-                    <span className="ml-4 text-white font-semibold text-2xl">Logging in....</span>
+                    <span className="ml-4 text-white font-semibold text-2xl sm:text-xl md:text-lg">Logging in....</span>
                 </div>
             )}
             <motion.div
-                className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-6"
+                className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col gap-6 sm:gap-8"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, ease: "easeInOut" }}
@@ -89,12 +89,12 @@ export default function LoginPage() {
                         height={28}
                         priority
                     />
-                    <span className="text-2xl font-bold text-primary">Printify</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-primary ">Printify</span>
                 </div>
                 <h2 className="text-3xl font-bold text-center text-primary -mt-3">
                     Welcome to Printify!
                 </h2>
-                <p className="text-center text-text-light -mt-4">
+                <p className="text-center text-text-light -mt-6">
                     Log in to your Printify account
                 </p>
                 <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -109,7 +109,7 @@ export default function LoginPage() {
                                     message: "Invalid email address",
                                 }
                             })}
-                            className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            className="w-full px-4 py-3 sm:px-3 sm:py-2 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
                             disabled={isPending}
                         />
                         {errors.email && (
@@ -133,7 +133,7 @@ export default function LoginPage() {
                                     message: "Password must be at least 6 characters long",
                                 }
                             })}
-                            className="w-full px-4 py-3 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            className="w-full px-4 py-3 sm:px-3 sm:py-2 rounded-lg border border-border-light focus:outline-none focus:ring-2 focus:ring-accent transition"
                             disabled={isPending}
                         />
                         <motion.button
@@ -160,7 +160,7 @@ export default function LoginPage() {
                     <motion.button
                         type="submit"
                         disabled={isPending}
-                        className={`mt-2 bg-primary text-white font-bold py-3 rounded-lg hover:bg-secondary transition-all ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                        className={`mt-2 bg-secondary text-white font-bold py-3 rounded-lg hover:bg-primary transition-all ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                     >

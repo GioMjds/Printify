@@ -4,9 +4,16 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
     req: NextRequest,
-    params: Promise<{ expenseId: number }>
+    { params }: { params: { expenseId: string } }
 ) {
-    const { expenseId } = await params;
+    const expenseId = Number(params.expenseId);
+
+    if (isNaN(expenseId)) {
+        return NextResponse.json({
+            error: "Invalid expense ID"
+        }, { status: 400 });
+    }
+
     try {
         const body = await req.json();
         const { expenseName, amount, category, description, occuredAt } = body;
@@ -41,19 +48,30 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    params: Promise<{ expenseId: number }>
+    { params }: { params: Promise<{ expenseId: string }> }
 ) {
-    const { expenseId } = await params;
+    const expenseId = Number((await params).expenseId);
+
+    if (isNaN(expenseId)) {
+        return NextResponse.json({
+            error: "Invalid expense ID"
+        }, { status: 400 });
+    }
+
     try {
-        const deletedExpense = await prisma.expense.delete({
+        const deletedExpense = await prisma.expense.findUnique({
             where: { id: expenseId },
         });
 
-        if (!expenseId) {
+        if (!deletedExpense) {
             return NextResponse.json({
                 error: "Expense not found"
             }, { status: 404 });
         }
+
+        await prisma.expense.delete({
+            where: { id: expenseId }
+        });
 
         return NextResponse.json({
             message: "Expense deleted successfully",

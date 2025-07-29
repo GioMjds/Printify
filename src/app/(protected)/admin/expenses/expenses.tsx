@@ -10,6 +10,8 @@ import { Expense, ExpenseFormData, ExpenseResponse } from '@/types/Admin';
 import { format } from 'date-fns';
 import { expensesCategories } from '@/constants/admin-expenses';
 import { formatExpenseCategories } from '@/utils/formatters';
+import Modal from '@/components/Modal';
+import { toast } from 'react-toastify';
 
 export default function ExpensesPage() {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -17,6 +19,7 @@ export default function ExpensesPage() {
     const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
     const [categoryFilter, setCategoryFilter] = useState<string>('all');
     const [dateFilter, setDateFilter] = useState<string>('all');
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const queryClient = useQueryClient();
 
@@ -31,6 +34,7 @@ export default function ExpensesPage() {
         mutationFn: addExpense,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['expenses'] });
+            toast.success('Expense added successfully');
             setIsModalOpen(false);
         },
     });
@@ -39,16 +43,22 @@ export default function ExpensesPage() {
         mutationFn: updateExpense,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['expenses'] });
+            toast.success('Expense updated successfully');
             setIsModalOpen(false);
             setEditingExpense(null);
         },
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteExpense,
+        mutationFn: (expenseId: string | number) => deleteExpense({ expenseId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['expenses'] });
+            toast.success('Expense deleted successfully');
+            setDeleteModal(false);
         },
+        onError: (error) => {
+            console.error(`Failed to delete expense: ${error}`);
+        }
     });
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ExpenseFormData>({
@@ -62,7 +72,6 @@ export default function ExpensesPage() {
         } : {}
     });
 
-    const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
     const categories = [...new Set(expenses.map(expense => expense.category))];
 
     const filteredExpenses = expenses.filter(expense => {
@@ -71,11 +80,6 @@ export default function ExpensesPage() {
             format(new Date(expense.occuredAt), 'yyyy-MM') === dateFilter;
         return matchesCategory && matchesDate;
     });
-
-    const currentMonth = format(new Date(), 'yyyy-MM');
-    const totalThisMonth = expenses
-        .filter(exp => format(new Date(exp.occuredAt), 'yyyy-MM') === currentMonth)
-        .reduce((sum, expense) => sum + Number(expense.amount), 0);
 
     const onSubmit = (data: ExpenseFormData) => {
         const expenseData = {
@@ -113,33 +117,12 @@ export default function ExpensesPage() {
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="glass-card p-6 rounded-xl"
-                >
-                    <h3 className="text-text-light text-sm font-medium">Total Expenses</h3>
-                    <p className="text-3xl font-bold text-text mt-2">₱{totalExpenses}</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="glass-card p-6 rounded-xl"
-                >
-                    <h3 className="text-text-light text-sm font-medium">Expenses This Month</h3>
-                    <p className="text-3xl font-bold text-text mt-2">
-                        ₱{totalThisMonth}
-                    </p>
-                </motion.div>
-            </div>
-
             {/* Expense List Header */}
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-text">Expense Records</h2>
+                <div>
+                    <h2 className="text-3xl font-bold text-text">Expense Records</h2>
+                    <p className="text-sm text-text-light">Keep track of your business expense records here</p>
+                </div>
                 <div className="flex space-x-4">
                     <button
                         onClick={() => setFiltersOpen(!filtersOpen)}
@@ -162,7 +145,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Filters */}
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {filtersOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -229,7 +212,7 @@ export default function ExpensesPage() {
                                     {(() => {
                                         const { label, icon: Icon, color } = formatExpenseCategories(expense.category);
                                         return (
-                                            <span className={`p-3 uppercase font-semibold ${color} rounded-full text-xs text-text`}>
+                                            <span className={`p-2 uppercase font-semibold ${color} rounded-full text-sm text-text`}>
                                                 <Icon className="inline-block mr-1" size={25} />
                                                 {label}
                                             </span>
@@ -248,7 +231,10 @@ export default function ExpensesPage() {
                                             <Edit size={28} />
                                         </button>
                                         <button
-                                            onClick={() => deleteMutation.mutate({ expenseId: expense.id })}
+                                            onClick={() => {
+                                                setEditingExpense(expense);
+                                                setDeleteModal(true);
+                                            }}
                                             className="p-2 text-red-500 cursor-pointer hover:bg-red-500/10 rounded-full"
                                         >
                                             <Trash2 size={28} />
@@ -278,7 +264,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Add/Edit Expense Modal */}
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {isModalOpen && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -352,7 +338,7 @@ export default function ExpensesPage() {
                                             Category
                                         </label>
                                         <div className="relative">
-                                            <select 
+                                            <select
                                                 {...register('category', { required: 'Category is required' })}
                                                 className="w-full p-2 border border-border-light rounded-lg bg-white"
                                             >
@@ -424,6 +410,29 @@ export default function ExpensesPage() {
                             </div>
                         </motion.div>
                     </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence mode="wait">
+                {deleteModal && (
+                    <Modal
+                        isOpen={deleteModal}
+                        onCancel={() => setDeleteModal(false)}
+                        onConfirm={() => {
+                            if (editingExpense?.id !== undefined) {
+                                deleteMutation.mutate(editingExpense.id);
+                            }
+                        }}
+                        title="Delete Expense"
+                        description={`Are you sure you want to delete "${editingExpense?.expenseName}" (₱${editingExpense?.amount})? This action cannot be undone.`}
+                        icon={<Trash2 size={24} />}
+                        className="max-w-sm"
+                        confirmText='Delete Expense'
+                        cancelText='Cancel'
+                        loading={deleteMutation.isPending}
+                        loadingText='Deleting...'
+                    />
                 )}
             </AnimatePresence>
         </>
