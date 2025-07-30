@@ -63,7 +63,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         getUserSession();
     }, []);
 
-    // Fetch initial notifications from API
     useEffect(() => {
         const fetchInitialNotifications = async () => {
             if (!userId) return;
@@ -93,9 +92,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             }
         };
 
-        if (userId) {
-            fetchInitialNotifications();
-        }
+        if (userId) fetchInitialNotifications();
     }, [userId]);
 
     const addNotification = (notification: Notification) => {
@@ -113,7 +110,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     };
 
-    // WebSocket connection management
     useEffect(() => {
         if (!userId) {
             setConnectionStatus('disconnected');
@@ -123,13 +119,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         console.log('🔌 Attempting to connect WebSocket for user:', userId);
         setConnectionStatus('connecting');
 
-        // Connect to WebSocket with actual user ID
         webSocketService.connect(userId);
 
-        // Set notification service
         notificationService.setWebSocketService(webSocketService);
 
-        // Set up connection status listeners
         webSocketService.on('connect', (data) => {
             setIsConnected(true);
             setConnectionStatus('connected');
@@ -151,8 +144,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         // Listen for new notifications
         webSocketService.on('message', (data) => {
             if (isWebSocketMessage(data)) {
-                console.log('🔔 Received message via WebSocket:', data);
-
                 if (data.type === 'notification' && data.data) {
                     addNotification({
                         id: data.data.id,
@@ -165,10 +156,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             }
         });
 
-        // Listen for direct notifications (legacy support)
         webSocketService.on('notification', (data) => {
             if (isNotificationMessageData(data)) {
-                console.log('🔔 Received notification via WebSocket:', data);
                 addNotification({
                     id: data.id,
                     message: data.message,
@@ -179,7 +168,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             }
         });
 
-        // Listen for heartbeat acknowledgments
         webSocketService.on('heartbeat_ack', () => {
             // Keep connection alive
         });

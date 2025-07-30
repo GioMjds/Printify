@@ -165,7 +165,7 @@ export const getSession = async () => {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true,
         });
-        return response.data.session;
+        return response.data;
     } catch (error) {
         console.error(`Get session failed: ${error}`);
         throw error;

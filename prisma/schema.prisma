@@ -39,6 +39,7 @@ model Upload {
   filename          String
   fileData          String
   status            UploadStatus  @default(pending)
+  cancel_reason     String?
   rejection_reason  String?
   needed_amount     Int?
   customer          User          @relation("UserUploads", fields: [customerId], references: [id])

@@ -41,3 +41,18 @@ export const fetchSinglePrintUpload = async ({ uploadId }: { uploadId: string })
         throw error;
     }
 }
+
+export const cancelPrintUpload = async ({ uploadId, cancelReason }: { uploadId: string; cancelReason: string }) => {
+    try {
+        const response = await API.put(`/profile/upload/${uploadId}`, {
+            cancelReason: cancelReason
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to cancel print upload with ID ${uploadId}: ${error}`);
+        throw error;
+    }
+}

@@ -3,8 +3,9 @@ export interface Upload {
     filename: string;
     fileData: string;
     status: string;
-    rejection_reason: string | null;
-    needed_amount: number | null;
+    rejection_reason?: string | null;
+    cancel_reason?: string | null;
+    needed_amount?: number | null;
     customerId: string;
     format: string;
     createdAt: string;

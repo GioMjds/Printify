@@ -1,17 +1,25 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { fetchCustomerPrintUploads } from "@/services/Customer";
+import { cancelPrintUpload, fetchCustomerPrintUploads } from "@/services/Customer";
 import { formatDate, getStatus, getStatusColor } from "@/utils/formatters";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { MyOrdersProps, Upload, UploadResponse } from "@/types/MyOrders";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import CancellationModal from "@/components/CancellationModal";
+import { cancellationReasons } from "@/constants/dropdown";
+import { toast } from "react-toastify";
 
 export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
+
     const router = useRouter();
     const searchParams = useSearchParams();
+    const queryClient = useQueryClient();
 
     const { data } = useQuery<UploadResponse>({
         queryKey: ["myOrders", userId, page, limit],
@@ -20,6 +28,17 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
             page,
             limit
         }),
+    });
+
+    const cancelMutation = useMutation({
+        mutationFn: ({ uploadId, cancelReason }: { uploadId: string; cancelReason: string }) =>
+            cancelPrintUpload({ uploadId, cancelReason }),
+        onSuccess: () => {
+            setModalOpen(false);
+            setSelectedUploadId(null);
+            toast.success("Print order successfully cancelled.");
+            queryClient.invalidateQueries({ queryKey: ["myOrders", userId, page, limit] });
+        },
     });
 
     const uploads = data?.uploads || [];
@@ -40,6 +59,38 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
     };
 
     const handlePageChange = (pageNum: number) => setPage(pageNum);
+
+    const handleCancelOrder = (uploadId: string) => {
+        setSelectedUploadId(uploadId);
+        setModalOpen(true);
+    };
+
+    const handleCancelConfirm = (reason: string) => {
+        if (selectedUploadId) cancelMutation.mutate({
+            uploadId: selectedUploadId,
+            cancelReason: reason
+        })
+    }
+
+    const displayPriceOrCancel = (upload: Upload) => {
+        if (upload.status === 'pending') {
+            return (
+                <button
+                    className="px-3 py-1 cursor-pointer rounded-md bg-red-600 text-white text-sm sm:text-base hover:bg-red-700 transition-colors"
+                    onClick={() => handleCancelOrder(upload.id)}
+                >
+                    Cancel Order
+                </button>
+            );
+        } else if (upload.needed_amount) {
+            return (
+                <span className="px-2 py-1 rounded-md text-sm sm:text-base md:text-lg bg-bg-soft/10 text-bg-soft">
+                    ₱{upload.needed_amount}
+                </span>
+            );
+        }
+        return null;
+    }
 
     return (
         <section className="w-full min-h-screen py-6 md:py-10 mt-16 px-4 sm:px-6 md:px-8 lg:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
@@ -101,11 +152,7 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
                                         >
                                             View Details
                                         </Link>
-                                        {upload.needed_amount && (
-                                            <span className="px-2 py-1 rounded-md text-sm sm:text-base md:text-lg bg-bg-soft/10 text-bg-soft">
-                                                ₱{upload.needed_amount}
-                                            </span>
-                                        )}
+                                        {displayPriceOrCancel(upload)}
                                     </div>
                                 </motion.div>
                             ))}
@@ -177,6 +224,18 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
                     </div>
                 )}
             </div>
+            <CancellationModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onConfirm={handleCancelConfirm}
+                title="Cancel Print Order"
+                description="Please provide a reason for cancelling this print order:"
+                reasonLabel="Reason for Cancellation"
+                reasonPlaceholder="Please explain why you're cancelling this print order..."
+                confirmButtonText={cancelMutation.isPending ? "Cancelling..." : "Confirm Cancellation"}
+                showPolicyNote={false}
+                reasons={cancellationReasons}
+            />
         </section>
     );
 }

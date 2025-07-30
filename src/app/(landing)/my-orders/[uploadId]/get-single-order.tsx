@@ -87,7 +87,7 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
                 className="container mx-auto px-4 sm:px-6 md:px-8 py-8 my-14 sm:my-20 md:my-16"
             >
                 <motion.button
-                    onClick={() => router.back()}
+                    onClick={() => router.push('/my-orders')}
                     className="flex items-center gap-2 text-white hover:text-highlight mb-4 sm:mb-6 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
@@ -145,6 +145,14 @@ export default function GetSingleOrderPage({ uploadId }: { uploadId: string }) {
                                             label="Rejection Reason"
                                             value={
                                                 <span className="text-red-600 font-medium text-sm sm:text-base">{data.rejection_reason}</span>
+                                            }
+                                        />
+                                    )}
+                                    {data?.cancel_reason && (
+                                        <DetailItem
+                                            label="Cancellation Reason"
+                                            value={
+                                                <span className="text-red-600 font-medium text-sm sm:text-base">{data.cancel_reason}</span>
                                             }
                                         />
                                     )}
