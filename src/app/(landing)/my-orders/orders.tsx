@@ -1,14 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { cancelPrintUpload, fetchCustomerPrintUploads } from "@/services/Customer";
 import { formatDate, getStatus, getStatusColor } from "@/utils/formatters";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { MyOrdersProps, Upload, UploadResponse } from "@/types/MyOrders";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
 import CancellationModal from "@/components/CancellationModal";
 import { cancellationReasons } from "@/constants/dropdown";
 import { toast } from "react-toastify";
@@ -23,11 +23,7 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
 
     const { data } = useQuery<UploadResponse>({
         queryKey: ["myOrders", userId, page, limit],
-        queryFn: () => fetchCustomerPrintUploads({
-            userId,
-            page,
-            limit
-        }),
+        queryFn: () => fetchCustomerPrintUploads({ userId, page, limit }),
     });
 
     const cancelMutation = useMutation({

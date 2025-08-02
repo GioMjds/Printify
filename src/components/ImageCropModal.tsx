@@ -5,6 +5,7 @@ import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import { motion } from 'framer-motion';
 import { X, Upload, Check } from 'lucide-react';
 import 'react-image-crop/dist/ReactCrop.css';
+import Image from 'next/image';
 
 interface ImageCropModalProps {
     isOpen: boolean;
@@ -142,7 +143,7 @@ export default function ImageCropModal({
                                     aspect={1}
                                     circularCrop
                                 >
-                                    <img
+                                    <Image
                                         ref={imgRef}
                                         alt="Crop preview"
                                         src={src}

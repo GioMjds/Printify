@@ -99,7 +99,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                                 />
                                 <button
                                     onClick={() => setIsCropModalOpen(true)}
-                                    className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-accent text-white p-1.5 sm:p-4 rounded-full shadow-md hover:bg-highlight transition-colors duration-200"
+                                    className="absolute cursor-pointer bottom-1 right-1 sm:bottom-2 sm:right-2 bg-accent text-white p-1.5 sm:p-4 rounded-full shadow-md hover:bg-highlight transition-colors duration-200"
                                     aria-label="Change profile image"
                                 >
                                     <Camera className="w-7 h-7" size={56} />

@@ -1,13 +1,15 @@
-// Types generated based on prisma schema.prisma
+export enum UserRole {
+  CUSTOMER = "customer",
+  ADMIN = "admin",
+}
 
-export type UserRole = "customer" | "admin";
-
-export type UploadStatus =
-  | "pending"
-  | "printing"
-  | "cancelled"
-  | "ready_to_pickup"
-  | "completed";
+export enum UploadStatus {
+  PENDING = "pending",
+  PRINTING = "printing",
+  CANCELLED = "cancelled",
+  READY_TO_PICKUP = "ready_to_pickup",
+  COMPLETED = "completed",
+}
 
 export interface User {
   id: string;
@@ -18,8 +20,8 @@ export interface User {
   role: UserRole;
   isVerified?: boolean | null;
   uploads: Upload[];
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Upload {
@@ -29,8 +31,8 @@ export interface Upload {
   status: UploadStatus;
   customer: string;
   customerId: string;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  createdAt: string;
+  updatedAt: string;
   notifications: Notification[];
 }
 
@@ -38,6 +40,6 @@ export interface Notification {
   id: string;
   upload: Upload;
   uploadId: string;
-  sentAt: string; // ISO string
+  sentAt: string;
   message: string;
 }

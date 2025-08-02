@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
-import { v2 as cloudinary } from 'cloudinary';
 import type { UploadApiResponse } from 'cloudinary';
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import cloudinary from "@/lib/cloudinary";
 
 const allowedExtensions = ['.pdf', '.doc', '.docx'];
 const allowedMimeTypes = [
@@ -10,13 +10,6 @@ const allowedMimeTypes = [
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
-
-cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-    api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
-    secure: true,
-});
 
 export const config = {
     api: { bodyParser: false }
@@ -56,12 +49,12 @@ export async function POST(req: NextRequest) {
     try {
         const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({
-            resource_type: 'raw',
-            public_id: fileName.replace(/\.[^/.]+$/, ""),
-            folder: 'printify_uploads',
-            use_filename: true,
-            unique_filename: false,
-            context: `extension=${fileExtension}|customerId=${customerId}`,
+                resource_type: 'raw',
+                public_id: fileName.replace(/\.[^/.]+$/, ""),
+                folder: 'printify_uploads',
+                use_filename: true,
+                unique_filename: false,
+                context: `extension=${fileExtension}|customerId=${customerId}`,
             }, (error, result) => {
                 if (error) return reject(error);
                 resolve(result as UploadApiResponse);

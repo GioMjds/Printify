@@ -1,20 +1,21 @@
 'use client';
 
+import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import Dropdown from '@/components/Dropdown';
-import Modal from '@/components/Modal';
-import ProfileIcon from '@/components/ProfileIcon';
+import { motion } from 'framer-motion';
 import { navbar } from '@/constants/navbar';
-import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { logout } from '@/services/Auth';
+import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { NavbarProps } from '@/types/Navbar';
 import { formatNotificationTime } from '@/utils/notifications';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'framer-motion';
 import { Bell, BellDot, Cloud, LogIn, LogOut, User2Icon, UserRoundPlus } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { faCloud, faUpload } from '@fortawesome/free-solid-svg-icons';
+import Dropdown from '@/components/Dropdown';
+import Modal from '@/components/Modal';
+import ProfileIcon from '@/components/ProfileIcon';
 
 export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -417,6 +418,15 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                                     router.push(`/profile/${userDetails.id}`);
                                                     setIsOpen(false);
                                                 },
+                                                icon: <User2Icon className="w-4 h-4" />
+                                            },
+                                            {
+                                                label: 'My Orders',
+                                                onClick: () => {
+                                                    router.push('/my-orders');
+                                                    setIsOpen(false);
+                                                },
+                                                icon: <Cloud className="w-4 h-4" />,
                                             },
                                             {
                                                 label: 'Log Out',
@@ -495,6 +505,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                             className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
                                             onClick={() => setIsOpen(false)}
                                         >
+                                            <FontAwesomeIcon icon={faUpload} className='inline mr-3' />
                                             Upload
                                         </Link>
                                         <Link
@@ -502,6 +513,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                             className="block px-3 py-2 rounded-md text-base font-medium nav-link text-highlight hover:text-primary hover:bg-bg-white transition-colors duration-200"
                                             onClick={() => setIsOpen(false)}
                                         >
+                                            <FontAwesomeIcon icon={faCloud} className='inline mr-3' />
                                             My Orders
                                         </Link>
                                     </>
