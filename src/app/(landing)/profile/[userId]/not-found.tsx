@@ -39,7 +39,7 @@ const pulseVariants = {
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen w-full bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
+        <div className="min-h-screen w-full bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden px-4 sm:px-6">
             {/* Background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-full blur-3xl" />
@@ -56,7 +56,7 @@ export default function NotFound() {
                     <motion.div
                         variants={pulseVariants}
                         animate="pulse"
-                        className="mb-8"
+                        className="mb-6 sm:mb-8"
                     >
                         <div className="text-[120px] md:text-[180px] font-bold text-highlight leading-none">
                             404
@@ -64,23 +64,23 @@ export default function NotFound() {
                     </motion.div>
 
                     <motion.h1
-                        className="text-4xl md:text-5xl font-bold text-highlight mb-4"
+                        className="text-3xl sm:text-4xl md:text-5xl font-bold text-highlight mb-4"
                         variants={itemVariants}
                     >
                         User Not Found
                     </motion.h1>
 
                     <motion.p
-                        className="text-xl text-highlight/80 mb-8"
+                        className="text-lg sm:text-xl text-highlight/80 mb-6 sm:mb-8"
                         variants={itemVariants}
                     >
-                        The user you&apos;re looking for doesn&apos;t exist or has been removed.
+                        The user you're looking for doesn't exist or has been removed.
                     </motion.p>
 
                     <motion.div variants={itemVariants}>
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-accent to-secondary text-white px-6 py-3 rounded-full font-semibold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-accent to-secondary text-white px-6 py-3 rounded-full font-semibold uppercase tracking-wider text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300"
                         >
                             Go To Homepage
                         </Link>

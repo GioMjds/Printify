@@ -11,6 +11,18 @@ type ChangeProfileProps = {
     imageData: string;
 }
 
+type CancelUpload = {
+    uploadId: string;
+    cancelReason: string;
+}
+
+type ContactForm = {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+}
+
 export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
     try {
         const response = await API.get(`/profile/${userId}`, {
@@ -63,7 +75,7 @@ export const fetchSinglePrintUpload = async ({ uploadId }: { uploadId: string })
     }
 }
 
-export const cancelPrintUpload = async ({ uploadId, cancelReason }: { uploadId: string; cancelReason: string }) => {
+export const cancelPrintUpload = async ({ uploadId, cancelReason }: CancelUpload) => {
     try {
         const response = await API.put(`/profile/upload/${uploadId}`, {
             cancelReason: cancelReason
@@ -74,6 +86,24 @@ export const cancelPrintUpload = async ({ uploadId, cancelReason }: { uploadId: 
         return response.data;
     } catch (error) {
         console.error(`Failed to cancel print upload with ID ${uploadId}: ${error}`);
+        throw error;
+    }
+};
+
+export const sendContactForm = async ({ name, email, subject, message }: ContactForm) => {
+    try {
+        const response = await API.post('/contact', {
+            name: name,
+            email: email,
+            subject: subject,
+            message: message
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to send contact form: ${error}`);
         throw error;
     }
 }

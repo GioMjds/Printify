@@ -386,3 +386,144 @@ export async function sendPassswordResetEmail(email: string, otp: string) {
 
   await transporter.sendMail(mailOptions);
 }
+
+export async function contactUsEmail(name: string, email: string, subject: string, message: string) {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+        tls: { rejectUnauthorized: false },
+    });
+
+    const htmlTemplate = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Contact Form Submission</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap');
+                body {
+                    font-family: 'Lexend', sans-serif;
+                    background: linear-gradient(135deg, #0E2148 0%, #7965C1 100%);
+                    color: #0E2148;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 40px auto;
+                    background: #fff;
+                    border-radius: 24px;
+                    box-shadow: 0 8px 32px rgba(14,33,72,0.10);
+                    overflow: hidden;
+                    border: 1.5px solid #7965C1;
+                }
+                .header {
+                    background: linear-gradient(135deg, #483AA0 0%, #7965C1 100%);
+                    padding: 36px 32px 24px 32px;
+                    text-align: center;
+                }
+                .header-title {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-bottom: 6px;
+                    letter-spacing: 1px;
+                }
+                .header-desc {
+                    color: #E3D095;
+                    font-size: 1rem;
+                    font-weight: 400;
+                }
+                .content {
+                    padding: 40px 32px 32px 32px;
+                    text-align: left;
+                    background: #fff;
+                }
+                .field {
+                    margin-bottom: 20px;
+                }
+                .field-label {
+                    font-size: 0.95rem;
+                    color: #483AA0;
+                    font-weight: 600;
+                    margin-bottom: 5px;
+                    display: block;
+                }
+                .field-value {
+                    font-size: 1rem;
+                    color: #0E2148;
+                    padding: 12px;
+                    background: #f8f7fa;
+                    border-radius: 8px;
+                    border-left: 4px solid #7965C1;
+                }
+                .footer {
+                    background: linear-gradient(135deg, #E3D095 0%, #7965C1 100%);
+                    padding: 24px 32px;
+                    text-align: center;
+                }
+                .footer-message {
+                    font-size: 0.92rem;
+                    color: #483AA0;
+                    opacity: 0.85;
+                }
+                @media (max-width: 600px) {
+                    .container { margin: 10px; border-radius: 16px; }
+                    .content, .footer, .header { padding-left: 12px; padding-right: 12px; }
+                }
+            </style>
+        <body>
+        </head>
+            <div class="container">
+                <div class="header">
+                    <div class="header-title">Printify</div>
+                    <div class="header-desc">New Contact Form Submission</div>
+                </div>
+                <div class="content">
+                    <div class="field">
+                        <span class="field-label">From:</span>
+                        <div class="field-value">${name}</div>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Email:</span>
+                        <div class="field-value">${email}</div>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Subject:</span>
+                        <div class="field-value">${subject}</div>
+                    </div>
+                    <div class="field">
+                        <span class="field-label">Message:</span>
+                        <div class="field-value">${message.replace(/\n/g, '<br>')}</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="footer-message">
+                        © ${new Date().getFullYear()} Printify. Your Print on Demand Partner.
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    const mailOptions = {
+        from: email,
+        to: process.env.EMAIL_USER,
+        subject: `📩 Contact Us Form Submission from ${name}`,
+        html: htmlTemplate,
+        text: `
+            You have received a new contact form submission from ${name} (${email}).
+
+            Message:
+            ${message}
+        `,
+    };
+
+    await transporter.sendMail(mailOptions);
+}

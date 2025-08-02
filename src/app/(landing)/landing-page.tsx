@@ -30,7 +30,7 @@ export default function LandingPage() {
     }
 
     return (
-        <div className="overflow-x-hidden">
+        <>
             {/* Hero Section */}
             <section
                 ref={heroRef}
@@ -170,21 +170,22 @@ export default function LandingPage() {
                         transition={{ duration: 1, ease: 'easeInOut' }}
                     >
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-5 md:mb-6 text-text-dark">
-                            Ready to Start Your Printing Project?
+                            Have Questions or Need Help?
                         </h2>
                         <p className="text-lg sm:text-xl mb-8 sm:mb-9 md:mb-10 text-text-dark max-w-2xl mx-auto">
-                            Get in touch with us today for a free quote and consultation
+                            Our team is here for you! Reach out and we'll get back to you as soon as possible.
                         </p>
                         <motion.button
-                            className="bg-primary hover:bg-text-dark text-white font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full text-base sm:text-lg transition-all duration-300"
+                            className="bg-primary cursor-pointer hover:bg-text-dark text-white font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full text-base sm:text-lg transition-all duration-300"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
+                            onClick={() => router.push('/contact')}
                         >
-                            Request a Quote
+                            Contact Us
                         </motion.button>
                     </motion.div>
                 </div>
             </section>
-        </div>
+        </>
     );
 }

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ userId: s
 
         return {
             title: data.name ? `${data.name} | Profile` : "User Profile",
-            description: `Profile details for ${data.name || "the user"}`,
+            description: `Profile details for ${data.name}`,
         }
     } catch {
         return {

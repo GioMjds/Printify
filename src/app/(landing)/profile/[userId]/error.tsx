@@ -1,20 +1,71 @@
 'use client';
 
 import { ErrorPageProps } from "@/types/next-types";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.2,
+            delayChildren: 0.3
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    }
+};
 
 export default function Error({ error, reset }: ErrorPageProps) {
     return (
-        <div className="flex items-center justify-center h-screen bg-gradient-to-r from-bg-primary to-bg-secondary">
-            <div className="text-center">
-                <h1 className="text-4xl font-bold mb-4">Woah! An error occured!</h1>
-                <p className="text-lg">{error.message || "Unknown error"}</p>
-                <button
-                    onClick={() => reset()}
-                    className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                    Retry
-                </button>
+        <div className="min-h-screen w-full bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden px-4 sm:px-6">
+            {/* Background elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-full blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-full blur-3xl" />
             </div>
+
+            <motion.div
+                className="flex items-center justify-center h-screen px-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <div className="text-center relative z-10 max-w-2xl">
+                    <motion.h1
+                        className="text-3xl sm:text-4xl md:text-5xl font-bold text-highlight mb-4"
+                        variants={itemVariants}
+                    >
+                        Woah! An error occurred!
+                    </motion.h1>
+
+                    <motion.p
+                        className="text-lg sm:text-xl text-highlight/80 mb-6 sm:mb-8"
+                        variants={itemVariants}
+                    >
+                        {error.message || "Unknown error"}
+                    </motion.p>
+
+                    <motion.div variants={itemVariants}>
+                        <button
+                            onClick={() => reset()}
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-accent to-secondary text-white px-6 py-3 rounded-full font-semibold uppercase tracking-wider text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                            Retry
+                        </button>
+                    </motion.div>
+                </div>
+            </motion.div>
         </div>
-    )
+    );
 }

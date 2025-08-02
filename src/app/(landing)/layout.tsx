@@ -6,6 +6,7 @@ import "../../app/globals.css";
 import Providers from "../providers";
 import { getSession, getCurrentUser } from "@/lib/auth";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
+import { ToastContainer } from "react-toastify";
 
 const lexend = Lexend({
     variable: "--font-lexend",
@@ -45,6 +46,16 @@ export default async function RootLayout({
                             {children}
                         </main>
                         <Footer />
+                        <ToastContainer
+                            position="top-right"
+                            autoClose={5000}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            theme="light"
+                            toastClassName="font-lexend"
+                        />
                     </Providers>
                 </WebSocketProvider>
             </body>

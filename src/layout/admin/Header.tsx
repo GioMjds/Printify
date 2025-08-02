@@ -40,8 +40,6 @@ export default function Header({
                 dateFormat="MMMM yyyy"
                 showMonthYearPicker
                 className="bg-white border border-border-light rounded-lg px-4 py-2 text-primary font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-bg-accent"
-                calendarClassName="!z-50"
-                popperPlacement="bottom-start"
             />
         </div>
     );

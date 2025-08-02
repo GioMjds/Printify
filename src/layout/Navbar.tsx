@@ -12,7 +12,7 @@ import { NavbarProps } from '@/types/Navbar';
 import { formatNotificationTime } from '@/utils/notifications';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
-import { Bell, BellDot, LogIn, LogOut, UserRoundPlus } from 'lucide-react';
+import { Bell, BellDot, Cloud, LogIn, LogOut, User2Icon, UserRoundPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -82,7 +82,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
         try {
             await markAsRead(notificationId);
         } catch (error) {
-            console.error("Failed to mark notification as read:", error);
+            console.error(`Failed to mark notification as read: ${error}`);
         }
     };
 
@@ -90,7 +90,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
         try {
             await markAllAsRead();
         } catch (error) {
-            console.error("Failed to mark all notifications as read:", error);
+            console.error(`Failed to mark all notifications as read: ${error}`);
         }
     };
 
@@ -100,7 +100,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                 setShowNotifications(false);
             }
             if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-                // Close profile dropdown if needed
+                setShowNotifications(false);
             }
         };
 
@@ -266,9 +266,13 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 options={[
                                     {
                                         label: 'Profile',
-                                        onClick: () => {
-                                            router.push(`/profile/${userDetails.id}`)
-                                        },
+                                        onClick: () => router.push(`/profile/${userDetails.id}`),
+                                        icon: <User2Icon className="w-4 h-4" />,
+                                    },
+                                    {
+                                        label: 'My Orders',
+                                        onClick: () => router.push('/my-orders'),
+                                        icon: <Cloud className="w-4 h-4" />,
                                     },
                                     {
                                         label: 'Log Out',

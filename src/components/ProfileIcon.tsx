@@ -14,8 +14,8 @@ const ProfileIcon: FC<ProfileIconProps> = ({ profileImage, onClick }) => {
             <Image
                 src={profileImage as string}
                 alt="Profile"
-                width={50}
-                height={50}
+                width={55}
+                height={55}
                 priority
                 className="rounded-full object-cover"
             />

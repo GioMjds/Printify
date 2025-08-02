@@ -82,17 +82,17 @@ const Dropdown: FC<CustomDropdownProps> = ({ options, position = "bottom", child
                         {/* Profile section above options */}
                         {userDetails && (
                             <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50">
-                                <div className="w-10 h-10 relative rounded-full overflow-hidden border border-accent">
+                                <div className="w-14 h-14 relative rounded-full overflow-hidden border border-accent">
                                     <Image
                                         src={userDetails.profileImage as string}
                                         alt={userDetails.name}
-                                        priority
+                                        loading="lazy"
                                         fill
                                         className="object-cover"
                                     />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="font-semibold text-primary text-base">{userDetails.name || 'No Name'}</span>
+                                    <span className="font-semibold text-primary text-base">{userDetails.name}</span>
                                     <span className="text-xs text-gray-500">{userDetails.email}</span>
                                 </div>
                             </div>
