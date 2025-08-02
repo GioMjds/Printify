@@ -16,12 +16,15 @@ import { faCloud, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Dropdown from '@/components/Dropdown';
 import Modal from '@/components/Modal';
 import ProfileIcon from '@/components/ProfileIcon';
+import AnnouncementBar from './AnnouncementBar';
 
 export default function Navbar({ userDetails }: NavbarProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const [showAnnouncement, setShowAnnouncement] = useState<boolean>(false);
+    
     const notificationRef = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
 
@@ -96,6 +99,10 @@ export default function Navbar({ userDetails }: NavbarProps) {
     };
 
     useEffect(() => {
+        setShowAnnouncement(process.env.NEXT_PUBLIC_ANNOUNCEMENT_BAR === 'true');
+    }, []);
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
                 setShowNotifications(false);
@@ -108,7 +115,8 @@ export default function Navbar({ userDetails }: NavbarProps) {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-primary shadow-lg">
+            {showAnnouncement && <AnnouncementBar />}
+            <nav className={`fixed left-0 w-full z-50 transition-all duration-300 bg-primary/85 shadow-lg ${showAnnouncement ? 'top-11' : 'top-0'}`}>
                 <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
                     {/* Logo */}
                     <motion.div
