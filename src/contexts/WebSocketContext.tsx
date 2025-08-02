@@ -51,8 +51,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         const getUserSession = async () => {
             try {
                 const session = await getSession();
-                if (session?.userId) {
-                    setUserId(session?.userId);
+                if (session?.user.userId) {
+                    setUserId(session?.user.userId);
                     console.log('✅ Got user session:', session.user.userId);
                 }
             } catch (error) {

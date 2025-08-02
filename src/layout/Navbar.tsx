@@ -100,9 +100,6 @@ export default function Navbar({ userDetails }: NavbarProps) {
             if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
                 setShowNotifications(false);
             }
-            if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-                setShowNotifications(false);
-            }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
@@ -167,7 +164,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                             })
                         }
                         {userDetails && (
-                            <div className="relative" ref={notificationRef}>
+                            <div className="relative">
                                 <motion.button
                                     onClick={() => setShowNotifications(!showNotifications)}
                                     className="relative group cursor-pointer p-3 text-highlight rounded-full transition-colors duration-200"
@@ -189,6 +186,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                                 {/* Notification Dropdown */}
                                 {showNotifications && (
                                     <motion.div
+                                        ref={notificationRef}
                                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
