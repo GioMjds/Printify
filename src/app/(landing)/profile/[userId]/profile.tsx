@@ -1,11 +1,14 @@
 'use client';
 
-import { fetchCustomerProfile } from "@/services/Customer";
-import { useQuery } from "@tanstack/react-query";
+import { fetchCustomerProfile, changeProfileImage } from "@/services/Customer";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Mail, Shield, CheckCircle2Icon } from "lucide-react";
+import { Mail, Shield, CheckCircle2Icon, Camera } from "lucide-react";
 import { User } from "@/types/prismaTypes";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import ImageCropModal from "@/components/ImageCropModal";
 
 interface ProfilePageProps {
     userId: string;
@@ -36,11 +39,43 @@ const cardVariants = {
 };
 
 export default function ProfilePage({ userId }: ProfilePageProps) {
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [uploadSuccess, setUploadSuccess] = useState(false);
+    const queryClient = useQueryClient();
+
     const { data } = useQuery<User>({
         queryKey: ["profile", userId],
         queryFn: () => fetchCustomerProfile({ userId: userId }),
         enabled: !!userId,
     });
+
+    const changeImageMutation = useMutation({
+        mutationFn: ({ userId, imageData }: { userId: string; imageData: string }) =>
+            changeProfileImage({ userId, imageData }),
+        onSuccess: (response) => {
+            toast.success("Profile image updated successfully!");
+            setIsCropModalOpen(false);
+            setUploadSuccess(true);
+            queryClient.setQueryData(["profile", userId], (oldData: User) => ({
+                ...oldData,
+                profile_image: response.user.profile_image
+            }));
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.error || "Failed to update profile image");
+        }
+    });
+
+    const handleCropComplete = (croppedImage: string) => {
+        changeImageMutation.mutate({ userId, imageData: croppedImage });
+    };
+
+    const handleSuccess = () => {
+        if (uploadSuccess) {
+            // Refresh the entire page
+            window.location.reload();
+        }
+    };
 
     if (!data) return null;
 
@@ -63,6 +98,13 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                                     loading="lazy"
                                     className="rounded-full object-cover ring-4 ring-white/50 shadow-2xl"
                                 />
+                                <button
+                                    onClick={() => setIsCropModalOpen(true)}
+                                    className="absolute bottom-2 right-2 bg-accent text-white p-2 rounded-full shadow-lg hover:bg-highlight transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                                    aria-label="Change profile image"
+                                >
+                                    <Camera className="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
 
@@ -99,6 +141,14 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                     </div>
                 </motion.div>
             </div>
+
+            <ImageCropModal
+                isOpen={isCropModalOpen}
+                onClose={() => setIsCropModalOpen(false)}
+                onCropComplete={handleCropComplete}
+                isLoading={changeImageMutation.isPending}
+                onSuccess={handleSuccess}
+            />
         </div>
     );
 }

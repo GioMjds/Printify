@@ -6,6 +6,11 @@ type PrintUploads = {
     limit?: number;
 }
 
+type ChangeProfileProps = {
+    userId: string;
+    imageData: string;
+}
+
 export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
     try {
         const response = await API.get(`/profile/${userId}`, {
@@ -14,6 +19,22 @@ export const fetchCustomerProfile = async ({ userId }: PrintUploads) => {
         return response.data;
     } catch (error) {
         console.error(`Failed to fetch customer profile: ${error}`);
+        throw error;
+    }
+};
+
+export const changeProfileImage = async ({ userId, imageData }: ChangeProfileProps) => {
+    try {
+        const response = await API.put(`/profile/change-profile-image`, {
+            userId: userId,
+            imageData: imageData
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to change profile image for user ${userId}: ${error}`);
         throw error;
     }
 };

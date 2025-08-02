@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-	allowedDevOrigins: [
-		'*',
-	],
+	allowedDevOrigins: ["*"],
 	serverExternalPackages: ['ws', '@prisma/client'],
 	output: 'standalone',
 	experimental: {
