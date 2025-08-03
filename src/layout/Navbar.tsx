@@ -69,9 +69,10 @@ export default function Navbar({ userDetails }: NavbarProps) {
     };
 
     const handleLogout = async () => {
-        setLoading(true);
         try {
+            setLoading(true);
             await logout();
+            router.push('/');
             router.prefetch('/');
             router.refresh();
             setShowLogoutModal(false);
@@ -99,7 +100,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
     };
 
     useEffect(() => {
-        setShowAnnouncement(process.env.NEXT_PUBLIC_ANNOUNCEMENT_BAR === 'true');
+        setShowAnnouncement(process.env.NEXT_PUBLIC_ANNOUNCEMENT_BAR === 'false');
     }, []);
 
     useEffect(() => {
@@ -320,7 +321,7 @@ export default function Navbar({ userDetails }: NavbarProps) {
                         {userDetails && (
                             <>
                                 {/* Mobile Notification Bell */}
-                                <div className="relative mt-1" ref={notificationRef}>
+                                <div className="relative mt-1">
                                     <motion.button
                                         onClick={() => setShowNotifications(!showNotifications)}
                                         className="relative group cursor-pointer p-2 text-highlight rounded-full transition-colors duration-200"

@@ -5,6 +5,7 @@ interface ClientInfo {
     ws: WebSocket;
     userId: string;
     connectedAt: Date;
+    isAdmin?: boolean;
 }
 
 const wss = new WebSocketServer({ 
@@ -12,7 +13,7 @@ const wss = new WebSocketServer({
     host: '0.0.0.0'
 });
 
-const clients = new Map<string, ClientInfo>(); // userId -> ClientInfo
+const clients = new Map<string, ClientInfo>();
 
 console.log('🚀 WebSocket server starting on ws://localhost:3001');
 
@@ -33,7 +34,8 @@ wss.on('connection', (ws: WebSocket, req) => {
         const clientInfo: ClientInfo = {
             ws,
             userId,
-            connectedAt: new Date()
+            connectedAt: new Date(),
+            isAdmin: false
         };
         
         clients.set(userId, clientInfo);
@@ -83,6 +85,19 @@ wss.on('connection', (ws: WebSocket, req) => {
                     } else {
                         console.warn(`⚠️ Target user ${message.targetUserId} not connected`);
                     }
+                    break;
+                case "subscribe_admin_updates":
+                    const clientInfo = clients.get(userId!);
+                    if (clientInfo) {
+                        clientInfo.isAdmin = true;
+                        clients.set(userId!, clientInfo);
+                        console.log(`🔔 User ${userId} subscribed to admin updates`);
+                    }
+                    ws.send(JSON.stringify({
+                        type: 'admin_updates_subscribed',
+                        timestamp: Date.now()
+                    }));
+                    break;
                 default:
                     console.log(`📨 Message from ${userId}:`, message);
             }
@@ -162,6 +177,27 @@ export function broadcastToAll(message: any): number {
     });
     
     console.log(`📢 Broadcast sent to ${sentCount} users`);
+    return sentCount;
+}
+
+export function broadcastToAdmins(message: any): number {
+    let sentCount = 0;
+
+    clients.forEach((client, userId) => {
+        if (client.ws.readyState === WebSocket.OPEN && client.isAdmin) {
+            try {
+                client.ws.send(JSON.stringify({
+                    ...message,
+                    timestamp: Date.now()
+                }));
+                sentCount++;
+            } catch (error) {
+                console.error(`❌ Failed to broadcast to admin ${userId}:`, error);
+                clients.delete(userId);
+            }
+        }
+    });
+    console.log(`📢 Broadcast sent to ${sentCount} admins`);
     return sentCount;
 }
 

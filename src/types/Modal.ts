@@ -9,6 +9,7 @@ export interface CancellationModalProps {
     confirmButtonText?: string;
     showPolicyNote?: boolean;
     reasons?: string[];
+    policyNote?: string;
 }
 
 // PrintOrderModal.tsx

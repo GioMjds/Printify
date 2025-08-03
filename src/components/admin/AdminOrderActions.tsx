@@ -29,9 +29,8 @@ export default function OrderActions({ order }: OrderActionsProps) {
             amount?: number;
         }) => updateUploadStatus({ uploadId, newStatus, rejectionReason, amount }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ 
-                queryKey: ['printOrders'],
-            });
+            queryClient.invalidateQueries({ queryKey: ['printOrders'] });
+            queryClient.invalidateQueries({ queryKey: ['orderCounts'] });
             setOpenModalId(false);
         },
         onError: (error: Error) => {

@@ -91,7 +91,8 @@ export async function GET(req: NextRequest) {
 
         const statusOptions = availableStatuses.map((item) => item.status);
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             printOrders: printOrders,
             statusOptions: statusOptions,
             totalCount: printOrders.length,
@@ -99,7 +100,9 @@ export async function GET(req: NextRequest) {
               status: statusFilter || "all",
               search: searchQuery || "",
             },
-        }, { status: 200 });
+          },
+          { status: 200 }
+        );
       }
       case "download_file": {
         if (!uploadId) {
@@ -150,9 +153,12 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "asc" },
         });
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             users: users,
-        }, { status: 200 });
+          },
+          { status: 200 }
+        );
       }
       case "fetch_staff": {
         const staffs = await prisma.user.findMany({
@@ -160,20 +166,29 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "asc" },
         });
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             staff: staffs,
-        }, { status: 200 });
+          },
+          { status: 200 }
+        );
       }
       default: {
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             error: "Invalid admin action",
-        }, { status: 400 });
+          },
+          { status: 400 }
+        );
       }
     }
   } catch (error) {
-    return NextResponse.json({
+    return NextResponse.json(
+      {
         error: `/api/admin/[adminAction] GET error: ${error}`,
-    }, { status: 500 });
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -187,12 +202,9 @@ export async function PUT(req: NextRequest) {
         const { uploadId, newStatus, rejectionReason, amount } = body;
 
         if (!uploadId || !newStatus) {
-          return NextResponse.json(
-            {
+          return NextResponse.json({
               error: "Missing required fields: uploadId and newStatus",
-            },
-            { status: 400 }
-          );
+          }, { status: 400 });
         }
 
         const validStatuses = [
@@ -204,26 +216,28 @@ export async function PUT(req: NextRequest) {
         ];
 
         if (!validStatuses.includes(newStatus)) {
+          return NextResponse.json({
+              error: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+          }, { status: 400 });
+        }
+
+        if (newStatus === "rejected" && !rejectionReason) {
           return NextResponse.json(
             {
-              error: `Invalid status. Must be one of: ${validStatuses.join(
-                ", "
-              )}`,
+              error: "Rejection reason is required when status is 'rejected'",
             },
             { status: 400 }
           );
         }
 
-        if (newStatus === "rejected" && !rejectionReason) {
-          return NextResponse.json({
-              error: "Rejection reason is required when status is 'rejected'",
-          }, { status: 400 });
-        }
-
         if (newStatus === "ready_to_pickup" && (!amount || amount <= 0)) {
-          return NextResponse.json({
-              error: "Amount is required and must be greater than 0 when status is 'ready_to_pickup'",
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              error:
+                "Amount is required and must be greater than 0 when status is 'ready_to_pickup'",
+            },
+            { status: 400 }
+          );
         }
 
         const existingUpload = await prisma.upload.findUnique({
@@ -290,6 +304,28 @@ export async function PUT(req: NextRequest) {
           },
         });
 
+        if (typeof window === "undefined") {
+          try {
+            const { broadcastToAll } = await import('@/../websocket-server');
+            broadcastToAll({
+              type: "order_status_update",
+              data: {
+                orderId: uploadId,
+                newStatus: newStatus,
+                filename: updatedUpload.filename,
+                customerId: updatedUpload.customerId,
+                amount: amount,
+                rejectionReason: rejectionReason,
+                timestamp: new Date().toISOString()
+              }
+            });
+
+            console.log(`✅ Broadcasted order status update for upload ${uploadId}`);
+          } catch (error) {
+            console.error(`❌ Failed to broadcast order status update: ${error}`);
+          }
+        }
+
         try {
           const notificationData = {
             id: notification.id,
@@ -346,9 +382,13 @@ export async function PUT(req: NextRequest) {
         const { staffId, firstName, middleName, lasName, email } = body;
 
         if (!staffId || !firstName || !lasName || !email) {
-          return NextResponse.json({
-              error: "Missing required fields: staffId, firstName, lastName, email",
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              error:
+                "Missing required fields: staffId, firstName, lastName, email",
+            },
+            { status: 400 }
+          );
         }
 
         const existingStaff = await prisma.user.findUnique({
@@ -356,9 +396,12 @@ export async function PUT(req: NextRequest) {
         });
 
         if (!existingStaff) {
-          return NextResponse.json({
+          return NextResponse.json(
+            {
               error: "Staff member not found",
-          }, { status: 404 });
+            },
+            { status: 404 }
+          );
         }
 
         const updatedStaff = await prisma.user.update({
@@ -371,25 +414,34 @@ export async function PUT(req: NextRequest) {
           },
         });
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             message: "Staff member updated successfully",
             staff: {
               id: updatedStaff.id,
               name: updatedStaff.name,
               email: updatedStaff.email,
             },
-        }, { status: 200 });
+          },
+          { status: 200 }
+        );
       }
       default: {
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             error: "Invalid admin action",
-        }, { status: 400 });
+          },
+          { status: 400 }
+        );
       }
     }
   } catch (error) {
-    return NextResponse.json({
+    return NextResponse.json(
+      {
         error: `/api/admin/[adminAction] PUT error: ${error}`,
-    }, { status: 500 });
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -410,16 +462,29 @@ export async function POST(req: NextRequest) {
           role,
         } = body;
 
-        if (!firstName || !lastName || !email || !password || !confirmPassword || !role) {
-          return NextResponse.json({
+        if (
+          !firstName ||
+          !lastName ||
+          !email ||
+          !password ||
+          !confirmPassword ||
+          !role
+        ) {
+          return NextResponse.json(
+            {
               error: "Missing required fields.",
-          }, { status: 400 });
+            },
+            { status: 400 }
+          );
         }
 
         if (role !== "staff") {
-          return NextResponse.json({
+          return NextResponse.json(
+            {
               error: "Role must be 'staff'",
-          }, { status: 400 });
+            },
+            { status: 400 }
+          );
         }
 
         const name = middleName
@@ -431,17 +496,23 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingUser) {
-          return NextResponse.json({
+          return NextResponse.json(
+            {
               error: "User with this email already exists.",
-          }, { status: 409 });
+            },
+            { status: 409 }
+          );
         }
 
         const hashedPassword = await hash(password, 12);
 
         if (password !== confirmPassword) {
-          return NextResponse.json({
+          return NextResponse.json(
+            {
               error: "Passwords do not match.",
-          }, { status: 400 });
+            },
+            { status: 400 }
+          );
         }
 
         const newStaff = await prisma.user.create({
@@ -455,7 +526,8 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             staff: {
               id: newStaff.id,
               name: newStaff.name,
@@ -463,18 +535,26 @@ export async function POST(req: NextRequest) {
               role: newStaff.role,
               isVerified: newStaff.isVerified,
             },
-        }, { status: 201 });
+          },
+          { status: 201 }
+        );
       }
       default: {
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             error: "Invalid admin action",
-        }, { status: 400 });
+          },
+          { status: 400 }
+        );
       }
     }
   } catch (error) {
-    return NextResponse.json({
+    return NextResponse.json(
+      {
         error: `/api/admin/[adminAction] POST error: ${error}`,
-    }, { status: 500 });
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -488,9 +568,12 @@ export async function DELETE(req: NextRequest) {
         const { staffId } = body;
 
         if (!staffId) {
-          return NextResponse.json({
-            error: "Missing required field: staffId",
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              error: "Missing required field: staffId",
+            },
+            { status: 400 }
+          );
         }
 
         const existingStaff = await prisma.user.findUnique({
@@ -498,28 +581,40 @@ export async function DELETE(req: NextRequest) {
         });
 
         if (!existingStaff) {
-          return NextResponse.json({
-            error: "Staff member not found",
-          }, { status: 404 });
+          return NextResponse.json(
+            {
+              error: "Staff member not found",
+            },
+            { status: 404 }
+          );
         }
 
         await prisma.user.delete({
           where: { id: staffId },
         });
 
-        return NextResponse.json({
+        return NextResponse.json(
+          {
             message: "Staff member deleted successfully",
-        }, { status: 200 });
+          },
+          { status: 200 }
+        );
       }
       default: {
-        return NextResponse.json({
-          error: "Invalid admin action",
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            error: "Invalid admin action",
+          },
+          { status: 400 }
+        );
       }
     }
   } catch (error) {
-    return NextResponse.json({
-      error: `/api/admin/[adminAction] DELETE error: ${error}`,
-    }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: `/api/admin/[adminAction] DELETE error: ${error}`,
+      },
+      { status: 500 }
+    );
   }
 }

@@ -33,7 +33,7 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      await prisma.upload.create({
+      const newUpload = await prisma.upload.create({
         data: {
           filename: file.name,
           fileData: file.ufsUrl,
@@ -42,6 +42,29 @@ export const ourFileRouter = {
           format: file.name.split(".").pop() || "",
         },
       });
+
+      if (typeof window === 'undefined') {
+        try {
+          const { broadcastToAll } = await import('@/../websocket-server');
+          
+          const notificationData = broadcastToAll({
+            type: 'new_order',
+            data: {
+              orderId: newUpload.id,
+              filename: newUpload.filename,
+              status: newUpload.status,
+              customerId: newUpload.customerId,
+              timestamp: new Date().toISOString()
+            }
+          });
+
+          const sentCount = broadcastToAll(notificationData)
+          console.log(`📊 New order WebSocket notification sent to ${sentCount} clients`);
+        } catch (wsError) {
+          console.error('❌ Failed to send WebSocket notification:', wsError);
+        }
+      }
+
       return {
         uploadedBy: metadata.userId,
         fileUrl: file.ufsUrl,

@@ -89,12 +89,12 @@ export default function MyOrdersPage({ userId, page, limit }: MyOrdersProps) {
     }
 
     return (
-        <section className="w-full min-h-screen py-6 md:py-10 mt-16 px-4 sm:px-6 md:px-8 lg:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
+        <section className="w-full min-h-screen py-6 md:py-10 px-4 sm:px-6 md:px-8 lg:px-12 bg-gradient-to-r from-bg-primary to-bg-secondary relative overflow-hidden">
             {/* Decorative Blobs */}
             <div className="absolute top-0 left-0 w-48 sm:w-60 md:w-72 h-48 sm:h-60 md:h-72 bg-bg-accent opacity-20 rounded-full blur-xl sm:blur-2xl md:blur-3xl z-0" />
             <div className="absolute bottom-0 right-0 w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 bg-bg-highlight opacity-15 rounded-full blur-xl sm:blur-2xl md:blur-3xl z-0" />
 
-            <div className="max-w-5xl mx-auto relative z-10">
+            <div className="max-w-5xl mx-auto mt-12 md:mt-16 relative z-10">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-bg-soft mb-6 md:mb-8 text-center tracking-tight">
                     My Print Orders
                 </h1>

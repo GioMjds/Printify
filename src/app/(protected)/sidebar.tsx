@@ -1,13 +1,15 @@
 'use client';
 
-import Modal from "@/components/Modal";
-import { adminSidebar } from "@/constants/admin-sidebar";
-import { logout } from "@/services/Auth";
-import { LogOut } from "lucide-react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { adminSidebar } from "@/constants/admin-sidebar";
+import { logout } from "@/services/Auth";
+import { LogOut } from "lucide-react";
+import Modal from "@/components/Modal";
+import CountBadge from "@/components/admin/CountBadge";
+import { useOrderCounts } from "@/hooks/useOrderCounts";
 
 export default function Sidebar({ role }: { role?: string }) {
     const router = useRouter();
@@ -15,6 +17,8 @@ export default function Sidebar({ role }: { role?: string }) {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+
+    const { counts, isLoading: countsLoading } = useOrderCounts();
 
     const sidebarItems = role === "staff"
         ? adminSidebar.filter(item => item.name === "Manage Orders")
@@ -31,6 +35,20 @@ export default function Sidebar({ role }: { role?: string }) {
             setLoading(false);
         }
     };
+
+    const renderCountBadge = (itemName: string) => {
+        if (itemName === "Manage Orders" && !countsLoading) {
+            const tooltip = `${counts.pending} pending, ${counts.readyToPickup} ready to pickup`;
+            return (
+                <CountBadge
+                    count={counts.total}
+                    variant={counts.pending > 0 ? "urgent" : "default"}
+                    tooltip={tooltip}
+                />
+            )
+        }
+        return null;
+    }
 
     return (
         <>
@@ -52,8 +70,17 @@ export default function Sidebar({ role }: { role?: string }) {
                                             : "hover:bg-accent"
                                             }`}
                                     >
-                                        <item.icon className={`w-5 h-5 ${isActive ? "text-highlight" : "text-white"}`} />
-                                        <span className="text-base">{item.name}</span>
+                                        <div className="flex items-center gap-4 relative">
+                                            <item.icon className={`w-5 h-5 ${isActive ? "text-highlight" : "text-white"}`} />
+                                            <span className="text-base relative">
+                                                {item.name}
+                                                {item.name === "Manage Orders" && (
+                                                    <span className="absolute -top-4 -right-10">
+                                                        {renderCountBadge(item.name)}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
                                     </Link>
                                 </li>
                             );

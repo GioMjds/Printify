@@ -14,7 +14,8 @@ const CancellationModal: FC<CancellationModalProps> = ({
     reasonPlaceholder = "Please explain why you're rejecting this print order...",
     confirmButtonText = "Confirm Rejection",
     showPolicyNote = true,
-    reasons
+    reasons,
+    policyNote
 }) => {
     const [selectedReason, setSelectedReason] = useState<string>('');
     const [otherReason, setOtherReason] = useState<string>('');
@@ -131,8 +132,7 @@ const CancellationModal: FC<CancellationModalProps> = ({
 
                         {showPolicyNote && (
                             <p className="text-xs text-text-light mt-4">
-                                Please note: Rejections will be notified to the customer.
-                                View our <a href="#" className="text-accent hover:underline">Print Policy</a> for more information.
+                                {policyNote}
                             </p>
                         )}
                     </motion.div>

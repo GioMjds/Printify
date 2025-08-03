@@ -127,6 +127,11 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             setIsConnected(true);
             setConnectionStatus('connected');
             console.log('✅ WebSocket connected successfully:', data);
+
+            // Subscribe to admin updates if user is admin/staff
+            webSocketService.send({
+                type: 'subscribe_admin_updates'
+            });
         });
 
         webSocketService.on('disconnect', (data) => {
@@ -138,12 +143,20 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         webSocketService.on('error', (error) => {
             setIsConnected(false);
             setConnectionStatus('error');
-            console.error('❌ WebSocket error:', error);
         });
 
-        // Listen for new notifications
         webSocketService.on('message', (data) => {
             if (isWebSocketMessage(data)) {
+                if (data.type === 'order_status_update' ||
+                    data.type === 'new_order' ||
+                    data.type === 'order_created' ||
+                    data.type === 'admin_subscription_confirmed') {
+
+                    console.log('📊 Order update received for count refresh:', data.type);
+
+                    window.dispatchEvent(new CustomEvent('orderCountUpdate', { detail: data }));
+                }
+
                 if (data.type === 'notification' && data.data) {
                     addNotification({
                         id: data.data.id,

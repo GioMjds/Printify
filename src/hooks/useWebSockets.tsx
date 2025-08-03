@@ -11,7 +11,6 @@ import {
     WebSocketChannelLeaveEvent,
 } from "@/types/useWebSocketsTypes";
 
-// WebSocketService interface
 export interface WebSocketService {
     connect: (userId?: string) => void;
     disconnect: () => void;
@@ -28,7 +27,6 @@ export interface WebSocketService {
     getConnectedChannels?: () => string[];
 }
 
-// Keep track of connection counts to handle multiple hook instances
 const connectionCounts = new WeakMap<WebSocketService, number>();
 
 /**
