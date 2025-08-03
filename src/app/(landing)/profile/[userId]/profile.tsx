@@ -61,8 +61,8 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
                 profile_image: response.user.profile_image
             }));
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.error || "Failed to update profile image");
+        onError: () => {
+            toast.error("Failed to update profile image");
         }
     });
 

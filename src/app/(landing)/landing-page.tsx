@@ -173,7 +173,7 @@ export default function LandingPage() {
                             Have Questions or Need Help?
                         </h2>
                         <p className="text-lg sm:text-xl mb-8 sm:mb-9 md:mb-10 text-text-dark max-w-2xl mx-auto">
-                            Our team is here for you! Reach out and we'll get back to you as soon as possible.
+                            Our team is here for you! Reach out and we&apos;ll get back to you as soon as possible.
                         </p>
                         <motion.button
                             className="bg-primary cursor-pointer hover:bg-text-dark text-white font-bold py-3 px-8 sm:py-4 sm:px-12 rounded-full text-base sm:text-lg transition-all duration-300"

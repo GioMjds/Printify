@@ -140,7 +140,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             console.log('🔌 WebSocket disconnected:', data);
         });
 
-        webSocketService.on('error', (error) => {
+        webSocketService.on('error', () => {
             setIsConnected(false);
             setConnectionStatus('error');
         });

@@ -12,6 +12,11 @@ interface OrderCounts {
     total: number;
 }
 
+interface WebSocketMessage {
+    type: string;
+    [key: string]: unknown;
+}
+
 export const useOrderCounts = () => {
     const queryClient = useQueryClient();
     const { webSocketService, isConnected } = useWebSocket();
@@ -28,12 +33,13 @@ export const useOrderCounts = () => {
             type: 'subscribe_admin_updates',
         });
 
-        const handleMessage = (data: any) => {
-            if (data.type === 'order_status_update' ||
+        const handleMessage = (data: WebSocketMessage) => {
+            if (
+                data.type === 'order_status_update' ||
                 data.type === 'new_order' ||
                 data.type === 'order_created' ||
-                data.type === 'admin_updates_subscribed') {
-
+                data.type === 'admin_updates_subscribed'
+            ) {
                 console.log('📊 Order update received, refreshing counts...', data);
 
                 queryClient.invalidateQueries({ queryKey: ['orderCounts'] });
