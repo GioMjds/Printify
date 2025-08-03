@@ -2,6 +2,8 @@ import { JWTPayload, SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import prisma from "./prisma";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const secretKey = process.env.JWT_SECRET_KEY;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -66,20 +68,43 @@ export async function verifyToken(token: string) {
 }
 
 export async function getSessionCookiesToDelete() {
-    return ["access_token", "refresh_token"];
+    return [
+        "access_token", 
+        "refresh_token", 
+        "next-auth.callback-url",
+        "next-auth.csrf-token",
+        "next-auth.pkce.code_verifier",
+        "next-auth.state",
+        "next-auth.nonce"
+    ];
 }
 
 export async function getSession(): Promise<SessionData | null> {
     try {
         const token = (await cookies()).get("access_token")?.value;
-        if (!token) return null;
+        if (token) {
+            try {
+                const nextAuthSession = await getServerSession(authOptions);
+                if (nextAuthSession?.user) {
+                    return {
+                        userId: nextAuthSession.user.id,
+                        role: nextAuthSession.user.role,
+                        email: nextAuthSession.user.email!,
+                    };
+                }
+            } catch {
+                return null;
+            }
 
-        try {
-            const verified = await jwtVerify(token, encodedKey);
-            return verified.payload as SessionData;
-        } catch {
-            return null;
+            try {
+                const verified = await jwtVerify(token, encodedKey);
+                return verified.payload as SessionData;
+            } catch {
+                return null;
+            }
         }
+
+        return null;
     } catch (error) {
         console.error(`Error getting session: ${error}`);
         return null;

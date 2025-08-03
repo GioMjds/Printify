@@ -1,6 +1,7 @@
 'use client';
 
 import logo from "@/../public/printify_logo.png";
+import GoogleLoginButton from "@/components/oauth/LoginButton";
 import { login } from "@/services/Auth";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -181,6 +182,7 @@ export default function LoginPage() {
                         }
                     </motion.button>
                 </form>
+                <GoogleLoginButton />
                 <div className="flex justify-between items-center">
                     <Link href="/forgot" className="text-sm text-accent hover:underline">
                         Forgot password?

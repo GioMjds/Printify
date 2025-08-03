@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { navbar } from '@/constants/navbar';
 import { logout } from '@/services/Auth';
+import { useSession } from 'next-auth/react';
 import { useNavbarNotifications } from '@/hooks/useNavbarNotifications';
 import { NavbarProps } from '@/types/Navbar';
 import { formatNotificationTime } from '@/utils/notifications';
