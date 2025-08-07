@@ -18,10 +18,9 @@ export const authOptions: NextAuthOptions = {
         signOut: "/logout",
         error: "/login"
     },
-    debug: true,
     cookies: {
         sessionToken: {
-            name: "access_token",
+            name: "next-auth.session-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",

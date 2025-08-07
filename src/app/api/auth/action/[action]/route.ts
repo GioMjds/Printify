@@ -42,21 +42,21 @@ export async function POST(req: NextRequest) {
                 const user = await prisma.user.findUnique({
                     where: { email }
                 });
-
+            
                 if (!email || !password) {
                     return NextResponse.json({
                         error: "Email and password are required"
                     }, { status: 400 });
                 }
-
+            
                 if (!user) {
                     return NextResponse.json({
                         error: "User does not exist"
                     }, { status: 404 });
                 }
-
+            
                 const isPasswordValid = await compare(password, user.password!);
-
+            
                 if (!isPasswordValid) {
                     return NextResponse.json({
                         error: "Invalid password"
@@ -64,13 +64,13 @@ export async function POST(req: NextRequest) {
                 }
 
                 const session = await createSession(user.id, user.role!);
-
+            
                 if (!session) {
                     return NextResponse.json({
                         error: "Failed to create session"
                     }, { status: 500 });
                 }
-
+            
                 const response = NextResponse.json({
                     message: `${user.role} logged in successfully!`,
                     user: {
@@ -79,27 +79,28 @@ export async function POST(req: NextRequest) {
                         role: user.role
                     }
                 }, { status: 200 });
-
+            
                 response.cookies.set({
                     name: "access_token",
                     value: session.accessToken,
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
+                    secure: false,
                     maxAge: 60 * 60 * 24, // 1 day
                     path: "/",
                     sameSite: "lax",
                 });
-
+            
                 response.cookies.set({
                     name: "refresh_token",
                     value: session.refreshToken,
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
+                    secure: false,
                     maxAge: 60 * 60 * 24 * 30, // 30 days
                     path: "/",
                     sameSite: "lax",
                 });
-
+            
+                console.log("✅ Response cookies set");
                 return response;
             }
             case "send_register_otp": {
@@ -265,7 +266,7 @@ export async function POST(req: NextRequest) {
                     secure: process.env.NODE_ENV === "production",
                     maxAge: 60 * 60 * 24, // 1 day
                     path: "/",
-                    sameSite: "strict",
+                    sameSite: "lax",
                 });
 
                 response.cookies.set({
@@ -275,7 +276,7 @@ export async function POST(req: NextRequest) {
                     secure: process.env.NODE_ENV === "production",
                     maxAge: 60 * 60 * 24 * 7, // 7 days
                     path: "/",
-                    sameSite: "strict",
+                    sameSite: "lax",
                 });
 
                 return response;

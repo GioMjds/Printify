@@ -14,33 +14,50 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
     
-    const accessToken = req.cookies.get("access_token")?.value;
-    
     let userRole: string | null = null;
     let isAuthenticated = false;
 
+    const accessToken = req.cookies.get("access_token")?.value;
     if (accessToken) {
+        try {
+            const { payload } = await jwtVerify(accessToken, encodedKey, { algorithms: ["HS256"] });
+            userRole = payload.role as string;
+            isAuthenticated = true;
+        } catch (jwtError) {
+            try {
+                const nextAuthToken = await getToken({ 
+                    req, 
+                    secret: process.env.NEXTAUTH_SECRET,
+                });
+                
+                if (nextAuthToken) {
+                    userRole = nextAuthToken.role as string;
+                    isAuthenticated = true;
+                }
+            } catch (nextAuthError) {
+                console.log("❌ NextAuth also failed");
+            }
+        }
+    } else {
         try {
             const nextAuthToken = await getToken({ 
                 req, 
                 secret: process.env.NEXTAUTH_SECRET,
-                cookieName: "access_token"
             });
             
             if (nextAuthToken) {
                 userRole = nextAuthToken.role as string;
                 isAuthenticated = true;
             }
-        } catch {
-            // Not a NextAuth token, try custom JWT validation
-            try {
-                const { payload } = await jwtVerify(accessToken, encodedKey, { algorithms: ["HS256"] });
-                userRole = payload.role as string;
-                isAuthenticated = true;
-            } catch {
-                // Invalid token
-            }
+        } catch (nextAuthError) {
+            console.log("❌ No authentication found");
         }
+    }
+
+    if ((pathname === "/login" || pathname === "/register") && isAuthenticated) {
+        if (userRole === "admin") return NextResponse.redirect(new URL("/admin", req.url), { status: 302 });
+        if (userRole === "staff") return NextResponse.redirect(new URL("/admin/orders", req.url), { status: 302 });
+        return NextResponse.redirect(new URL("/", req.url), { status: 302 });
     }
 
     const landingRoutes = [
@@ -75,6 +92,7 @@ export async function middleware(req: NextRequest) {
 
     if (pathname.startsWith("/admin")) {
         if (!isAuthenticated) {
+            console.log("🚫 Redirecting to login - not authenticated");
             return NextResponse.redirect(new URL("/login", req.url), { status: 302 });
         }
         

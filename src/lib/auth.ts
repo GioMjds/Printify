@@ -31,6 +31,11 @@ export async function decrypt(token: string) {
 
 export async function createSession(userId: string, role: string) {
     try {
+        if (!secretKey) {
+            console.error("❌ JWT_SECRET_KEY is not set!");
+            return null;
+        }
+
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { email: true, role: true },
@@ -58,7 +63,7 @@ export async function createSession(userId: string, role: string) {
 
         return { sessionData, accessToken, refreshToken };
     } catch (error) {
-        console.error(`Error creating session: ${error}`);
+        console.error(`❌ Error creating session: ${error}`);
         return null;
     }
 }
@@ -71,6 +76,7 @@ export async function getSessionCookiesToDelete() {
     return [
         "access_token", 
         "refresh_token", 
+        "next-auth.session-token",
         "next-auth.callback-url",
         "next-auth.csrf-token",
         "next-auth.pkce.code_verifier",
@@ -81,32 +87,34 @@ export async function getSessionCookiesToDelete() {
 
 export async function getSession(): Promise<SessionData | null> {
     try {
-        const token = (await cookies()).get("access_token")?.value;
+        const cookieStore = await cookies();
+        const token = cookieStore.get("access_token")?.value;
+        
         if (token) {
-            try {
-                const nextAuthSession = await getServerSession(authOptions);
-                if (nextAuthSession?.user) {
-                    return {
-                        userId: nextAuthSession.user.id,
-                        role: nextAuthSession.user.role,
-                        email: nextAuthSession.user.email!,
-                    };
-                }
-            } catch {
-                return null;
-            }
-
             try {
                 const verified = await jwtVerify(token, encodedKey);
                 return verified.payload as SessionData;
-            } catch {
-                return null;
+            } catch (jwtError) {
+                console.error(`❌ JWT verification failed: ${jwtError}`);
             }
+        }
+
+        try {
+            const nextAuthSession = await getServerSession(authOptions);
+            if (nextAuthSession?.user) {
+                const sessionData = {
+                    userId: nextAuthSession.user.id,
+                    role: nextAuthSession.user.role,
+                    email: nextAuthSession.user.email!,
+                };
+                return sessionData;
+            }
+        } catch (nextAuthError) {
+            console.error(`❌ NextAuth session failed: ${nextAuthError}`);
         }
 
         return null;
     } catch (error) {
-        console.error(`Error getting session: ${error}`);
         return null;
     }
 }
